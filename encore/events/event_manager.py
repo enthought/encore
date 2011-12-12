@@ -20,9 +20,6 @@ from types import MethodType
 import weakref
 import traceback
 
-# Enthought library imports.
-from traits.api import HasTraits, Any, Bool
-
 # Logging.
 logger = logging.getLogger(__name__)
 
@@ -30,14 +27,16 @@ logger = logging.getLogger(__name__)
 ###############################################################################
 # `BaseEvent` Class.
 ###############################################################################
-class BaseEvent(HasTraits):
+class BaseEvent(object):
     """ Base class for all events in the application.
     """
-    # The source of the event.
-    source = Any
-
-    # Whether the event has been handled by a listener.
-    _handled = Bool(False)
+    
+    def __init__(self, source=None):
+        # The source of the event.
+        self.source = []
+        
+        # Whether the event has been handled by a listener.
+        self._handled = False
 
     def mark_as_handled(self):
         """ Mark the event as handled so subsequent listeners are not notified.

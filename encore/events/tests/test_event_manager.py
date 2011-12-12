@@ -11,11 +11,8 @@ import mock
 import weakref
 import threading
 
-# Enthought library imports.
-from traits.api import Bool, Str, Any
-
 # Local imports.
-from canopy.events.event_manager import EventManager, BaseEvent
+from encore.events.event_manager import EventManager, BaseEvent
 
 class TestEventManager(unittest.TestCase):
     def setUp(self):
@@ -83,6 +80,7 @@ class TestEventManager(unittest.TestCase):
 
         class MyEvt(BaseEvent):
             def __init__(self, name=1):
+                super(MyEvt, self).__init__()
                 self.name = name
             def callback_bound(self, evt):
                 pass
@@ -128,7 +126,8 @@ class TestEventManager(unittest.TestCase):
         """ Test if temporarily disabling an event works.
         """
         class MyEvt(BaseEvent):
-            pass
+            def __init__(self):
+                super(MyEvt, self).__init__()
 
         callback = mock.Mock()
         self.evt_mgr.connect(BaseEvent, callback)
@@ -185,15 +184,17 @@ class TestEventManager(unittest.TestCase):
         """ Test if mark_as_handled() works.
         """
         class MyEvent(BaseEvent):
-            veto = Bool(False)
+            def __init__(self, veto=False):
+                super(MyEvent, self).__init__()
+                self.veto = veto
 
         def callback(evt):
             if evt.veto:
                 evt.mark_as_handled()
         callback = mock.Mock(wraps=callback)
-        self.evt_mgr.connect(MyEvent, callback)
+        self.evt_mgr.connect(MyEvent, callback, priority=2)
         callback2 = mock.Mock()
-        self.evt_mgr.connect(MyEvent, callback2)
+        self.evt_mgr.connect(MyEvent, callback2, priority=1)
 
         evt1 = MyEvent()
         self.evt_mgr.emit(evt1)
@@ -211,9 +212,11 @@ class TestEventManager(unittest.TestCase):
         """ Test if event filtering on arguments works.
         """
         class MyEvent(BaseEvent):
-            prop1 = Str('f0')
-            prop2 = Bool(True)
-            prop3 = Any
+            def __init__(self, prop1="f0", prop2=True, prop3=None):
+                super(MyEvent, self).__init__()
+                self.prop1 = prop1
+                self.prop2 = prop2
+                self.prop3 = prop3
 
         callbacks = [mock.Mock() for i in range(5)]
         self.evt_mgr.connect(MyEvent, callbacks[0])
@@ -240,7 +243,9 @@ class TestEventManager(unittest.TestCase):
         """ Test if exception in handler causes subsequent notifications.
         """
         class MyEvt(BaseEvent):
-            err = Bool(False)
+            def __init__(self, err=False):
+                super(MyEvt, self).__init__()
+                self.err = err
         def callback(evt):
             if evt.err:
                 raise Exception('you did it')

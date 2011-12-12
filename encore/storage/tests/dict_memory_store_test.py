@@ -5,7 +5,7 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-import canopy.storage.tests.abstract_test as abstract_test
+import encore.storage.tests.abstract_test as abstract_test
 from ..dict_memory_store import DictMemoryStore
 
 class DictMemoryStoreReadTest(abstract_test.AbstractStoreReadTest):
