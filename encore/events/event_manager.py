@@ -7,7 +7,7 @@
 #
 """ This module defines an event registry, notification and filtering class.
 
-The main class of the module is the EventManager.
+The main class of the module is the `EventManager`.
 """
 
 # Standard library imports.
@@ -23,39 +23,8 @@ import traceback
 # Logging.
 logger = logging.getLogger(__name__)
 
-
-###############################################################################
-# `BaseEvent` Class.
-###############################################################################
-class BaseEvent(object):
-    """ Base class for all events in the application.
-    """
-    
-    def __init__(self, source=None):
-        # The source of the event.
-        self.source = []
-        
-        # Whether the event has been handled by a listener.
-        self._handled = False
-
-    def mark_as_handled(self):
-        """ Mark the event as handled so subsequent listeners are not notified.
-        """
-        self._handled = True
-
-    def pre_emit(self):
-        """ Called before emitting an event.
-
-        Can be used any event specific functionality, validation etc.
-        """
-        pass
-
-    def post_emit(self):
-        """ Called after emitting an event.
-
-        Can be used any event specific functionality, post event validation etc.
-        """
-        pass
+# Local imports
+from .abstract_event_manager import BaseEvent, BaseEventManager
 
 
 ###############################################################################
@@ -262,11 +231,9 @@ class EventInfo(object):
 # `EventManager` Class.
 ###############################################################################
 
-class EventManager(object):
+class EventManager(BaseEventManager):
     """ A single registry point for all application events.
 
-    The users are expected to keep register events the Event manager and
-    connect listeners.
     """
     # store the length of the BaseEvent's __mro__
     bmro_clip = -len(BaseEvent.__mro__)+1
@@ -431,3 +398,4 @@ class EventManager(object):
         """ The the sequence of event classes which are notified for given cls.
         """
         return cls.__mro__[:self.bmro_clip]
+

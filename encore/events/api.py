@@ -6,4 +6,5 @@
 #
 
 # Local imports
-from .event_manager import EventManager, BaseEvent
+from .abstract_event_manager import BaseEvent, BaseEventManager
+from .event_manager import EventManager
