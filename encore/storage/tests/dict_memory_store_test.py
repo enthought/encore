@@ -5,6 +5,7 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
+from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
 from ..dict_memory_store import DictMemoryStore
 
@@ -27,7 +28,7 @@ class DictMemoryStoreReadTest(abstract_test.AbstractStoreReadTest):
         
         and set into 'self.store'.
         """
-        self.store = DictMemoryStore()
+        self.store = DictMemoryStore(EventManager())
         self.store._data['test1'] = 'test2\n'
         self.store._metadata['test1'] = {
             'a_str': 'test3',
@@ -63,7 +64,7 @@ class DictMemoryStoreWriteTest(abstract_test.AbstractStoreWriteTest):
        
         and set into 'self.store'.
         """
-        self.store = DictMemoryStore()
+        self.store = DictMemoryStore(EventManager())
         self.store._data['test1'] = 'test2\n'
         self.store._metadata['test1'] = {
             'a_str': 'test3',

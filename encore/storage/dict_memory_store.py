@@ -19,9 +19,10 @@ This class is provided in part as a sample implementation of the API.
 
 import cStringIO
 from itertools import izip
+from uuid import uuid4
 
 from .abstract_store import AbstractStore
-from .utils import buffer_iterator, DummyTransactionContext
+from .utils import buffer_iterator, DummyTransactionContext, StoreProgressManager
 
 
 class DictMemoryStore(AbstractStore):
@@ -35,9 +36,10 @@ class DictMemoryStore(AbstractStore):
     
     """
     
-    def __init__(self):
+    def __init__(self, event_manager):
         self._data = {}
         self._metadata = {}
+        self.event_manager = event_manager
     
     def connect(self, credentials=None):
         """ Connect to the key-value store
@@ -125,8 +127,8 @@ class DictMemoryStore(AbstractStore):
      
         """
         data, metadata = value
-        self.set_data(key, data, buffer_size)
         self._metadata[key] = metadata.copy()
+        self.set_data(key, data, buffer_size)
 
     def delete(self, key):
         """ Delete a key from the repsository.
@@ -236,8 +238,11 @@ class DictMemoryStore(AbstractStore):
             key-value store.
 
         """
-        chunks = list(buffer_iterator(data, buffer_size))
-        self._data[key] = b''.join(chunks)
+        with StoreProgressManager(self.event_manager, self, uuid4(),
+                "Setting data into '%s'" % (key,), -1,
+                key=key, metadata=self._metadata.get(key, None)) as progress:
+            chunks = list(buffer_iterator(data, buffer_size, progress))
+            self._data[key] = b''.join(chunks)
     
     
     def set_metadata(self, key, metadata):

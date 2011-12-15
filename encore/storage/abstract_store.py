@@ -123,6 +123,15 @@ underlying storage mechanism has the notion of a transaction, this can be
 encapsulated by writing a context manager for transactions.  The transaction()
 method returns an instance of the appropriate context manager.
 
+Events
+------
+
+All implementations should have an event manager attribute, and may choose to
+emit appropriate events.  This is of particular importance during long-running
+interactions so that progress can be displayed.  This also provides a mechanism
+that an implementation can use to inform listeners that new objects have been
+added, or the store has been otherwise modified.
+
 Notes For Writing An Implementation
 -----------------------------------
 
@@ -140,8 +149,8 @@ Determine the Single Points of Truth:
 
 from abc import ABCMeta, abstractmethod
 
-from .utils import buffer_iterator
-  
+from .utils import StoreProgressManager, buffer_iterator
+from .events import ProgressStartEvent, ProgressStepEvent, ProgressEndEvent
 
 class AbstractStore(object):
     """
@@ -226,7 +235,26 @@ class AbstractStore(object):
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
             default if they need to.  The default is 1048576 bytes (1 MiB).
-     
+        
+        Events
+        ------
+        
+        StoreProgressStartEvent:
+            For buffering implementations, this event should be emitted prior to
+            writing any data to the underlying store.
+        
+        StoreProgressStepEvent:
+            For buffering implementations, this event should be emitted
+            periodically as data is written to the underlying store.
+        
+        StoreProgressEndEvent:
+            For buffering implementations, this event should be emitted after
+            finishing writing to the underlying store.
+            
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
+        
         """
         raise NotImplementedError
 
@@ -245,6 +273,12 @@ class AbstractStore(object):
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
         
+        Events
+        ------
+        
+        StoreDeleteEvent:
+            On successful completion of a transaction, a StoreDeleteEvent should
+            be emitted with the key.
         """
         raise NotImplementedError
 
@@ -320,6 +354,25 @@ class AbstractStore(object):
             A readable file-like object the that provides stream of data from the
             key-value store.
 
+        Events
+        ------
+        
+        StoreProgressStartEvent:
+            For buffering implementations, this event should be emitted prior to
+            writing any data to the underlying store.
+        
+        StoreProgressStepEvent:
+            For buffering implementations, this event should be emitted
+            periodically as data is written to the underlying store.
+        
+        StoreProgressEndEvent:
+            For buffering implementations, this event should be emitted after
+            finishing writing to the underlying store.
+        
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
+
         """
         raise NotImplementedError
         
@@ -342,6 +395,13 @@ class AbstractStore(object):
             A dictionary of metadata to associate with the key.  The dictionary
             keys should be strings which are valid Python identifiers.
 
+        Events
+        ------
+        
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
+
         """
         raise NotImplementedError
         
@@ -363,6 +423,13 @@ class AbstractStore(object):
         metadata : dict
             A dictionary of metadata to associate with the key.  The dictionary
             keys should be strings which are valid Python identifiers.
+
+        Events
+        ------
+        
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
 
         """
         raise NotImplementedError
@@ -507,6 +574,25 @@ class AbstractStore(object):
             Implementations are free to ignore this hint or use a different
             default if they need to.  The default is 1048576 bytes (1 MiB).
         
+        Events
+        ------
+        
+        StoreProgressStartEvent:
+            For buffering implementations, this event should be emitted prior to
+            writing any data to the underlying store.
+        
+        StoreProgressStepEvent:
+            For buffering implementations, this event should be emitted
+            periodically as data is written to the underlying store.
+        
+        StoreProgressEndEvent:
+            For buffering implementations, this event should be emitted after
+            finishing writing to the underlying store.
+        
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata for each key that was set.
+
         """
         raise NotImplementedError
     
@@ -537,6 +623,25 @@ class AbstractStore(object):
             Implementations are free to ignore this hint or use a different
             default if they need to.  The default is 1048576 bytes (1 MiB).
         
+        Events
+        ------
+        
+        StoreProgressStartEvent:
+            For buffering implementations, this event should be emitted prior to
+            writing any data to the underlying store.
+        
+        StoreProgressStepEvent:
+            For buffering implementations, this event should be emitted
+            periodically as data is written to the underlying store.
+        
+        StoreProgressEndEvent:
+            For buffering implementations, this event should be emitted after
+            finishing writing to the underlying store.
+        
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata for each key that was set.
+
         """
         raise NotImplementedError
     
@@ -562,6 +667,13 @@ class AbstractStore(object):
             An iterator that provides the metadata dictionaries for the
             corresponding keys.
         
+        Events
+        ------
+        
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata for each key that was set.
+
         """
         raise NotImplementedError
     
@@ -588,6 +700,13 @@ class AbstractStore(object):
             An iterator that provides the metadata dictionaries for the
             corresponding keys.
         
+        Events
+        ------
+        
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata for each key that was set.
+
         """
         raise NotImplementedError
     
@@ -627,6 +746,38 @@ class AbstractStore(object):
         
         transaction : context manager
             A context manager for the transaction.
+        
+        Events
+        ------
+        
+        StoreTransactionStartEvent:
+            This event should be emitted on entry into the transaction.
+        
+        StoreProgressStartEvent:
+            For buffering implementations, this event should be emitted prior to
+            writing any data to the underlying store.
+        
+        StoreProgressStepEvent:
+            For buffering implementations, this event should be emitted
+            periodically as data is written to the underlying store.
+        
+        StoreProgressEndEvent:
+            For buffering implementations, this event should be emitted after
+            finishing writing to the underlying store.
+        
+        StoreTransactionEndEvent:
+            This event should be emitted on successful conclusion of the
+            transaction, before any Set or Delete events are emitted.
+        
+        StoreSetEvent:
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata for each key that was set during the
+            transaction.
+
+        StoreDeleteEvent:
+            On successful completion of a transaction, a StoreDeleteEvent should
+            be emitted with the key for all deleted keys.
+
         """
         raise NotImplementedError
         
@@ -745,11 +896,33 @@ class AbstractStore(object):
             Implementations are free to ignore this hint or use a different
             default if they need to.  The default is 1048576 bytes (1 MiB).
         
+        Events
+        ------
+        
+        StoreProgressStartEvent:
+            For buffering implementations, this event should be emitted prior to
+            writing any data to disk.
+        
+        StoreProgressStepEvent:
+            For buffering implementations, this event should be emitted
+            periodically as data is written to disk.
+        
+        StoreProgressEndEvent:
+            For buffering implementations, this event should be emitted after
+            finishing writing to disk.
+        
         """
         with open(path, 'wb') as fp:
-            data = self.get_data(key)
-            for buffer in buffer_iterator(data, buffer_size):
-                fp.write(buffer)
+            data, metadata = self.get(key)
+            bytes_written = 0
+            with StoreProgressManager(self.event_manager, self, None,
+                    "Saving key '%s' to file '%s'" % (key, path), -1,
+                    key=key, metadata=metadata) as progress:
+                for buffer in buffer_iterator(data, buffer_size):
+                    fp.write(buffer)
+                    bytes_written += len(buffer) 
+                    progress("Saving key '%s' to file '%s' (%d bytes written)"
+                        % (key, path, bytes))
                         
         
     def from_file(self, key, path, buffer_size=1048576):
@@ -808,6 +981,21 @@ class AbstractStore(object):
         
         bytes :
             The contents of the file-like object as bytes.
+        
+        Events
+        ------
+        
+        StoreProgressStartEvent:
+            For buffering implementations, this event should be emitted prior to
+            extracting the data.
+        
+        StoreProgressStepEvent:
+            For buffering implementations, this event should be emitted
+            periodically as data is extracted.
+        
+        StoreProgressEndEvent:
+            For buffering implementations, this event should be emitted after
+            extracting the data.
         
         """
         return b''.join(buffer_iterator(self.get_data(key), buffer_size))

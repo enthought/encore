@@ -31,9 +31,10 @@ class BaseEvent(object):
     """ Base class for all events in the application.
     """
     
-    def __init__(self, source=None):
+    def __init__(self, source=None, **kwargs):
         # The source of the event.
-        self.source = []
+        kwargs['source'] = [] if source is None else source
+        self.__dict__.update(**kwargs)
         
         # Whether the event has been handled by a listener.
         self._handled = False
