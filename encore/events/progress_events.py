@@ -81,9 +81,9 @@ class ProgressManager(object):
                 ... do work ...
                 progress(step)
         except ... as exc:
-            progress.end(message='Faulure mode 1', end_state='warning')
+            progress.end(message='Failure mode 1', end_state='warning')
         except ... as exc:
-            progress.end(message='Faulure mode 2', end_state='error')
+            progress.end(message='Failure mode 2', end_state='error')
         except Exception as exc:
             progress.end(message=str(exc), end_state='exception')
         else:
