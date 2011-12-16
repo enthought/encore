@@ -922,7 +922,7 @@ class AbstractStore(object):
                     fp.write(buffer)
                     bytes_written += len(buffer) 
                     progress("Saving key '%s' to file '%s' (%d bytes written)"
-                        % (key, path, bytes))
+                        % (key, path, bytes_written))
                         
         
     def from_file(self, key, path, buffer_size=1048576):
