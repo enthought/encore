@@ -23,6 +23,7 @@ from uuid import uuid4
 
 from .abstract_store import AbstractStore
 from .utils import buffer_iterator, DummyTransactionContext, StoreProgressManager
+from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 
 
 class DictMemoryStore(AbstractStore):
@@ -142,7 +143,8 @@ class DictMemoryStore(AbstractStore):
         
         """
         del self._data[key]
-        del self._metadata[key]
+        metadata = self._metadata.pop(key)
+        self.event_manager.emit(StoreDeleteEvent(self, key=key, metadata=metadata))
     
     
     def exists(self, key):
@@ -238,11 +240,17 @@ class DictMemoryStore(AbstractStore):
             key-value store.
 
         """
+        update = key in self._data
+        metadata = self._metadata.get(key, None)
         with StoreProgressManager(self.event_manager, self, uuid4(),
                 "Setting data into '%s'" % (key,), -1,
-                key=key, metadata=self._metadata.get(key, None)) as progress:
+                key=key, metadata=metadata) as progress:
             chunks = list(buffer_iterator(data, buffer_size, progress))
             self._data[key] = b''.join(chunks)
+        if update:
+            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
+        else:
+            self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
     
     
     def set_metadata(self, key, metadata):
@@ -263,7 +271,12 @@ class DictMemoryStore(AbstractStore):
             keys should be strings which are valid Python identifiers.
 
         """
+        update = key in self._metadata
         self._metadata[key] = metadata.copy()
+        if update:
+            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
+        else:
+            self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
 
 
     def update_metadata(self, key, metadata):
@@ -285,6 +298,7 @@ class DictMemoryStore(AbstractStore):
 
         """
         self._metadata[key].update(metadata)
+        self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=self._metadata[key]))
    
    
     def multiget(self, keys):

@@ -148,6 +148,7 @@ Determine the Single Points of Truth:
 """
 
 from abc import ABCMeta, abstractmethod
+from itertools import izip
 
 from .utils import StoreProgressManager, buffer_iterator
 from .events import ProgressStartEvent, ProgressStepEvent, ProgressEndEvent
@@ -209,7 +210,7 @@ class AbstractStore(object):
             If the key is not found in the store, a KeyError is raised.
 
         """
-        raise NotImplementedError
+        return (self.get_data(key), self.get_metadata(key))
 
 
     @abstractmethod
@@ -256,7 +257,10 @@ class AbstractStore(object):
             emitted with the key & metadata
         
         """
-        raise NotImplementedError
+        data, metadata = value
+        with self.transaction('Setting key "%s"' % key):
+            self.set_metadata(key, metadata)
+            self.set_data(key, data)
 
 
     @abstractmethod
@@ -453,7 +457,12 @@ class AbstractStore(object):
             Whether or not the key exists in the key-value store.
         
         """
-        raise NotImplementedError
+        try:
+            self.get_metadata(key)
+        except KeyError:
+            return False
+        else:
+            return True
 
         
     ##########################################################################
@@ -484,7 +493,8 @@ class AbstractStore(object):
             This will raise a key error if the key is not present in the store.
         
         """
-        raise NotImplementedError
+        for key in keys:
+            yield self.get(key)
     
    
     @abstractmethod
@@ -511,7 +521,8 @@ class AbstractStore(object):
             This will raise a key error if the key is not present in the store.
         
         """
-        raise NotImplementedError
+        for key in keys:
+            yield self.get_data(key)
     
 
     @abstractmethod
@@ -545,7 +556,8 @@ class AbstractStore(object):
             This will raise a key error if the key is not present in the store.
         
         """
-        raise NotImplementedError
+        for key in keys:
+            yield self.get_metadata(key, select)
         
             
     @abstractmethod
@@ -594,7 +606,8 @@ class AbstractStore(object):
             emitted with the key & metadata for each key that was set.
 
         """
-        raise NotImplementedError
+        for key, value in izip(keys, values):
+            yield self.set(key, value, buffer_size)
     
    
     @abstractmethod
@@ -643,7 +656,8 @@ class AbstractStore(object):
             emitted with the key & metadata for each key that was set.
 
         """
-        raise NotImplementedError
+        for key, data in izip(keys, datas):
+            yield self.set_data(key, data, buffer_size)
     
    
     @abstractmethod
@@ -675,8 +689,8 @@ class AbstractStore(object):
             emitted with the key & metadata for each key that was set.
 
         """
-        raise NotImplementedError
-    
+        for key, metadata in izip(keys, metadatas):
+            yield self.set_metadata(key, metadata)
    
    
     @abstractmethod
@@ -708,7 +722,8 @@ class AbstractStore(object):
             emitted with the key & metadata for each key that was set.
 
         """
-        raise NotImplementedError
+        for key, metadata in izip(keys, metadatas):
+            yield self.update_metadata(key, metadata)
     
    
     ##########################################################################

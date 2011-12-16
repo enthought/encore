@@ -1,8 +1,24 @@
+#
+# (C) Copyright 2011 Enthought, Inc., Austin, TX
+# All right reserved.
+#
+# This file is open source software distributed according to the terms in LICENSE.txt
+#
+
 from encore.events.api import (BaseEvent, ProgressEvent, ProgressStartEvent,
     ProgressStepEvent, ProgressEndEvent)
 
 
 class StoreEvent(BaseEvent):
+    pass
+
+class StoreTransactionEvent(StoreEvent):
+    pass
+
+class StoreTransactionStartEvent(StoreTransactionEvent):
+    pass
+
+class StoreTransactionEndEvent(StoreTransactionEvent):
     pass
 
 class StoreKeyEvent(StoreEvent):
@@ -20,6 +36,15 @@ class StoreKeyEvent(StoreEvent):
         The metadata of the key which is involved in the event.
         
     """
+
+class StoreSetEvent(StoreKeyEvent):
+    pass
+    
+class StoreUpdateEvent(StoreKeyEvent):
+    pass
+    
+class StoreDeleteEvent(StoreKeyEvent):
+    pass
 
 class StoreProgressEvent(ProgressEvent, StoreKeyEvent):
     pass
