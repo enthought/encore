@@ -25,7 +25,8 @@ from itertools import izip
 from uuid import uuid4
 
 from .abstract_store import AbstractStore
-from .utils import buffer_iterator, DummyTransactionContext, StoreProgressManager
+from .events import StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent
+from .utils import buffer_iterator, SimpleTransactionContext, StoreProgressManager
 
 def adapt_dict(d):
     return cPickle.dumps(d)
@@ -35,6 +36,17 @@ def convert_dict(s):
     
 sqlite3.register_adapter(dict, adapt_dict)
 sqlite3.register_converter('dict', convert_dict)
+
+class SqliteTransactionContext(SimpleTransactionContext):
+    
+    def commit(self):
+        self.store._connection.commit()
+        print 'commit'
+    
+    def rollback(self):
+        print 'rollback'
+        self.store._connection.rollback()
+
 
 class SqliteStore(AbstractStore):
     """ Sqlite-based Store
@@ -63,14 +75,13 @@ class SqliteStore(AbstractStore):
             (self.table,)
         )
         if len(cursor.fetchall()) == 0:
-            # we need to create the table
-            self._connection.execute("""
-                create table ? (
+            # we need to create the table (substitution OK since table is internal
+            query = """create table %s (
                     key text primary key,
                     metadata dict,
                     data blob
-                )
-                """, self.table)
+                )""" % self.table
+            self._connection.execute(query)
     
     
     def disconnect(self):
@@ -124,14 +135,11 @@ class SqliteStore(AbstractStore):
             If the key is not found in the store, a KeyError is raised.
 
         """
-        rows = self._connection.execute(
-            'select data, metadata from '+self.table+' where key == ?',
-            (key,)
-        ).fetchall() # should only ever be zero or one
-        if len(rows) == 0:
+        row = self._get_columns_by_key(key, ['metadata', 'data'])
+        if row is None:
             raise KeyError(key)
-        data = cStringIO.StringIO(rows[0][0])
-        metadata = rows[0][1]
+        data = cStringIO.StringIO(row['data'])
+        metadata = row['metadata']
         return data, metadata
     
     
@@ -160,8 +168,21 @@ class SqliteStore(AbstractStore):
      
         """
         data, metadata = value
-        self._metadata[key] = metadata.copy()
-        self.set_data(key, data, buffer_size)
+        update = self.exists(key)
+        
+        with StoreProgressManager(self.event_manager, self, uuid4(),
+                "Setting data into '%s'" % (key,), -1,
+                key=key, metadata=metadata) as progress:
+            chunks = list(buffer_iterator(data, buffer_size, progress))
+            data = buffer(b''.join(chunks))
+            
+            with self.transaction('Setting key "%s"' % key):
+                self._insert_row(key, metadata, data)
+
+        if update:
+            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
+        else:
+            self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
 
     def delete(self, key):
         """ Delete a key from the repsository.
@@ -174,9 +195,15 @@ class SqliteStore(AbstractStore):
             identifier for the resource within the key-value store.
         
         """
-        del self._data[key]
-        metadata = self._metadata.pop(key)
-        self.event_manager.emit(StoreDeleteEvent(self, key=key, metadata=metadata))
+        row = self._get_columns_by_key(key, ['metadata'])
+        if row is None:
+            raise KeyError(key)
+        metadata = row['metadata']
+        
+        with self.transaction('Deleting "%s"' % key):
+            query = 'delete from %s where key=?' % self.table
+            self._connection.execute(query, (key,))
+            self.event_manager.emit(StoreDeleteEvent(self, key=key, metadata=metadata))
     
     
     def exists(self, key):
@@ -196,7 +223,7 @@ class SqliteStore(AbstractStore):
             Whether or not the key exists in the key-value store.
         
         """
-        return key in self._data and key in self._metadata
+        return self._get_columns_by_key(key, ['metadata']) is not None
 
 
     def get_data(self, key):
@@ -217,13 +244,10 @@ class SqliteStore(AbstractStore):
             key-value store.
 
         """
-        rows = self._connection.execute(
-            'select data from '+self.table+' where key == ?',
-            (key,)
-        ).fetchall() # should only ever be zero or one
-        if len(rows) == 0:
+        row = self._get_columns_by_key(key, ['data'])
+        if row is None:
             raise KeyError(key)
-        data = cStringIO.StringIO(rows[0][0])
+        data = cStringIO.StringIO(row['data'])
         return data
 
 
@@ -257,18 +281,49 @@ class SqliteStore(AbstractStore):
             metadata.
 
         """
-        rows = self._connection.execute(
-            'select metadata from '+self.table+' where key == ?',
-            (key,)
-        ).fetchall() # should only ever be zero or one
-        if len(rows) == 0:
+        row = self._get_columns_by_key(key, ['metadata'])
+        if row is None:
             raise KeyError(key)
-        metadata = rows[0][0]
+        metadata = row['metadata']
         if select is not None:
             return dict((metadata_key, metadata[metadata_key])
                 for metadata_key in select if metadata_key in metadata)
-        return metadata.copy()
+        return metadata
     
+    
+    def _get_columns_by_key(self, key, columns=None):
+        """ Query the sqlite database for columns in the row with the given key
+        """
+        columns = columns if columns is not None else ['metadata', 'data']
+        
+        # substitution OK, since these values are not user-defined
+        query = 'select %s from %s where key == ?' % (','.join(columns), self.table)
+        rows = self._connection.execute(query, (key,)).fetchall()
+        
+        # only expect 0 or 1 row, since primary key is unique
+        if len(rows) == 0:
+            return None
+        else:
+            return dict(zip(columns, rows[0]))
+
+    def _insert_row(self, key, metadata, data):
+        """ Insert or replace a row into the underlying sqlite table
+        
+        This simply constructs and executes the query. It does not attempt any
+        sort of transaction control.
+        """
+        query = 'insert or replace into %s values (?, ?, ?)' % self.table
+        self._connection.execute(query, (key, metadata, data))    
+
+    def _update_column(self, key, column, value):
+        """ Update an existing column value in the a row with the given key
+        
+        This simply constructs and executes the query. It does not attempt any
+        sort of transaction control.
+        """
+        query = 'update %s set %s=? where key=?' % (self.table, column)
+        print query, key, value
+        self._connection.execute(query, (value, key))
     
     def set_data(self, key, data, buffer_size=1048576):
         """ Replace the data for a given key in the key-value store.
@@ -285,17 +340,27 @@ class SqliteStore(AbstractStore):
             key-value store.
 
         """
-        update = key in self._data
-        metadata = self._metadata.get(key, None)
+        row = self._get_columns_by_key(key, ['metadata'])
+        update = row is not None
+        if update:
+            metadata = row['metadata']
+        else:
+            metadata = {}
+                    
         with StoreProgressManager(self.event_manager, self, uuid4(),
-                "Setting data into '%s'" % (key,), -1,
+                "Setting data for '%s'" % (key,), -1,
                 key=key, metadata=metadata) as progress:
             chunks = list(buffer_iterator(data, buffer_size, progress))
-            self._data[key] = b''.join(chunks)
-        if update:
-            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
-        else:
-            self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
+            data = buffer(b''.join(chunks))
+
+        print 'setting data', key, data            
+        with self.transaction('Setting data for "%s"' % key):
+            if update:
+                self._update_column(key, 'data', data)
+                self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
+            else:
+                self._insert_row(key, metadata, data)
+                self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
     
     
     def set_metadata(self, key, metadata):
@@ -316,12 +381,15 @@ class SqliteStore(AbstractStore):
             keys should be strings which are valid Python identifiers.
 
         """
-        update = key in self._metadata
-        self._metadata[key] = metadata.copy()
+        update = self.exists(key)
         if update:
-            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
+            with self.transaction('Setting metadata for "%s"' % key):
+                self._update_column(key, 'metadata', metadata)
+                self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
         else:
-            self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
+            with self.transaction('Setting metadata for "%s"' % key):
+                self._insert_row(key, metadata, buffer(''))
+                self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
 
 
     def update_metadata(self, key, metadata):
@@ -342,8 +410,16 @@ class SqliteStore(AbstractStore):
             keys should be strings which are valid Python identifiers.
 
         """
-        self._metadata[key].update(metadata)
-        self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=self._metadata[key]))
+        row = self._get_columns_by_key(key, ['metadata'])
+        update = row is not None
+        if row is not None:
+            temp_metadata = row['metadata']
+        else:
+            raise KeyError(key)
+        temp_metadata.update(metadata)
+        with self.transaction('Setting metadata for "%s"' % key):
+            self._update_column(key, 'metadata', temp_metadata)
+            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=temp_metadata))
    
    
     def multiget(self, keys):
@@ -538,12 +614,8 @@ class SqliteStore(AbstractStore):
     
    
     def transaction(self, notes):
-        """ Provide a transaction context manager
-        
-        This class does not support transactions, so it returns a dummy object.
-
-        """
-        return DummyTransactionContext()
+        """ Provide a transaction context manager"""
+        return SqliteTransactionContext(self)
 
 
     def query(self, select=None, **kwargs):

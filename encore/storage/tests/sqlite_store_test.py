@@ -93,23 +93,43 @@ class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
        
         and set into 'self.store'.
         """
-        self.store = SqliteStore(EventManager())
-        #self.store._data['test1'] = 'test2\n'
-        #self.store._metadata['test1'] = {
-        #    'a_str': 'test3',
-        #    'an_int': 1,
-        #    'a_float': 2.0,
-        #    'a_bool': True,
-        #    'a_list': ['one', 'two', 'three'],
-        #    'a_dict': {'one': 1, 'two': 2, 'three': 3}
-        #}
-        #for i in range(10):
-        #    key = 'existing_key'+str(i)
-        #    data = 'existing_value'+str(i)
-        #    metadata = {'meta': True, 'meta1': -i}
-        #    self.store._data[key] = data
-        #    self.store._metadata[key] = metadata
+        self.path = mkdtemp()
+        self.db_file = os.path.join(self.path, 'db.sqlite')
+        
+        connection = sqlite3.connect(self.db_file)
+        
+        connection.execute("""
+            create table store (
+                key text primary key,
+                metadata dict,
+                data blob
+            )
+            """)
+        
+        connection.execute("""insert into store values (?, ?, ?)""", (
+            'test1',
+            {
+                'a_str': 'test3',
+                'an_int': 1,
+                'a_float': 2.0,
+                'a_bool': True,
+                'a_list': ['one', 'two', 'three'],
+                'a_dict': {'one': 1, 'two': 2, 'three': 3}
+            },
+            buffer('test2\n')))
+        for i in range(10):
+            key = 'existing_key%d'%i
+            data = buffer('existing_value%d' % i)
+            metadata = {'meta': True, 'meta1': -i}
+            connection.execute("""insert into store values (?, ?, ?)""", (key, metadata, data))
+        connection.commit()
+        
+        connection = None
 
+        self.store = SqliteStore(EventManager(), self.db_file, 'store')
+        self.store.connect()
+
+    """
     def test_set(self):
         self.skipTest('Not Implemented')
         super(SqliteStoreWriteTest, self).test_set()
@@ -270,4 +290,5 @@ class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
         self.skipTest('Not Implemented')
         super(SqliteStoreWriteTest, self).test_from_bytes()
         self.assertEqual(self.store._data['test3'], 'test4')
+    """
         
