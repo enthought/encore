@@ -47,7 +47,7 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
             """)
         
         connection.execute("""insert into store values (?, ?, ?)""", (
-            'test1',
+            b'test1',
             {
                 'a_str': 'test3',
                 'an_int': 1,
@@ -56,10 +56,10 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
                 'a_list': ['one', 'two', 'three'],
                 'a_dict': {'one': 1, 'two': 2, 'three': 3}
             },
-            buffer('test2\n')))
+            buffer(b'test2\n')))
         for i in range(10):
-            key = 'key%d'%i
-            data = buffer('value%d' % i)
+            key = b'key%d'%i
+            data = buffer(b'value%d' % i)
             metadata = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
                 metadata['optional'] = True
@@ -107,7 +107,7 @@ class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
             """)
         
         connection.execute("""insert into store values (?, ?, ?)""", (
-            'test1',
+            b'test1',
             {
                 'a_str': 'test3',
                 'an_int': 1,
@@ -116,10 +116,10 @@ class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
                 'a_list': ['one', 'two', 'three'],
                 'a_dict': {'one': 1, 'two': 2, 'three': 3}
             },
-            buffer('test2\n')))
+            buffer(b'test2\n')))
         for i in range(10):
-            key = 'existing_key%d'%i
-            data = buffer('existing_value%d' % i)
+            key = b'existing_key%d'%i
+            data = buffer(b'existing_value%d' % i)
             metadata = {'meta': True, 'meta1': -i}
             connection.execute("""insert into store values (?, ?, ?)""", (key, metadata, data))
         connection.commit()
