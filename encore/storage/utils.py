@@ -60,7 +60,7 @@ class SimpleTransactionContext(object):
     def __enter__(self):
         self._context_depth += 1
         if self._context_depth == 1:
-            self.start()
+            self.begin()
             self.store.event_manager.emit(StoreTransactionStartEvent(
                 source=self.store))    
             # grab Set & veto events for later emission
@@ -92,14 +92,14 @@ class SimpleTransactionContext(object):
                     self.store.event_manager.emit(event)
         return False
 
-    def start(self):
-        pass
+    def begin(self):
+        getattr(self.store, '_begin_transaction', lambda: None)()
     
     def commit(self):
-        pass
+        getattr(self.store, '_commit_transaction', lambda: None)()
     
     def rollback(self):
-        pass
+        getattr(self.store, '_rollback_transaction', lambda: None)()
 
 def buffer_iterator(filelike, buffer_size=1048576, progress=None):
     """ Return an iterator of byte buffers

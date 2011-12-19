@@ -28,6 +28,7 @@ from .abstract_store import AbstractStore
 from .events import StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent
 from .utils import buffer_iterator, SimpleTransactionContext, StoreProgressManager
 
+
 def adapt_dict(d):
     return cPickle.dumps(d)
 
@@ -36,16 +37,6 @@ def convert_dict(s):
     
 sqlite3.register_adapter(dict, adapt_dict)
 sqlite3.register_converter('dict', convert_dict)
-
-class SqliteTransactionContext(SimpleTransactionContext):
-    
-    def commit(self):
-        self.store._connection.commit()
-        print 'commit'
-    
-    def rollback(self):
-        print 'rollback'
-        self.store._connection.rollback()
 
 
 class SqliteStore(AbstractStore):
@@ -289,42 +280,8 @@ class SqliteStore(AbstractStore):
             return dict((metadata_key, metadata[metadata_key])
                 for metadata_key in select if metadata_key in metadata)
         return metadata
-    
-    
-    def _get_columns_by_key(self, key, columns=None):
-        """ Query the sqlite database for columns in the row with the given key
-        """
-        columns = columns if columns is not None else ['metadata', 'data']
-        
-        # substitution OK, since these values are not user-defined
-        query = 'select %s from %s where key == ?' % (','.join(columns), self.table)
-        rows = self._connection.execute(query, (key,)).fetchall()
-        
-        # only expect 0 or 1 row, since primary key is unique
-        if len(rows) == 0:
-            return None
-        else:
-            return dict(zip(columns, rows[0]))
 
-    def _insert_row(self, key, metadata, data):
-        """ Insert or replace a row into the underlying sqlite table
         
-        This simply constructs and executes the query. It does not attempt any
-        sort of transaction control.
-        """
-        query = 'insert or replace into %s values (?, ?, ?)' % self.table
-        self._connection.execute(query, (key, metadata, data))    
-
-    def _update_column(self, key, column, value):
-        """ Update an existing column value in the a row with the given key
-        
-        This simply constructs and executes the query. It does not attempt any
-        sort of transaction control.
-        """
-        query = 'update %s set %s=? where key=?' % (self.table, column)
-        print query, key, value
-        self._connection.execute(query, (value, key))
-    
     def set_data(self, key, data, buffer_size=1048576):
         """ Replace the data for a given key in the key-value store.
         
@@ -615,8 +572,14 @@ class SqliteStore(AbstractStore):
    
     def transaction(self, notes):
         """ Provide a transaction context manager"""
-        return SqliteTransactionContext(self)
+        return SimpleTransactionContext(self)
 
+    
+    def _commit_transaction(self):
+        self._connection.commit()
+    
+    def _rollback_transaction(self):
+        self._connection.rollback()
 
     def query(self, select=None, **kwargs):
         """ Query for keys and metadata matching metadata provided as keyword arguments
@@ -782,3 +745,38 @@ class SqliteStore(AbstractStore):
         """
         return super(SqliteStore, self).from_bytes(key, data, buffer_size)
 
+    # Private API
+    
+    def _get_columns_by_key(self, key, columns=None):
+        """ Query the sqlite database for columns in the row with the given key
+        """
+        columns = columns if columns is not None else ['metadata', 'data']
+        
+        # substitution OK, since these values are not user-defined
+        query = 'select %s from %s where key == ?' % (','.join(columns), self.table)
+        rows = self._connection.execute(query, (key,)).fetchall()
+        
+        # only expect 0 or 1 row, since primary key is unique
+        if len(rows) == 0:
+            return None
+        else:
+            return dict(zip(columns, rows[0]))
+
+    def _insert_row(self, key, metadata, data):
+        """ Insert or replace a row into the underlying sqlite table
+        
+        This simply constructs and executes the query. It does not attempt any
+        sort of transaction control.
+        """
+        query = 'insert or replace into %s values (?, ?, ?)' % self.table
+        self._connection.execute(query, (key, metadata, data))    
+
+    def _update_column(self, key, column, value):
+        """ Update an existing column value in the a row with the given key
+        
+        This simply constructs and executes the query. It does not attempt any
+        sort of transaction control.
+        """
+        query = 'update %s set %s=? where key=?' % (self.table, column)
+        print query, key, value
+        self._connection.execute(query, (value, key))
