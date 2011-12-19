@@ -37,13 +37,16 @@ class StoreKeyEvent(StoreEvent):
         
     """
 
-class StoreSetEvent(StoreKeyEvent):
+class StoreModificationEvent(StoreKeyEvent):
+    pass
+
+class StoreSetEvent(StoreModificationEvent):
     pass
     
-class StoreUpdateEvent(StoreKeyEvent):
+class StoreUpdateEvent(StoreModificationEvent):
     pass
     
-class StoreDeleteEvent(StoreKeyEvent):
+class StoreDeleteEvent(StoreModificationEvent):
     pass
 
 class StoreProgressEvent(ProgressEvent, StoreKeyEvent):
