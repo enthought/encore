@@ -12,7 +12,8 @@
 import itertools
 from encore.events.api import ProgressManager
 from .events import (StoreTransactionStartEvent, StoreTransactionEndEvent,
-    StoreProgressStartEvent, StoreProgressStepEvent, StoreProgressEndEvent)
+    StoreProgressStartEvent, StoreProgressStepEvent, StoreProgressEndEvent,
+    StoreModificationEvent)
 
 
 class StoreProgressManager(ProgressManager):
@@ -26,11 +27,10 @@ class DummyTransactionContext(object):
     """
     def __new__(cls, store):
         if getattr(store, '_transaction', None) is None:
-            store._transaction = super(DummyTransactionContext).__new__(store)
+            obj = object.__new__()
+            obj.store = store
+            store._transaction = obj
         return store._transaction
-    
-    def __init__(self, store):
-        self.store = store
     
     def __enter__(self):
         return self
@@ -41,41 +41,24 @@ class DummyTransactionContext(object):
 class SimpleTransactionContext(object):
     """ A simple class that adds support for simple transactions
 
-    This works by deferring set/update/delete operations until the __exit__
-    method of the context.  This is still not a perfect transaction system, as
-    the transaction could fail during the __exit__ method, leaving the store in
-    an incorrect state.  However if the store only ever writes new keys and
-    never updates or deletes, then transactions will work as expected.
-
-    This also handles emitting events appropriately when called (ie. start
-    transaction and end transaction at the appropriate places, plus defers
-    sets/deletes to the end if called correctly).
-    
-    To work with this API, the store needs to implement the following methods:
-        
-        _set()
-            The same signature as set(), but actually does the work.
-        
-        _update_metadata()
-            The same signature as update_metadata(), but actually does the work.
-        
-        _delete()
-            The same signature as delete(), but actually does the work.
-
+    This is a base class that ensures transactions are appropriately handled in
+    terms of nesting and event generation.  Subclasses should override the
+    start, commit and rollback methods to perform appropriate implementation-specific
+    actions.
     """
     def __new__(cls, store):
         if getattr(store, '_transaction', None) is None:
-            store._transaction = super(DummyTransactionContext).__new__(store)
+            obj = object.__new__(cls)
+            obj.store = store
+            obj._context_depth = 0
+            obj._events = []
+            store._transaction = obj
         return store._transaction
-    
-    def __init__(self, store):
-        self.store = store
-        self._context_depth = 0
-        self._events = []
     
     def __enter__(self):
         self._context_depth += 1
         if self._context_depth == 1:
+            self.start()
             self.store.event_manager.emit(StoreTransactionStartEvent(
                 source=self.store))    
             # grab Set & veto events for later emission
@@ -84,19 +67,37 @@ class SimpleTransactionContext(object):
         
     def _handle_event(self, event):
         self._events.append(event)
-        self.event.mark_as_handled()
+        event.mark_as_handled()
     
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self._context_depth -= 1
         if self._context_depth <= 0:
+            if exc_value is None:
+                self.commit()
+                state = 'done'
+            else:
+                self.rollback()
+                state = 'failed'
+
             self.store.event_manager.emit(StoreTransactionEndEvent(
-                source=self.store))
-            self.store.event_manager.disconnect(self._handle_event)
+                source=self.store, state=state))
+            self.store.event_manager.disconnect(StoreModificationEvent, self._handle_event)
             self.store._transaction = None
-            for event in self._events:
-                event._handled = False # Yikes!
-                self.store.event_manager.emit(event)
+
+            if exc_value is None:
+                for event in self._events:
+                    event._handled = False # Yikes!
+                    self.store.event_manager.emit(event)
         return False
+
+    def start(self):
+        pass
+    
+    def commit(self):
+        pass
+    
+    def rollback(self):
+        pass
 
 def buffer_iterator(filelike, buffer_size=1048576, progress=None):
     """ Return an iterator of byte buffers
