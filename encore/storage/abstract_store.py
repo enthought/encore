@@ -606,8 +606,9 @@ class AbstractStore(object):
             emitted with the key & metadata for each key that was set.
 
         """
-        for key, value in izip(keys, values):
-            yield self.set(key, value, buffer_size)
+        with self.transaction('Setting '+', '.join('"%s"' % key for key in keys)):
+            for key, value in izip(keys, values):
+                self.set(key, value, buffer_size)
     
    
     @abstractmethod
@@ -656,8 +657,9 @@ class AbstractStore(object):
             emitted with the key & metadata for each key that was set.
 
         """
-        for key, data in izip(keys, datas):
-            yield self.set_data(key, data, buffer_size)
+        with self.transaction('Setting data for '+', '.join('"%s"' % key for key in keys)):
+            for key, data in izip(keys, datas):
+                self.set_data(key, data, buffer_size)
     
    
     @abstractmethod
@@ -689,8 +691,9 @@ class AbstractStore(object):
             emitted with the key & metadata for each key that was set.
 
         """
-        for key, metadata in izip(keys, metadatas):
-            yield self.set_metadata(key, metadata)
+        with self.transaction('Setting metadata for '+', '.join('"%s"' % key for key in keys)):
+            for key, metadata in izip(keys, metadatas):
+                self.set_metadata(key, metadata)
    
    
     @abstractmethod
@@ -722,8 +725,9 @@ class AbstractStore(object):
             emitted with the key & metadata for each key that was set.
 
         """
-        for key, metadata in izip(keys, metadatas):
-            yield self.update_metadata(key, metadata)
+        with self.transaction('Updating metadata for '+', '.join('"%s"' % key for key in keys)):
+            for key, metadata in izip(keys, metadatas):
+                self.update_metadata(key, metadata)
     
    
     ##########################################################################
@@ -858,7 +862,7 @@ class AbstractStore(object):
             specified values for the specified metadata keywords.
         
         """
-        return self.query(**kwargs).keys()
+        return (key for key, value in self.query(**kwargs))
 
 
     @abstractmethod
