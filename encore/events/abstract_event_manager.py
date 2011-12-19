@@ -25,13 +25,14 @@ class BaseEvent(object):
     """ Base class for all events.
     """
 
-    def __init__(self, source=None):
+    def __init__(self, source=None, **kwargs):
         # The source of the event.
-        self.source = source
-
+        kwargs['source'] = [] if source is None else source
+        self.__dict__.update(**kwargs)
+        
         # Whether the event has been handled by a listener.
         self._handled = False
-
+    
     def mark_as_handled(self):
         """ Mark the event as handled so subsequent listeners are not notified.
         """
