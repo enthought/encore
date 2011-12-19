@@ -9,7 +9,9 @@
 
 """
 
+import sys
 import itertools
+
 from encore.events.api import ProgressManager
 from .events import (StoreTransactionStartEvent, StoreTransactionEndEvent,
     StoreProgressStartEvent, StoreProgressStepEvent, StoreProgressEndEvent,
@@ -63,7 +65,7 @@ class SimpleTransactionContext(object):
                 source=self.store))    
             # grab Set & veto events for later emission
             self.store.event_manager.connect(StoreModificationEvent, self._handle_event,
-                {'source': self.store}, 0)
+                {'source': self.store}, sys.maxint)
         
     def _handle_event(self, event):
         self._events.append(event)
