@@ -52,12 +52,13 @@ class SqliteStore(AbstractStore):
     injection.  This is particularly important for indexed queries.
     """
     
-    def __init__(self, event_manager, location=':memory:', table='store', index=True):
+    def __init__(self, event_manager, location=':memory:', table='store', index='dynamic', index_columns=None):
         self.event_manager = event_manager
         self.location = location
         self.table = table
         
         self._index = index
+        self.index_columns = set(index_columns) if index_columns is not None else set()
         
         self._connection = None
     
@@ -81,11 +82,12 @@ class SqliteStore(AbstractStore):
                     data blob
                 )""" % self.table
             self._connection.execute(query)
-        elif self._index:
+        elif self._index is not None:
             # we need to find the names of the existing index columns
             rows = self._connection.execute('PRAGMA table_info(%s)' % self.table)
-            self._index_columns = set(row[0] for row in rows)
-            if not self._index_columns:
+            index_columns = set(row[0] for row in rows
+                if row[0] not in ('key', 'metadata', 'data'))
+            if not self.index_columns.issubset(index_columns):
                 # being paranoid here
                 self._build_index()
     
@@ -627,7 +629,7 @@ class SqliteStore(AbstractStore):
         
         """
         if self._index and kwargs:
-            columns = list(column for column in kwargs if column in self._index_columns)
+            columns = list(column for column in kwargs if column in self.index_columns)
             unindexed_columns = set(kwargs) - set(columns)
             if columns:
                 query = 'select key, metadata from %s where %s' % (self.table,
@@ -677,7 +679,7 @@ class SqliteStore(AbstractStore):
         
         """
         if self._index and kwargs:
-            columns = list(column for column in kwargs if column in self._index_columns)
+            columns = list(column for column in kwargs if column in self.index_columns)
             unindexed_columns = set(kwargs) - set(columns)
             if unindexed_columns:
                 if columns:
@@ -854,19 +856,22 @@ class SqliteStore(AbstractStore):
     def _update_index(self, key, metadata):
         if not self._index:
             return
-        missing_columns = set(column for column in metadata
-            if column not in self._index_columns)
-        query1 = 'alter table %s add column %s blob'
-        query2 = 'create index %s on %s (%s)'
-        for column in missing_columns:
-            self._connection.execute(query1 % (self.table, column))
-            self._connection.execute(query2 % (column, self.table, column))
-        self._index_columns |= missing_columns
+        if self._index == 'dynamic':
+            missing_columns = set(column for column in metadata
+                if column not in self.index_columns)
+            query1 = 'alter table %s add column %s blob'
+            query2 = 'create index %s on %s (%s)'
+            for column in missing_columns:
+                self._connection.execute(query1 % (self.table, column))
+                self._connection.execute(query2 % (column, self.table, column))
+            self.index_columns |= missing_columns
         
-        columns = [column for column in metadata if column in self._index_columns]
+        columns = [column for column in metadata if column in self.index_columns]
         values = [buffer(cPickle.dumps(metadata[column], protocol=2)) for column in columns]
-        self._update_columns(key, columns, values)
+        if columns:
+            self._update_columns(key, columns, values)
     
     def _build_index(self):
         for row in self._connection.execute('select key, metadata from %s' % self.table):
             self._update_index(*row)
+            self._commit_transaction()
