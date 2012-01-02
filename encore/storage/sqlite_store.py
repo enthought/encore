@@ -44,12 +44,11 @@ class SqliteStore(AbstractStore):
 
     The file-like objects returned by data methods are cStringIO objects.
     
-    Notes
-    -----
+    .. warning::
     
-    The table name and metadata names used as index columns are not sanitized,
-    and so should never be derived from user-supplied values to prevent SQL
-    injection.  This is particularly important for indexed queries.
+        The table name and metadata names used as index columns are not sanitized.
+        To prevent SQL injection these should never be directly derived from
+        user-supplied values.  This is particularly important for indexed queries.
     """
     
     def __init__(self, event_manager, location=':memory:', table='store', index='dynamic', index_columns=None):
@@ -616,7 +615,7 @@ class SqliteStore(AbstractStore):
             then the metadata dictionaries will only have values for the specified
             keys populated.
         
-        **kwargs :
+        ``**kwargs`` :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 
@@ -660,13 +659,13 @@ class SqliteStore(AbstractStore):
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of keys for the key-value store.
         
-        This is equivalent to self.query(**kwargs).keys(), but potentially
+        This is equivalent to ``self.query(**kwargs).keys()``, but potentially
         more efficiently implemented.
         
         Parameters
         ----------
         
-        **kwargs :
+        ``**kwargs`` :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 

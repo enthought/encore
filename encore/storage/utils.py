@@ -5,7 +5,11 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-""" Utilities for key-value store handling
+"""
+Utils
+=====
+
+Utilities for key-value stores.
 
 """
 
@@ -19,6 +23,8 @@ from .events import (StoreTransactionStartEvent, StoreTransactionEndEvent,
 
 
 class StoreProgressManager(ProgressManager):
+    """ ProgressManager subclass that generates StoreProgressEvents
+    """
     StartEventType = StoreProgressStartEvent
     StepEventType = StoreProgressStepEvent
     EndEventType = StoreProgressEndEvent
@@ -40,6 +46,7 @@ class DummyTransactionContext(object):
     def __exit__(self, exc_type, exc_value, exc_traceback):
         return False
 
+
 class SimpleTransactionContext(object):
     """ A simple class that adds support for simple transactions
 
@@ -47,6 +54,7 @@ class SimpleTransactionContext(object):
     terms of nesting and event generation.  Subclasses should override the
     start, commit and rollback methods to perform appropriate implementation-specific
     actions.
+    
     """
     def __new__(cls, store):
         if getattr(store, '_transaction', None) is None:
@@ -93,30 +101,28 @@ class SimpleTransactionContext(object):
         return False
 
     def begin(self):
+        """ Begin a transaction
+        
+        By default, this calls the store's ``_begin_transaction`` method.
+        Override in subclasses if you need different behaviour.
+        """
         getattr(self.store, '_begin_transaction', lambda: None)()
     
     def commit(self):
+        """ Commit a transaction
+        
+        By default, this calls the store's ``_commit_transaction`` method.
+        Override in subclasses if you need different behaviour.
+        """
         getattr(self.store, '_commit_transaction', lambda: None)()
     
     def rollback(self):
+        """ Roll back a transaction
+        
+        By default, this calls the store's ``_rollback_transaction`` method.
+        Override in subclasses if you need different behaviour.
+        """
         getattr(self.store, '_rollback_transaction', lambda: None)()
-
-def buffer_iterator(filelike, buffer_size=1048576, progress=None):
-    """ Return an iterator of byte buffers
-    
-    The buffers of bytes default to the provided buffer_size.  This is a useful
-    method when copying one data stream to another.
-    
-    """
-    progress = progress if progress is not None else lambda *args, **kwargs: None
-    bytes_iterated = 0
-    while True:
-        chunk = filelike.read(buffer_size)
-        bytes_iterated += len(chunk)
-        progress(step=bytes_iterated)
-        if not chunk:
-            break
-        yield chunk
 
 
 class BufferIteratorIO(object):
@@ -127,6 +133,7 @@ class BufferIteratorIO(object):
     is usable with the store API.
     
     This uses less memory than a StringIO, at the cost of some flexibility.
+    
     """
     
     def __init__(self, iterator):
@@ -152,6 +159,24 @@ class BufferIteratorIO(object):
     
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.close()
+
+
+def buffer_iterator(filelike, buffer_size=1048576, progress=None):
+    """ Return an iterator of byte buffers
+    
+    The buffers of bytes default to the provided buffer_size.  This is a useful
+    method when copying one data stream to another.
+    
+    """
+    progress = progress if progress is not None else lambda *args, **kwargs: None
+    bytes_iterated = 0
+    while True:
+        chunk = filelike.read(buffer_size)
+        bytes_iterated += len(chunk)
+        progress(step=bytes_iterated)
+        if not chunk:
+            break
+        yield chunk
 
 
 def tee(filelike, n=2, buffer_size=1048576):

@@ -523,7 +523,7 @@ class DictMemoryStore(AbstractStore):
             then the metadata dictionaries will only have values for the specified
             keys populated.
         
-        **kwargs :
+        ``**kwargs`` :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 
@@ -553,13 +553,13 @@ class DictMemoryStore(AbstractStore):
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of keys for the key-value store.
         
-        This is equivalent to self.query(**kwargs).keys(), but potentially
+        This is equivalent to ``self.query(**kwargs).keys()``, but potentially
         more efficiently implemented.
         
         Parameters
         ----------
         
-        **kwargs :
+        ``**kwargs`` :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 

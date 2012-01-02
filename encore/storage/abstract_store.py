@@ -19,132 +19,6 @@ where and how the data is stored.  The API is also agnostic about what is being
 stored, and so while the key use case is for egg repositories, potentially any
 data values can be stored in the key-value store.
 
-Keys
-----
-
-The keys of the key-value store are strings, and the key-value store API makes no
-assumptions about what the strings represent or any structure they might have.
-In particular keys are assumed to be case sensitive and may include arbitrary
-characters, so key-value store implementations should be careful to handle any issues
-which may arise if the underlying data store is case insensitive and has special
-characters which need to be escaped.
-
-Each key has associated with it a collection of metadata and some binary data.
-The key-value store API makes no assumptions about how the metadata and data is
-serialized.
-
-Metadata
---------
-
-Metadata should be representable as a dictionary whose keys are valid Python
-identifiers, and whose values can be serialized into reasonable human-readable
-form (basically, you should be able to represent the dictionary as JSON, XML,
-YAML, or similar in a clear and sane way, because some underlying datastore
-will).
-
-Metadata can be retrieved via the get_metadata() method or as the second element
-of the tuple returned by get().  Metadata can be set using set() or set_metadata()
-and existing metadata can be modified using update_metadata() (similarly to the
-way that the update() method works for dictionaries).
-
-There is nothing that ensures that metadata and the corresponding data are
-synchronised for a particular object.  It is up to the user of the API to ensure
-that the metadata for stored data is correct.
-
-We currently make no assumptions about the metadata keys, but we expect
-conventions to evolve for the meanings and format of particular keys.  Given
-that this is generally thought of as a repository for storing eggs, the
-following metadata keys are likely to be available:
-    
-    type:
-        The type of object being stored (package, app, patch, video, etc.).
-    
-    name:
-        The name of the object being stored.
-    
-    version:
-        The version of the object being stored.
-    
-    arch:
-        The architecture that the object being stored is for.
-    
-    python:
-        The version of Python that the object being stored is for.
-    
-    ctime:
-        The creation time of the object in the repository in seconds since
-        the Unix Epoch.
-    
-    mtime:
-        The last modification time of the object in the repository in seconds
-        since the Unix Epoch.
-    
-    size:
-        The size of the binary data in bytes.
-
-Data
-----
-
-The binary data stored in the values is presented through the key-value store API as
-file-like objects which implement at least read() and close().  Frequently this
-will be a standard file, socket or StringIO object.  The read() method should
-accept an optional number of bytes to read, so that buffered reads can be
-performed.
-
-Similarly, for writable repositories, data should be supplied to keys via the
-same sort of file-like object.  This allows copying between repositories using
-code like::
-
-    repo1.set(key, repo1.get(key))
-        
-Since files are likely to be common targets for extracting data from values, or
-sources for data being stored, the key-value store API provides utility methods
-to_file() and from_file().  Simple default implementations of these methods are
-provided, but implementations of the key-value store API may be able to override
-these to be more efficient, depending on the nature of the back-end data store.
-
-Querying
---------
-
-A very simple querying API is provided by default.  The query() method simply
-takes a collection of keyword arguments and interprets them as metadata keys
-and values.  It returns all the keys and corresponding metadata that match all
-of the supplied arguments.  query_keys() does the same, but only returns the
-matching keys.
-
-Subclasses may choose to provide more sophisticated querying mechanisms.
-
-Transactions
-------------
-
-The base abstract key-value store has no notion of transactions, since we want to
-handle the read-only and simple writer cases efficiently.  However, if the
-underlying storage mechanism has the notion of a transaction, this can be
-encapsulated by writing a context manager for transactions.  The transaction()
-method returns an instance of the appropriate context manager.
-
-Events
-------
-
-All implementations should have an event manager attribute, and may choose to
-emit appropriate events.  This is of particular importance during long-running
-interactions so that progress can be displayed.  This also provides a mechanism
-that an implementation can use to inform listeners that new objects have been
-added, or the store has been otherwise modified.
-
-Notes For Writing An Implementation
------------------------------------
-
-Metadata is really an index:
-    In terms of traditional database design, things that you are exposing in
-    metadata are really indexed columns.  If you are implementing a store which
-    needs fast querying, you may want to look at how traditional databases do
-    indexing to guide your data structure choices.
-
-Determine the Single Points of Truth:
-    Every piece of data should have a single point of truth - a canonical place
-    which holds the correct value.  This is particularly true for metadata.
-
 """
 
 from abc import ABCMeta, abstractmethod
@@ -154,9 +28,10 @@ from .utils import StoreProgressManager, buffer_iterator
 from .events import ProgressStartEvent, ProgressStepEvent, ProgressEndEvent
 
 class AbstractStore(object):
-    """
+    """ Abstract base class for Key-Value Store API
     
-    
+    This class implements some of the API so that it can be used with super()
+    where appropriate.
     """
     __metaclass__ = ABCMeta    
     
@@ -820,7 +695,7 @@ class AbstractStore(object):
             then the metadata dictionaries will only have values for the specified
             keys populated.
         
-        **kwargs :
+        ``**kwargs`` :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 
@@ -844,13 +719,13 @@ class AbstractStore(object):
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of keys for the key-value store.
         
-        This is equivalent to self.query(**kwargs).keys(), but potentially
+        This is equivalent to ``self.query(**kwargs).keys()``, but potentially
         more efficiently implemented.
         
         Parameters
         ----------
         
-        **kwargs :
+        ``**kwargs`` :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 

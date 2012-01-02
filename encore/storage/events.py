@@ -5,6 +5,14 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
+"""
+Storage Events
+==============
+
+This module contains asbtract and concrete Event subclasses that support the
+Storage API.
+"""
+
 from encore.events.api import (BaseEvent, ProgressEvent, ProgressStartEvent,
     ProgressStepEvent, ProgressEndEvent)
 
