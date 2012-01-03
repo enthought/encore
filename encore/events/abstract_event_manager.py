@@ -10,7 +10,7 @@
 The main class of the module is the :py:class:`BaseEventManager`.
 Event managers are expected to implement the interface as specified by
 :py:class:`BaseEventManager`. A concrete implementation is present in the
-:py:mod:`event_manager`
+:py:mod:`~encore.events.event_manager`
 module.
 
 """

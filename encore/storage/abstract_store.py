@@ -36,11 +36,32 @@ class AbstractStore(object):
     __metaclass__ = ABCMeta    
     
     @abstractmethod
-    def connect(self, authentication=None):
+    def connect(self, credentials=None):
         """ Connect to the key-value store, optionally with authentication
+        
+        This method creates or connects to any long-lived resources that the
+        store requires.
+        
+        Parameters
+        ----------
+        credentials :
+            An object that can supply appropriate credentials to to authenticate
+            the use of any required resources.  The exact form of the credentials
+            is implementation-specific, but may be as simple as a
+            ``(username, password)`` tuple.
+            
         """
         raise NotImplementedError
     
+    
+    @abstractmethod
+    def disconnect(self):
+        """ Disconnect from the key-value store
+        
+        This method disposes or disconnects to any long-lived resources that the
+        store requires.
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def info(self):
@@ -619,19 +640,16 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         select : iterable of strings or None
             An optional list of metadata keys to return.  If this is not None,
             then the metadata dictionaries will only have values for the specified
-            keys populated.
-        
-        ``**kwargs`` :
+            keys populated.        
+        kwargs :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 
         Returns
         -------
-        
         result : iterable
             An iterable of (key, metadata) tuples where metadata matches
             all the specified values for the specified metadata keywords.
@@ -654,14 +672,12 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
-        ``**kwargs`` :
+        kwargs :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 
         Returns
         -------
-        
         result : iterable
             An iterable of key-value store keys whose metadata matches all the
             specified values for the specified metadata keywords.
@@ -676,13 +692,11 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         pattern : string
             Glob-style pattern to match keys with.
 
         Returns
         -------
-        
         result : iterable
             A iterable of keys which match the glob pattern.
         
@@ -707,14 +721,11 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         path : string
             A file system path to store the data to.
-        
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -722,16 +733,13 @@ class AbstractStore(object):
         
         Events
         ------
-        
-        StoreProgressStartEvent:
+        StoreProgressStartEvent :
             For buffering implementations, this event should be emitted prior to
             writing any data to disk.
-        
-        StoreProgressStepEvent:
+        StoreProgressStepEvent :
             For buffering implementations, this event should be emitted
             periodically as data is written to disk.
-        
-        StoreProgressEndEvent:
+        StoreProgressEndEvent :
             For buffering implementations, this event should be emitted after
             finishing writing to disk.
         
@@ -762,14 +770,11 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         path : string
             A file system path to read the data from.
-        
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -790,34 +795,28 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
             default if they need to.  The default is 1048576 bytes (1 MiB).
-        
+
         Returns
         -------
-        
         bytes :
             The contents of the file-like object as bytes.
         
         Events
         ------
-        
-        StoreProgressStartEvent:
+        StoreProgressStartEvent :
             For buffering implementations, this event should be emitted prior to
             extracting the data.
-        
-        StoreProgressStepEvent:
+        StoreProgressStepEvent :
             For buffering implementations, this event should be emitted
             periodically as data is extracted.
-        
-        StoreProgressEndEvent:
+        StoreProgressEndEvent :
             For buffering implementations, this event should be emitted after
             extracting the data.
         
@@ -835,14 +834,11 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         data : bytes
             The data as a bytes object.
-        
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different

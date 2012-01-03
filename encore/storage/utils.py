@@ -23,7 +23,8 @@ from .events import (StoreTransactionStartEvent, StoreTransactionEndEvent,
 
 
 class StoreProgressManager(ProgressManager):
-    """ ProgressManager subclass that generates :py:class:`..events.StoreProgressEvent`
+    """ :py:class:`encore.events.progress_events.ProgressManager` subclass that
+    generates :py:class:`encore.storage.events.StoreProgressEvent`
     instances
     """
     StartEventType = StoreProgressStartEvent

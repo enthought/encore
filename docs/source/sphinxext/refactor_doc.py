@@ -344,7 +344,6 @@ class BaseDocstring(object):
         """
         header = lines[0].strip()
         if ' :' in header:
-            print re.split('\s\:\s?', header, maxsplit=1)
             arg_name, arg_type = re.split('\s\:\s?', header, maxsplit=1)
         else:
             arg_name, arg_type = header, ''

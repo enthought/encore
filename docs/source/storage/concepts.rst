@@ -35,7 +35,7 @@ my store's optimized for remote access...").
 
 .. digraph:: diagram1
 
-    node [shape=box]
+    node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
     "Egg Store" -> "General Implementation";
     "Code Block Store" -> "General Implementation";
     "Configuration Store" -> "General Implementation"
@@ -50,7 +50,7 @@ an egg store... but now they're 100 times bigger than they need to be...")
 
 .. digraph:: diagram2
 
-    node [shape=box]
+    node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
     "Egg Store API" -> "Memory Store"
     "Egg Store API" -> "Disk Store"
     "Egg Store API" -> "HTTP Store"
@@ -71,7 +71,7 @@ ability to pick and choose allows a great deal of flexibility.
 
 .. digraph:: diagram2
 
-    node [shape=box]
+    node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
     "Egg Store" -> "Key-Value Store API"
     "Code Block Store" -> "Key-Value Store API"
     "Configuration Store" -> "Key-Value Store API"

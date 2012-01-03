@@ -1,5 +1,5 @@
-Event Manager Implementation
-============================
+Progress Events
+===============
 
 .. currentmodule:: encore.events.progress_events
 

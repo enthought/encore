@@ -272,7 +272,7 @@ class EventManager(BaseEventManager):
         filter : dict
             Filters to match for before calling the listener. The listener is
             called only when the event matches the filter.
-        priority: int
+        priority : int
             The priority of the listener. Higher priority listeners are called
             before lower priority listeners (even from sub/superclass events).
             Listeners with same priority are called in order of `count`.
