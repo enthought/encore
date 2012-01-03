@@ -71,7 +71,7 @@ def get_indent(line):
 #------------------------------------------------------------------------------
 
 def is_variable_field(line, indent=''):
-    regex = indent + r'\*?\*?\w+\s:\s*'
+    regex = indent + r'\*?\*?\w+\s:(\s+|$)'
     match = re.match(regex, line)
     return match
 
@@ -344,13 +344,14 @@ class BaseDocstring(object):
         """
         header = lines[0].strip()
         if ' :' in header:
-            arg_name, arg_type = re.split(' \:\s?', header)
+            print re.split('\s\:\s?', header, maxsplit=1)
+            arg_name, arg_type = re.split('\s\:\s?', header, maxsplit=1)
         else:
             arg_name, arg_type = header, ''
         if self.verbose:
             print "name is:", arg_name, " type is:", arg_type
             print "the output of 're.split(' \:\s?', header)' was", \
-                        re.split(' \:\s?', header)
+                        re.split('\s\:\s?', header, maxsplit=1)
         if len(lines) > 1:
             lines = [line.rstrip() for line in lines]
             return arg_name.strip(), arg_type.strip(), lines[1:]
@@ -385,7 +386,7 @@ class BaseDocstring(object):
 
         del docstring[index:(index + len(lines))]
         self.index = index
-        return lines[:-1]
+        return lines
 
     def is_section(self):
         """Check if the line defines a section.
@@ -512,7 +513,8 @@ class FunctionDocstring(BaseDocstring):
         if headers is None:
             headers = {'Returns': 'returns', 'Arguments': 'arguments',
                        'Parameters': 'arguments', 'Raises': 'raises',
-                       'Yields': 'returns', 'Notes':'notes'}
+                       'Yields': 'returns', 'Notes':'notes', 'Events': 
+                       'events'}
 
         super(FunctionDocstring, self).__init__(lines, headers, verbose)
         return
@@ -594,6 +596,43 @@ class FunctionDocstring(BaseDocstring):
         self.index += len(descriptions)
         return
 
+    def _refactor_events(self, header):
+        """Refactor the events section to sphinx friendly format"""
+
+        if self.verbose:
+            print 'Raised section refactoring'
+
+        descriptions = []
+        index = self.index
+        self.remove_lines(index, 2)
+        indent = get_indent(self.peek())
+        fields = self.extract_fields(indent)
+
+        if self.verbose:
+            print 'Raised Errors'
+            print fields
+
+        descriptions = []
+        descriptions.append(indent + ':events:')
+        if len(fields) == 1:
+            name_format = '**{0}** '
+        else:
+            name_format = '- **{0}** '
+
+        for arg_name, arg_type, desc in fields:
+            if not is_empty(desc[0]):
+                arg_name = name_format.format(arg_name) + '- '
+            else:
+                arg_name = name_format.format(arg_name)
+            arg_name = indent + '    ' + arg_name
+            paragraph = ' '.join(remove_indent(desc))
+            descriptions.append(arg_name + paragraph)
+        descriptions.append('')
+
+        self.insert_lines(descriptions, index)
+        self.index += len(descriptions)
+        return
+
     def _refactor_arguments(self, header):
         """Refactor the argument section to sphinx friendly format"""
 
@@ -646,7 +685,8 @@ class ClassDocstring(BaseDocstring):
         if headers is None:
             headers = {'Attributes': 'attributes', 'Methods': 'methods',
                        'See Also': 'header', 'Abstract Methods': 'methods',
-                       'Notes':'notes'}
+                       'Notes':'notes', 'Arguments': 'arguments',
+                       'Parameters': 'arguments', }
 
         super(ClassDocstring, self).__init__(lines, headers, verbose)
         return
@@ -791,6 +831,33 @@ class ClassDocstring(BaseDocstring):
         line_list = list(line)
         line_list[index: (index + word_length)] = list(word)
         return ''.join(line_list)
+
+    def _refactor_arguments(self, header):
+        """Refactor the argument section to sphinx friendly format"""
+
+        if self.verbose:
+            print '{0} Section'.format(header)
+
+        index = self.index
+        self.remove_lines(index, 2)
+        indent = get_indent(self.peek())
+        parameters = self.extract_fields(indent)
+        print parameters
+
+        descriptions = []
+        for arg_name, arg_type, desc in parameters:
+            arg_name = fix_name(arg_name)
+            descriptions.append(indent + ':param {0}: {1}'.\
+                                format(arg_name, desc[0].strip()))
+            for line in desc[1:]:
+                descriptions.append('{0}'.format(line))
+            if len(arg_type) > 0:
+                descriptions.append(indent + ':type {0}: {1}'.\
+                                    format(arg_name, arg_type))
+        descriptions.append('')
+        self.insert_lines(descriptions, index)
+        self.index += len(descriptions)
+        return
 
 #------------------------------------------------------------------------------
 # Extension definition
