@@ -11,6 +11,7 @@ Contents
 .. toctree::
    :maxdepth: 2
    
+   events/index.rst
    storage/index.rst
 
 Indices and tables

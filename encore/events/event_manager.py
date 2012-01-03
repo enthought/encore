@@ -263,8 +263,8 @@ class EventManager(BaseEventManager):
     def connect(self, cls, func, filter=None, priority=0):
         """ Add a listener for the event.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         cls : class
             The class of events for which the listener is registered.
         func : callable
@@ -298,8 +298,8 @@ class EventManager(BaseEventManager):
     def emit(self, evt, block=True):
         """ Notifies all listeners about the event with the specified arguments.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         evt : BaseEvent instance
             The BaseEvent instance to emit.
         block : bool

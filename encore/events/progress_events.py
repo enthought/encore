@@ -4,18 +4,32 @@
 #
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
+""" Events and helpers for managing progress indicators
+"""
 
 from .abstract_event_manager import BaseEvent
 
 class ProgressEvent(BaseEvent):
-    pass
+    """ Abstract base class for all progress events
+    
+    This class is provided so that listeners can easily listen for any type
+    ProgressEvent.
+
+    Attributes
+    ----------    
+    operation_id :
+        A unique identifier for the operation being performed.
+    
+    message : string
+        A human-readable describing the operation being performed.
+    
+    """
 
 class ProgressStartEvent(ProgressEvent):
-    """
+    """ Event emitted at the start of an operation
     
     Attributes
-    ----------
-    
+    ----------    
     operation_id :
         A unique identifier for the operation being performed.
     
@@ -28,11 +42,10 @@ class ProgressStartEvent(ProgressEvent):
     """
 
 class ProgressStepEvent(ProgressEvent):
-    """
+    """ Event emitted periodically during an operation
     
     Attributes
-    ----------
-    
+    ----------    
     operation_id :
         A unique identifier for the operation being performed.
     
@@ -45,11 +58,10 @@ class ProgressStepEvent(ProgressEvent):
     """
 
 class ProgressEndEvent(ProgressEvent):
-    """
+    """ Event emitted at the end of an operation
     
     Attributes
     ----------
-    
     operation_id :
         A unique identifier for the operation that is finished.
     
@@ -57,8 +69,8 @@ class ProgressEndEvent(ProgressEvent):
         A human-readable describing the state of the operation that ended.
     
     exit_state : string
-        A constant describing the end state of the operation.  One of 'normal',
-        'warning', 'error' or 'exception'.
+        A constant describing the end state of the operation.  One of ``normal``,
+        ``warning``, ``error`` or ``exception``.
         
     """
 
@@ -96,14 +108,17 @@ class ProgressManager(object):
         else:
             progress.end(message='Success', end_state='normal')
     
-    Class Attributes
-    ----------------
-
+    Attributes
+    ----------
     StartEventType : ProgressStartEvent subclass
+        The actual event class to use when emitting a start event.  The default
+        is :py:class:`ProgressStartEvent`, but subclasses may choose to override.
     StepEventType : ProgressStepEvent subclass
+        The actual event class to use when emitting a step event.  The default
+        is :py:class:`ProgressStepEvent`, but subclasses may choose to override.
     EndEventType : ProgressEndEvent subclass
-        The actual event classes to use when emitting the appropriate types of
-        events.
+        The actual event class to use when emitting an end event.  The default
+        is :py:class:`ProgressEndEvent`, but subclasses may choose to override.
     
     """
     
@@ -116,7 +131,6 @@ class ProgressManager(object):
         
         Arguments
         ---------
-        
         event_manager : EventManager instance
             The event manager to use when emitting events.
         
@@ -144,6 +158,17 @@ class ProgressManager(object):
         self._running = False
     
     def start(self, **extra_kwargs):
+        """ Emit a start event
+        
+        By default creates an instance of :py:attr:`StartEventType` with the
+        appropriate attributes.
+        
+        Parameters
+        ----------
+        extra_kwargs : dict
+            Additional arguments to be passed through to the event's constructor.
+            
+        """
         self._running = True
         
         kwargs = self.kwargs.copy()
@@ -157,6 +182,23 @@ class ProgressManager(object):
             **kwargs))
     
     def step(self, message=None, step=None, **extra_kwargs):
+        """ Emit a step event
+        
+        By default creates an instance of :py:attr:`StepEventType` with the
+        appropriate attributes.
+        
+        Parameters
+        ----------
+        message : str
+            The message to be passed to the event's constructor.  By default will
+            use ``self.message``.
+        step : int
+            The step number.  By default keeps an internal step count, incremented
+            each time this method is called.
+        extra_kwargs : dict
+            Additional arguments to be passed through to the event's constructor.
+            
+        """
         if not self._running:
             raise Exception("ProgressManager.step() called before start()")
 
@@ -175,6 +217,22 @@ class ProgressManager(object):
         self._step_count += 1
 
     def end(self, message=None, exit_state='normal', **extra_kwargs):
+        """ Emit a step event
+        
+        By default creates an instance of :py:attr:`StepEventType` with the
+        appropriate attributes.
+        
+        Parameters
+        ----------
+        message : str
+            The message to be passed to the event's constructor.  By default will
+            use ``self.message``.
+        exit_state : one of ``normal``, ``warning``, ``error`` or ``exception``
+            The exit_state of the event.
+        extra_kwargs : dict
+            Additional arguments to be passed through to the event's constructor.
+            
+        """
         if not self._running:
             raise Exception("ProgressManager.end() called before start()")
             
