@@ -33,6 +33,13 @@ trade-offs, and the trade-offs may end up being inappropriate for particular use
 cases (eg. "Now I need to have an in-memory code-block store for efficiency, and
 my store's optimized for remote access...").
 
+.. digraph:: diagram1
+
+    node [shape=box]
+    "Egg Store" -> "General Implementation";
+    "Code Block Store" -> "General Implementation";
+    "Configuration Store" -> "General Implementation"
+
 Alternatively, it is tempting to start from the task that is being attempted
 (eg. "I need to store eggs, so I build an egg store") and then generalize the
 implementation (eg. "Now I need to store eggs remotely, so I'll build a remote
@@ -40,6 +47,15 @@ egg store, but at least I'll use the same API").  However, again the specifics
 of the implementation may make it inappropriate for particular use cases (eg.
 "Now I need a code-block store, so I'll wrap up my code-blocks as eggs and use
 an egg store... but now they're 100 times bigger than they need to be...")
+
+.. digraph:: diagram2
+
+    node [shape=box]
+    "Egg Store API" -> "Memory Store"
+    "Egg Store API" -> "Disk Store"
+    "Egg Store API" -> "HTTP Store"
+    "Egg Store API" -> "Cached Store"
+    "Egg Store API" -> "SQL Store"
 
 This storage API instead to simply provides an API through which data providers
 and data consumers can talk.  The API deliberately makes no assumptions about
@@ -52,6 +68,18 @@ code-block store logic which uses the API, and my in-memory store logic which
 implements the API, and join them together").  Not every combination may make
 sense (an in-memory egg store is probably a bad idea, for example), but the
 ability to pick and choose allows a great deal of flexibility.
+
+.. digraph:: diagram2
+
+    node [shape=box]
+    "Egg Store" -> "Key-Value Store API"
+    "Code Block Store" -> "Key-Value Store API"
+    "Configuration Store" -> "Key-Value Store API"
+    "Key-Value Store API" -> "Memory Store"
+    "Key-Value Store API" -> "Disk Store"
+    "Key-Value Store API" -> "HTTP Store"
+    "Key-Value Store API" -> "Cached Store"
+    "Key-Value Store API" -> "SQL Store"
 
 This also reflects the reality that developers frequently do not have complete
 freedom to choose the best possible data store solution due to external

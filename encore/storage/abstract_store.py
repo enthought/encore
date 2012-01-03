@@ -48,7 +48,6 @@ class AbstractStore(object):
         
         Returns
         -------
-        
         metadata : dict
             A dictionary of metadata giving information about the key-value store.
         """
@@ -65,23 +64,21 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
         
         Returns
         -------
-        
-        (data, metadata) : tuple of file-like, dict
-            A pair of objects, the first being a readable file-like object that
-            provides stream of data from the key-value store.  The second is a
-            dictionary of metadata for the key.
+        data : file-like
+            A readable file-like object that provides stream of data from the
+            key-value store
+        metadata : dictionary
+            A dictionary of metadata for the key.
         
         Raises
         ------
-        
-        KeyError:
+        KeyError :
             If the key is not found in the store, a KeyError is raised.
 
         """
@@ -97,16 +94,13 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         value : tuple of file-like, dict
             A pair of objects, the first being a readable file-like object that
             provides stream of data from the key-value store.  The second is a
             dictionary of metadata for the key.
-           
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -114,20 +108,16 @@ class AbstractStore(object):
         
         Events
         ------
-        
-        StoreProgressStartEvent:
+        StoreProgressStartEvent :
             For buffering implementations, this event should be emitted prior to
             writing any data to the underlying store.
-        
-        StoreProgressStepEvent:
+        StoreProgressStepEvent :
             For buffering implementations, this event should be emitted
             periodically as data is written to the underlying store.
-        
-        StoreProgressEndEvent:
+        StoreProgressEndEvent :
             For buffering implementations, this event should be emitted after
             finishing writing to the underlying store.
-            
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
         
@@ -147,17 +137,16 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
         
         Events
         ------
-        
-        StoreDeleteEvent:
+        StoreDeleteEvent :
             On successful completion of a transaction, a StoreDeleteEvent should
             be emitted with the key.
+        
         """
         raise NotImplementedError
 
@@ -168,14 +157,12 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
         
         Returns
         -------
-        
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
@@ -190,18 +177,15 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         select : iterable of strings or None
             Which metadata keys to populate in the result.  If unspecified, then
             return the entire metadata dictionary.
         
         Returns
         -------
-        
         metadata : dict
             A dictionary of metadata associated with the key.  The dictionary
             has keys as specified by the select argument.  If a key specified in
@@ -210,8 +194,7 @@ class AbstractStore(object):
         
         Raises
         ------
-        
-        KeyError:
+        KeyError :
             This will raise a key error if the key is not present in the store.
 
         """
@@ -224,31 +207,25 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
 
         Events
         ------
-        
-        StoreProgressStartEvent:
+        StoreProgressStartEvent :
             For buffering implementations, this event should be emitted prior to
             writing any data to the underlying store.
-        
-        StoreProgressStepEvent:
+        StoreProgressStepEvent :
             For buffering implementations, this event should be emitted
             periodically as data is written to the underlying store.
-        
-        StoreProgressEndEvent:
+        StoreProgressEndEvent :
             For buffering implementations, this event should be emitted after
             finishing writing to the underlying store.
-        
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
 
@@ -265,19 +242,16 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         metadata : dict
             A dictionary of metadata to associate with the key.  The dictionary
             keys should be strings which are valid Python identifiers.
 
         Events
         ------
-        
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
 
@@ -294,19 +268,16 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         metadata : dict
             A dictionary of metadata to associate with the key.  The dictionary
             keys should be strings which are valid Python identifiers.
 
         Events
         ------
-        
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
 
@@ -320,14 +291,12 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
         
         Returns
         -------
-        
         exists : bool
             Whether or not the key exists in the key-value store.
         
@@ -350,21 +319,18 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
         
         Returns
         -------
-        
         result : iterator of (file-like, dict) tuples
             An iterator of (data, metadata) pairs.
         
         Raises
         ------
-        
-        KeyError:
+        KeyError :
             This will raise a key error if the key is not present in the store.
         
         """
@@ -378,21 +344,18 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
         
         Returns
         -------
-        
         result : iterator of file-like
             An iterator of file-like data objects corresponding to the keys.
         
         Raises
         ------
-        
-        KeyError:
+        KeyError :
             This will raise a key error if the key is not present in the store.
         
         """
@@ -406,18 +369,15 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         select : iterable of strings or None
             Which metadata keys to populate in the results.  If unspecified, then
             return the entire metadata dictionary.
-        
+
         Returns
         -------
-        
         metadatas : iterator of dicts
             An iterator of dictionaries of metadata associated with the key.
             The dictionaries have keys as specified by the select argument.  If
@@ -426,8 +386,7 @@ class AbstractStore(object):
         
         Raises
         ------
-        
-        KeyError:
+        KeyError :
             This will raise a key error if the key is not present in the store.
         
         """
@@ -447,15 +406,12 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         values : iterable of (file-like, dict) tuples
             An iterator that provides the (data, metadata) pairs for the
             corresponding keys.
-           
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -463,20 +419,16 @@ class AbstractStore(object):
         
         Events
         ------
-        
-        StoreProgressStartEvent:
+        StoreProgressStartEvent :
             For buffering implementations, this event should be emitted prior to
             writing any data to the underlying store.
-        
-        StoreProgressStepEvent:
+        StoreProgressStepEvent :
             For buffering implementations, this event should be emitted
             periodically as data is written to the underlying store.
-        
-        StoreProgressEndEvent:
+        StoreProgressEndEvent :
             For buffering implementations, this event should be emitted after
             finishing writing to the underlying store.
-        
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata for each key that was set.
 
@@ -498,15 +450,12 @@ class AbstractStore(object):
 
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         datas : iterable of file-like objects
             An iterator that provides the data file-like objects for the
             corresponding keys.
-           
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -514,20 +463,16 @@ class AbstractStore(object):
         
         Events
         ------
-        
-        StoreProgressStartEvent:
+        StoreProgressStartEvent :
             For buffering implementations, this event should be emitted prior to
             writing any data to the underlying store.
-        
-        StoreProgressStepEvent:
+        StoreProgressStepEvent :
             For buffering implementations, this event should be emitted
             periodically as data is written to the underlying store.
-        
-        StoreProgressEndEvent:
+        StoreProgressEndEvent :
             For buffering implementations, this event should be emitted after
             finishing writing to the underlying store.
-        
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata for each key that was set.
 
@@ -549,19 +494,16 @@ class AbstractStore(object):
 
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         metadatas : iterable of dicts
             An iterator that provides the metadata dictionaries for the
             corresponding keys.
-        
+
         Events
         ------
-        
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata for each key that was set.
 
@@ -583,19 +525,16 @@ class AbstractStore(object):
 
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         metadatas : iterable of dicts
             An iterator that provides the metadata dictionaries for the
             corresponding keys.
         
         Events
         ------
-        
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata for each key that was set.
 
@@ -630,45 +569,36 @@ class AbstractStore(object):
         
         Parameters
         ----------
-        
         notes : string
             Some information about the transaction, which may or may not be used
             by the implementation.
         
         Returns
-        -------
-        
+        -------        
         transaction : context manager
             A context manager for the transaction.
         
         Events
-        ------
-        
-        StoreTransactionStartEvent:
+        ------        
+        StoreTransactionStartEvent :
             This event should be emitted on entry into the transaction.
-        
-        StoreProgressStartEvent:
+        StoreProgressStartEvent :
             For buffering implementations, this event should be emitted prior to
             writing any data to the underlying store.
-        
-        StoreProgressStepEvent:
+        StoreProgressStepEvent :
             For buffering implementations, this event should be emitted
             periodically as data is written to the underlying store.
-        
-        StoreProgressEndEvent:
+        StoreProgressEndEvent :
             For buffering implementations, this event should be emitted after
             finishing writing to the underlying store.
-        
-        StoreTransactionEndEvent:
+        StoreTransactionEndEvent :
             This event should be emitted on successful conclusion of the
             transaction, before any Set or Delete events are emitted.
-        
-        StoreSetEvent:
+        StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata for each key that was set during the
             transaction.
-
-        StoreDeleteEvent:
+        StoreDeleteEvent :
             On successful completion of a transaction, a StoreDeleteEvent should
             be emitted with the key for all deleted keys.
 
