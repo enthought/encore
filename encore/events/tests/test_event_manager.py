@@ -534,5 +534,28 @@ class TestEventManager(unittest.TestCase):
         self.evt_mgr.emit(MyEvt())
         self.assertEqual(data, [MyEvt, MyEvt2, MyEvt2, MyEvt])
 
+    def test_reconnect(self):
+        """ Test reconnecting already connected listener. """
+        calls = []
+        def callback1(evt):
+            calls.append(1)
+        def callback2(evt):
+            calls.append(2)
+
+        # Test if reconnect disconnects previous.
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertEqual(calls, [1])
+        calls[:] = []
+
+        # Test if sequence is changed.
+        self.evt_mgr.connect(BaseEvent, callback2)
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertEqual(calls, [2, 1])
+        calls[:] = []
+
+
 if __name__ == '__main__':
     unittest.main()
