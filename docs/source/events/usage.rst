@@ -261,7 +261,7 @@ listener simply removes the writer object from the display, which will cause it
 to eventually be garbage-collected and the listeners disconnected automatically::
 
     class ProgressWriter(object):
-        def __init__(self, display, event_manager, operation_id, steps):
+        def __init__(self, display, operation_id, steps):
             self.display = display
             self.operation_id = operation_id
             self.steps = steps
@@ -269,26 +269,30 @@ to eventually be garbage-collected and the listeners disconnected automatically:
             self._max = 75
         
         def step_listener(self, event):
-            stars = int(round(event.step/self.steps)*self._max)
+            stars = int(round(float(event.step)/self.steps*self._max))
             if stars > self._count:
                 sys.stdout.write('*'*(stars-self._count))
                 sys.stdout.flush()
                 self._count = stars
         
         def end_listener(self, event):
-            if event.end_state == 'normal':
+            if event.exit_state == 'normal':
                 sys.stdout.write(']\n')
                 sys.stdout.flush()
             else:
                 sys.stdout.write('\n')
-                sys.stdout.write(event.end_state.upper())
+                sys.stdout.write(event.exit_state.upper())
                 sys.stdout.write(': ')
                 sys.stdout.write(event.message)
+                sys.stdout.write('\n')
                 sys.stdout.flush()
             del self.display[self.operation_id]
 
 Advanced Features
 -----------------
+
+Disabling Events
+~~~~~~~~~~~~~~~~
 
 The event manager has methods that allow code to temporarily disable events
 of a certain class.  These are accessed via the :py:meth:`~.EventManager.disable`,
@@ -307,6 +311,9 @@ Enabled/disabled state is kept track of on a per-class basis, so after::
 
 the :py:class:`SaveEvent` events will still be disabled.
 
+Pre- and Post-Emit Callbacks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The event classes also have two hooks :py:meth:`~.BaseEvent.pre_emit` and
 :py:meth:`~.BaseEvent.post_emit` which get called immediately before and
 immediately after dispatch to listeners.  This potentially allows Event code to
@@ -315,5 +322,17 @@ perform actions based upon interactions with listeners, such as having a
 event is not handled.  These hooks may also be of use for instrumenting and
 debugging code.
 
+Threading
+~~~~~~~~~
 
+By default events are processed on the thread that they were emitted on, and
+the :py:meth:`~.EventManager.connect`, :py:meth:`~.EventManager.disconnect`
+and :py:meth:`~.EventManager.emit` methods should be thread-safe.  Processing
+an event blocks that thread from further work until all listeners have been
+called.
+
+The :py:meth:`~.EventManager.emit` method has an optional argument ``block``
+which if ``False`` will cause the emit method to create a worker thread to
+perform the listener dispatch, and will return that thread from the function
+call.
 
