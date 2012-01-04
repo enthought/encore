@@ -32,6 +32,13 @@ class AbstractStore(object):
     
     This class implements some of the API so that it can be used with super()
     where appropriate.
+    
+    Attributes
+    ----------
+    event_manager :
+        Every store is assumed to have an event_manager attribute which
+        implements the :py:class:`~.abstract_event_manager.BaseEventManager` API.
+        
     """
     __metaclass__ = ABCMeta    
     

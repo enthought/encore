@@ -34,6 +34,15 @@ class StoreProgressManager(ProgressManager):
 
 class DummyTransactionContext(object):
     """ A dummy class that can be returned by stores which don't support transactions
+    
+    This class guarantees that there is only one transaction object for each
+    store instance.
+    
+    Parameters
+    ----------
+    store : key-value store instance
+        The store that this transaction context is associated with.
+    
     """
     def __new__(cls, store):
         if getattr(store, '_transaction', None) is None:
@@ -56,6 +65,16 @@ class SimpleTransactionContext(object):
     terms of nesting and event generation.  Subclasses should override the
     start, commit and rollback methods to perform appropriate implementation-specific
     actions.
+    
+    This class correctly handles nested transactions by ensuring that each store
+    has precisely one active transaction context and by tracking the number of
+    times the context has been entered and exited.  The transaction is only
+    committed once the top-level context has exited.
+    
+    Parameters
+    ----------
+    store : key-value store instance
+        The store that this transaction context is associated with.
     
     """
     def __new__(cls, store):
@@ -136,6 +155,11 @@ class BufferIteratorIO(object):
     
     This uses less memory than a StringIO, at the cost of some flexibility.
     
+    Parameters
+    ----------
+    iterator : iterator of bytes objects
+        An iterator that produces a bytes object on each iteration.
+    
     """
     
     def __init__(self, iterator):
@@ -143,6 +167,9 @@ class BufferIteratorIO(object):
         self.buffer = b''
     
     def read(self, buffer_size=1048576):
+        """Read at most buffer_size bytes, returned as a string.
+
+        """
         while len(self.buffer) < buffer_size:
             try:
                 data = self.iterator.next()
@@ -169,6 +196,18 @@ def buffer_iterator(filelike, buffer_size=1048576, progress=None):
     The buffers of bytes default to the provided buffer_size.  This is a useful
     method when copying one data stream to another.
     
+    Parameters
+    ----------
+    filelike : a file-like object
+        An object which implements the :py:meth:`read(buffer_size)` method.
+    buffer_size : int
+        The number of bytes to read at a time.
+    progress : callable
+        A callback for progress indication.  A StoreProgressManager instance
+        inside a ``with`` block would be appropriate, but anthing that takes a
+        `step` parameter which is the total number of bytes read so far will
+        work.
+    
     """
     progress = progress if progress is not None else lambda *args, **kwargs: None
     bytes_iterated = 0
@@ -188,6 +227,16 @@ def tee(filelike, n=2, buffer_size=1048576):
     cautions about memory usage.  In general it should be more memory efficient
     than pulling everything into memory.
     
+    
+    Parameters
+    ----------
+    filelike : a file-like object
+        An object which implements the :py:meth:`read(buffer_size)` method.
+    n : int
+        The number of filelike streams to produce.
+    buffer_size : int
+        The number of bytes to read at a time.
+
     """
     iters = itertools.tee(buffer_iterator(filelike, buffer_size), n)
     return [BufferIteratorIO(iter) for iter in iters]

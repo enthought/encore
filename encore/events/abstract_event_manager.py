@@ -120,6 +120,7 @@ class BaseEventManager(object):
         ------
         KeyError :
             if `func` is not already connected.
+            
         """
         raise NotImplementedError
 
@@ -143,6 +144,7 @@ class BaseEventManager(object):
         Listeners of superclasses of the event are also called.
         Eg. a :py:class:`BaseEvent` listener will also be notified about any
         derived class events.
+        
         """
         raise NotImplementedError
 
@@ -154,6 +156,7 @@ class BaseEventManager(object):
         ----------
         cls : class
             The class of events which we want to disable.
+
         """
         raise NotImplementedError
 
@@ -165,6 +168,7 @@ class BaseEventManager(object):
         ----------
         cls : class
             The class of events which we want to enable.
+
         """
         raise NotImplementedError
 
@@ -175,7 +179,7 @@ class BaseEventManager(object):
         Parameters
         ----------
         cls : class
-            The class of events which we want chekc the status of.
+            The class of events which we want check the status of.
         """
         raise NotImplementedError
 
