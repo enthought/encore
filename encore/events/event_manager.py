@@ -106,30 +106,42 @@ class EventInfo(object):
     def connect(self, func, filter=None, priority=0, count=0):
         """ Add a listener for the event.
 
-        Parameters:
-        -----------
+
+        Parameters
+        ----------
+        cls : class
+            The class of events for which the listener is registered.
+
         func : callable
-            A function to be called when the event is emitted
+            A callable to be called when the event is emitted.  The function
+            should expect one argument which is the event instance which was
+            emitted.
+
         filter : dict
             Filters to match for before calling the listener. The listener is
-            called only when the event matches the filter.
-        priority: int
+            called only when the event matches all of the filter .
+            
+            Filter specification:
+                - key: string which is name of an attribute of the event instance.
+                - value: the value of the specified attribute.
+
+        priority : int
             The priority of the listener. Higher priority listeners are called
-            before lower priority listeners (even from sub/superclass events).
-            Listeners with same priority are called in order of `count`.
+            before lower priority listeners.
+
         count : int
             A unique integer to break a tie in priority. This is generally
             an incremental number assigned by EventManager in order of
             registration.
 
-        Filter specification:
-            key - string which is name of an attribute of the event instance.
-            value - the value of the specified attribute.
-
-        Note: The filtering is added so that future optimizations can be done
+        Note
+        ----
+       
+        The filtering is added so that future optimizations can be done
         on specific events with large number of handlers. For example there
         should be a fast way to filter key events to specific listeners rather
         than iterating through all listeners.
+
         """
         with self._priority_list_lock:
             sub = self._get_notifier(func, self._listener_deleted)
@@ -143,7 +155,13 @@ class EventInfo(object):
             self._priority_info[id] = key
 
     def disconnect(self, func):
-        """ Disconnects a listener from being notified about the event.
+        """ Disconnects a listener from being notified about the event'
+
+        Parameters
+        ----------
+        func : callable
+            The callable which was registered.
+
         """
         self._disconnect(self.get_id(func))
 
@@ -263,28 +281,36 @@ class EventManager(BaseEventManager):
     def connect(self, cls, func, filter=None, priority=0):
         """ Add a listener for the event.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         cls : class
             The class of events for which the listener is registered.
+
         func : callable
-            A function to be called when the event is emitted
+            A callable to be called when the event is emitted.  The function
+            should expect one argument which is the event instance which was
+            emitted.
+
         filter : dict
             Filters to match for before calling the listener. The listener is
-            called only when the event matches the filter.
-        priority: int
+            called only when the event matches all of the filter .
+            
+            Filter specification:
+                - key: string which is name of an attribute of the event instance.
+                - value: the value of the specified attribute.
+
+        priority : int
             The priority of the listener. Higher priority listeners are called
-            before lower priority listeners (even from sub/superclass events).
-            Listeners with same priority are called in order of `count`.
+            before lower priority listeners.
 
-        Filter specification:
-            key - string which is name of an attribute of the event instance.
-            value - the value of the specified attribute.
-
-        Note: The filtering is added so that future optimizations can be done
+        Note
+        ----
+       
+        The filtering is added so that future optimizations can be done
         on specific events with large number of handlers. For example there
         should be a fast way to filter key events to specific listeners rather
         than iterating through all listeners.
+
         """
         if cls not in self.event_map:
             self.register(cls)
@@ -292,24 +318,42 @@ class EventManager(BaseEventManager):
 
     def disconnect(self, cls, func):
         """ Disconnects a listener from being notified about the event'
+
+        Parameters
+        ----------
+        cls : class
+            The class of events for which the listener is registered.
+        func : callable
+            The callable which was registered for that class.
+
+        Raises
+        ------
+        KeyError :
+            if `func` is not already connected.
+            
         """
         self.event_map[cls].disconnect(func)
 
     def emit(self, evt, block=True):
         """ Notifies all listeners about the event with the specified arguments.
 
-        Parameters:
-        -----------
-        evt : BaseEvent instance
-            The BaseEvent instance to emit.
+        Parameters
+        ----------
+        evt : instance of :py:class:`BaseEvent`
+            The :py:class:`BaseEvent` instance to emit.
         block : bool
             Whether to block the call until the event handling is finished.
             If block is False, the event will be emitted in a separate thread
             and the thread will be returned, so you can later query its status
             or do ``wait()`` on the thread.
 
-        Note: Listeners of superclasses of the event are also called.
-        BaseEvent listener will also be notified about any derived class events.
+        Note
+        ----
+        
+        Listeners of superclasses of the event are also called.
+        Eg. a :py:class:`BaseEvent` listener will also be notified about any
+        derived class events.
+
         """
         if not block:
             t = threading.Thread(target=self.emit, args=(evt, True),
@@ -341,7 +385,18 @@ class EventManager(BaseEventManager):
     def get_event(self, cls=None):
         """ Returns an ``EventInfo`` instance for the event.
 
-        If ``cls`` is ``None``, then all known event types are returned.
+        Parameters
+        ----------
+        cls : class
+            The class of the event we want the ``EventInfo`` for.        
+            If ``cls`` is ``None``, then all known event types are returned.
+        
+        Returns
+        -------
+        event_info :
+            An ``EventInfo`` instance for the class, or a dictionary mapping
+            classes to ``EventInfo`` instances.
+        
         """
         if cls is None:
             return self.event_map
@@ -350,14 +405,25 @@ class EventManager(BaseEventManager):
 
     def get_listeners(self, event, cls=None):
         """ Return listeners which will be called on specified event.
-
-        If ``event`` is instance of BaseEvent(), listeners which will be called
-        for the event are returned (satisfying any filters on the listeners).
-        If ``event`` is BaseEvent subclass, all listeners for specified event
-        class are returned).
-        ``cls`` argument is generally not needed, it is for internal use.
-        If ``cls`` is specified as a subclass of ``BaseEvent``, then only
-        listeners for the specified event class and superclasses are returned.
+        
+        Parameters
+        ----------
+        
+        event : event instance or class
+            The event we want to get the listeners for.
+            If ``event`` is an instance of BaseEvent(), the listeners which will
+            be called for the event are returned (satisfying any filters on the
+            listeners).
+            
+            If ``event`` is BaseEvent subclass, all listeners for specified event
+            class are returned (but no filtering is performed).
+        
+        cls : BaseEvent subclass
+            ``cls`` argument is generally not needed, it is for internal use.
+            If ``cls`` is specified as a subclass of ``BaseEvent``, then only
+            listeners for the specified event class and superclasses are
+            returned.
+        
         """
         evt_map = self.event_map
         if cls is None:
@@ -374,6 +440,12 @@ class EventManager(BaseEventManager):
 
     def disable(self, cls):
         """ Disable the event from generating notifications.
+
+        Parameters
+        ----------
+        cls : class
+            The class of events which we want to disable.
+
         """
         if cls not in self.event_map:
             self.register(cls)
@@ -381,6 +453,12 @@ class EventManager(BaseEventManager):
 
     def enable(self, cls):
         """ Enable the event again to generate notifications.
+
+        Parameters
+        ----------
+        cls : class
+            The class of events which we want to enable.
+
         """
         if cls not in self.event_map:
             self.register(cls)
@@ -388,6 +466,12 @@ class EventManager(BaseEventManager):
 
     def is_enabled(self, cls):
         """ Check if the event is enabled.
+
+        Parameters
+        ----------
+        cls : class
+            The class of events which we want check the status of.
+
         """
         for cls in self.get_event_hierarchy(cls):
             if cls in self.event_map and not self.event_map[cls].is_enabled():
@@ -396,6 +480,7 @@ class EventManager(BaseEventManager):
 
     def get_event_hierarchy(self, cls):
         """ The the sequence of event classes which are notified for given cls.
+        
         """
         return cls.__mro__[:self.bmro_clip]
 
