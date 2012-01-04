@@ -100,7 +100,7 @@ class EventInfo(object):
         self._filter_keys = set() # to precompute filters on event emit
         self._disable = False
 
-        self._priority_list_lock = threading.Lock()
+        self._priority_list_lock = threading.RLock()
 
 
     def connect(self, func, filter=None, priority=0, count=0):
@@ -126,14 +126,22 @@ class EventInfo(object):
             key - string which is name of an attribute of the event instance.
             value - the value of the specified attribute.
 
-        Note: The filtering is added so that future optimizations can be done
+        Note: Reconnecting an already connected listener will disconnect the
+        old listener. This may have rammifications in changing the filters
+        and the priority.
+
+        The filtering is added so that future optimizations can be done
         on specific events with large number of handlers. For example there
         should be a fast way to filter key events to specific listeners rather
         than iterating through all listeners.
         """
+        id = self.get_id(func)
+        if id in self._priority_info:
+            # Ensure a function is connected only once.
+            # Reconnecting will update its sequence and filters.
+            self._disconnect(id)
         with self._priority_list_lock:
             sub = self._get_notifier(func, self._listener_deleted)
-            id = self.get_id(func)
             if filter:
                 self._listener_filters[id] = filter
                 for key in filter:
@@ -281,7 +289,11 @@ class EventManager(BaseEventManager):
             key - string which is name of an attribute of the event instance.
             value - the value of the specified attribute.
 
-        Note: The filtering is added so that future optimizations can be done
+        Note: Reconnecting an already connected listener will disconnect the
+        old listener. This may have rammifications in changing the filters
+        and the priority.
+
+        The filtering is added so that future optimizations can be done
         on specific events with large number of handlers. For example there
         should be a fast way to filter key events to specific listeners rather
         than iterating through all listeners.
