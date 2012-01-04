@@ -339,7 +339,7 @@ class EventManager(BaseEventManager):
         for listener in listeners:
             try:
                 listener(evt)
-            except BaseException as e:
+            except Exception as e:
                 logger.warn('Exception {0} occurred in listener: {1} for '
                     'event: {2}:\n{3}'.format(e, listener, evt,
                                               traceback.format_exc()))
