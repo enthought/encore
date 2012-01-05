@@ -21,3 +21,5 @@ systems.
 Prerequisites
 -------------
 * Python >= 2.6 (not Python 3)
+
+* Sphinx, graphviz, pydot (documentation build)
