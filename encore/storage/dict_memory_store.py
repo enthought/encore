@@ -255,6 +255,9 @@ class DictMemoryStore(AbstractStore):
     def set_data(self, key, data, buffer_size=1048576):
         """ Replace the data for a given key in the key-value store.
         
+        If the key does not already exist, it tacitly creates an empty metadata
+        object.
+        
         Parameters
         ----------
         key : string
@@ -291,6 +294,8 @@ class DictMemoryStore(AbstractStore):
                 key=key, metadata=metadata) as progress:
             chunks = list(buffer_iterator(data, buffer_size, progress))
             self._data[key] = b''.join(chunks)
+        if metadata is None:
+            self._metadata[key] = {}
         if update:
             self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
         else:
@@ -301,7 +306,8 @@ class DictMemoryStore(AbstractStore):
         """ Set new metadata for a given key in the key-value store.
         
         This replaces the existing metadata set for the key with a new set of
-        metadata.
+        metadata.  If the key does not already exist, it tacitly creates an
+        empty data object.
         
         Parameters
         ----------
@@ -321,6 +327,8 @@ class DictMemoryStore(AbstractStore):
         """
         update = key in self._metadata
         self._metadata[key] = metadata.copy()
+        if not key in self._data:
+            self._data[key] = b''
         if update:
             self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
         else:
