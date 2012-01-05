@@ -41,6 +41,9 @@ class AbstractStoreReadTest(TestCase):
         """
         self.store = None
 
+    def utils_large(self):
+        self.store.from_bytes('test3', 'test4'*10000000)
+
     def test_get(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -264,7 +267,11 @@ class AbstractStoreReadTest(TestCase):
     def test_to_file_large(self):
         if self.store is None:
             self.skipTest('Abstract test case')
-        self.store.from_bytes('test3', 'test4'*10000000)
+        self.utils_large()
+        print list(self.store.query_keys())
+        #print list(self.store1.query_keys())
+        #print list(self.store2.query_keys())
+        #print list(self.store3.query_keys())
         with temp_dir() as directory:
             filepath = os.path.join(directory, 'test')
             self.store.to_file('test3', filepath)
