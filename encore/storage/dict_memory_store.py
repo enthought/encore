@@ -263,6 +263,10 @@ class DictMemoryStore(AbstractStore):
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
+        buffer_size : int
+            An optional indicator of the number of bytes to read at a time.
+            Implementations are free to ignore this hint or use a different
+            default if they need to.  The default is 1048576 bytes (1 MiB).
 
         Events
         ------
