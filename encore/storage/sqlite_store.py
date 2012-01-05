@@ -351,7 +351,6 @@ class SqliteStore(AbstractStore):
             chunks = list(buffer_iterator(data, buffer_size, progress))
             data = buffer(b''.join(chunks))
 
-        print 'setting data', key, data            
         with self.transaction('Setting data for "%s"' % key):
             if update:
                 self._update_column(key, 'data', data)
