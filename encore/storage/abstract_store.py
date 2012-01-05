@@ -58,7 +58,7 @@ class AbstractStore(object):
             ``(username, password)`` tuple.
             
         """
-        raise NotImplementedError
+        self._connected = True
     
     
     @abstractmethod
@@ -68,7 +68,21 @@ class AbstractStore(object):
         This method disposes or disconnects to any long-lived resources that the
         store requires.
         """
-        raise NotImplementedError
+        self._connected = False
+    
+    
+    @abstractmethod
+    def is_connected(self):
+        """ Whether or not the store is currently connected
+        
+        Returns
+        -------
+        connected : bool
+            Whether or not the store is currently connected.
+
+        """
+        return self._connected
+
 
     @abstractmethod
     def info(self):

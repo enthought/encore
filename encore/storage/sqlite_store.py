@@ -101,6 +101,18 @@ class SqliteStore(AbstractStore):
         self._connection = None
 
 
+    def is_connected(self):
+        """ Whether or not the store is currently connected
+        
+        Returns
+        -------
+        connected : bool
+            Whether or not the store is currently connected.
+
+        """
+        return self._connection is not None
+
+
     def info(self):
         """ Get information about the key-value store
         

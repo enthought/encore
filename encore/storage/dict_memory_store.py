@@ -46,6 +46,7 @@ class DictMemoryStore(AbstractStore):
         self._data = {}
         self._metadata = {}
         self.event_manager = event_manager
+        self._connected = False
     
     def connect(self, credentials=None):
         """ Connect to the key-value store
@@ -57,7 +58,7 @@ class DictMemoryStore(AbstractStore):
             so credentials are ignored.
 
         """
-        pass
+        self._connected = True
     
     
     def disconnect(self):
@@ -67,9 +68,21 @@ class DictMemoryStore(AbstractStore):
         does nothing
 
         """
-        pass
+        self._connected = False
 
 
+    def is_connected(self):
+        """ Whether or not the store is currently connected
+        
+        Returns
+        -------
+        connected : bool
+            Whether or not the store is currently connected.
+
+        """
+        return self._connected
+
+    
     def info(self):
         """ Get information about the key-value store
         
