@@ -44,12 +44,11 @@ class SqliteStore(AbstractStore):
 
     The file-like objects returned by data methods are cStringIO objects.
     
-    Notes
-    -----
+    .. warning::
     
-    The table name and metadata names used as index columns are not sanitized,
-    and so should never be derived from user-supplied values to prevent SQL
-    injection.  This is particularly important for indexed queries.
+        The table name and metadata names used as index columns are not sanitized.
+        To prevent SQL injection these should never be directly derived from
+        user-supplied values.  This is particularly important for indexed queries.
     """
     
     def __init__(self, event_manager, location=':memory:', table='store', index='dynamic', index_columns=None):
@@ -66,7 +65,7 @@ class SqliteStore(AbstractStore):
         """ Connect to the key-value store
         
         This connects to the specified location and creates the table, if needed.
-        Sqlite has no notion of authentication, so that is not included.
+        Sqlite has no notion of authentication, so credentials are ignored.
 
         """
         self._connection = sqlite3.connect(self.location, detect_types=sqlite3.PARSE_DECLTYPES)
@@ -95,8 +94,8 @@ class SqliteStore(AbstractStore):
     def disconnect(self):
         """ Disconnect from the key-value store
         
-        This store does not authenticate, and has no external resources, so this
-        does nothing
+        This clears the reference to the sqlite connection object, allowing it
+        to be garbage-collected.
 
         """
         self._connection = None
@@ -107,7 +106,6 @@ class SqliteStore(AbstractStore):
         
         Returns
         -------
-        
         metadata : dict
             A dictionary of metadata giving information about the key-value store.
 
@@ -123,23 +121,21 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
         
         Returns
         -------
-        
-        (data, metadata) : tuple of file-like, dict
-            A pair of objects, the first being a readable file-like object that
-            provides stream of data from the key-value store.  The second is a
-            dictionary of metadata for the key.
+        data : file-like
+            A readable file-like object that provides stream of data from the
+            key-value store
+        metadata : dictionary
+            A dictionary of metadata for the key.
         
         Raises
         ------
-        
-        KeyError:
+        KeyError :
             If the key is not found in the store, a KeyError is raised.
 
         """
@@ -159,16 +155,13 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         value : tuple of file-like, dict
             A pair of objects, the first being a readable file-like object that
             provides stream of data from the key-value store.  The second is a
             dictionary of metadata for the key.
-           
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -198,10 +191,14 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
+        
+        Raises
+        ------
+        KeyError :
+            This will raise a key error if the key is not present in the store.
         
         """
         row = self._get_columns_by_key(key, ['metadata'])
@@ -220,14 +217,12 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
         
         Returns
         -------
-        
         exists : bool
             Whether or not the key exists in the key-value store.
         
@@ -240,17 +235,20 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
         
         Returns
         -------
-        
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
+        
+        Raises
+        ------
+        KeyError :
+            This will raise a key error if the key is not present in the store.
 
         """
         row = self._get_columns_by_key(key, ['data'])
@@ -265,26 +263,22 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         select : iterable of strings or None
             Which metadata keys to populate in the result.  If unspecified, then
             return the entire metadata dictionary.
         
         Returns
         -------
-        
         metadata : dict
             A dictionary of metadata associated with the key.  The dictionary
             has keys as specified by the metadata_keys argument.
         
         Raises
         ------
-        
-        KeyError:
+        KeyError :
             This will raise a key error if the key is not present in the store,
             and if any metadata key is requested which is not present in the
             metadata.
@@ -305,11 +299,9 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
@@ -346,11 +338,9 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         metadata : dict
             A dictionary of metadata to associate with the key.  The dictionary
             keys should be strings which are valid Python identifiers.
@@ -376,14 +366,17 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         metadata : dict
             A dictionary of metadata to associate with the key.  The dictionary
             keys should be strings which are valid Python identifiers.
+        
+        Raises
+        ------
+        KeyError :
+            This will raise a key error if the key is not present in the store.
 
         """
         row = self._get_columns_by_key(key, ['metadata'])
@@ -404,22 +397,19 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
         
         Returns
         -------
-        
         result : iterator of (file-like, dict) tuples
             An iterator of (data, metadata) pairs.
         
         Raises
         ------
-        
-        KeyError:
-            This will raise a key error if the key is not present in the store.
+        KeyError :
+            This will raise a key error if any key is not present in the store.
         
         """
         return super(SqliteStore, self).multiget(keys)
@@ -430,22 +420,19 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
         
         Returns
         -------
-        
         result : iterator of file-like
             An iterator of file-like data objects corresponding to the keys.
         
         Raises
         ------
-        
-        KeyError:
-            This will raise a key error if the key is not present in the store.
+        KeyError :
+            This will raise a key error if any key is not present in the store.
         
         """
         return super(SqliteStore, self).multiget_data(keys)
@@ -456,18 +443,15 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         select : iterable of strings or None
             Which metadata keys to populate in the results.  If unspecified, then
             return the entire metadata dictionary.
         
         Returns
         -------
-        
         metadatas : iterator of dicts
             An iterator of dictionaries of metadata associated with the key.
             The dictionaries have keys as specified by the select argument.  If
@@ -476,9 +460,8 @@ class SqliteStore(AbstractStore):
         
         Raises
         ------
-        
-        KeyError:
-            This will raise a key error if the key is not present in the store.
+        KeyError :
+            This will raise a key error if any key is not present in the store.
         
         """
         return super(SqliteStore, self).multiget_metadata(keys, select)
@@ -495,15 +478,12 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         values : iterable of (file-like, dict) tuples
             An iterator that provides the (data, metadata) pairs for the
             corresponding keys.
-           
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -524,15 +504,12 @@ class SqliteStore(AbstractStore):
 
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         datas : iterable of file-like objects
             An iterator that provides the data file-like objects for the
             corresponding keys.
-           
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -553,11 +530,9 @@ class SqliteStore(AbstractStore):
 
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         metadatas : iterable of dicts
             An iterator that provides the metadata dictionaries for the
             corresponding keys.
@@ -577,14 +552,17 @@ class SqliteStore(AbstractStore):
 
         Parameters
         ----------
-        
         keys : iterable of strings
             The keys for the resources in the key-value store.  Each key is a
             unique identifier for a resource within the key-value store.
-        
         metadatas : iterable of dicts
             An iterator that provides the metadata dictionaries for the
             corresponding keys.
+        
+        Raises
+        ------
+        KeyError :
+            This will raise a key error if the any is not present in the store.
         
         """
         return super(SqliteStore, self).multiupdate_metadata(keys, metadatas)
@@ -610,19 +588,16 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         select : iterable of strings or None
             An optional list of metadata keys to return.  If this is not None,
             then the metadata dictionaries will only have values for the specified
             keys populated.
-        
-        **kwargs :
+        kwargs :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 
         Returns
         -------
-        
         result : iterable
             An iterable of keys, metadata tuples where metadata matches
             all the specified values for the specified metadata keywords.
@@ -660,19 +635,17 @@ class SqliteStore(AbstractStore):
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of keys for the key-value store.
         
-        This is equivalent to self.query(**kwargs).keys(), but potentially
+        This is equivalent to ``self.query(**kwargs).keys()``, but potentially
         more efficiently implemented.
         
         Parameters
         ----------
-        
-        **kwargs :
+        kwargs :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
 
         Returns
         -------
-        
         result : iterable
             An iterable of key-value store keys whose metadata matches all the
             specified values for the specified metadata keywords.
@@ -716,13 +689,11 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         pattern : string
             Glob-style pattern to match keys with.
 
         Returns
         -------
-        
         result : iterable
             A iterable of keys which match the glob pattern.
         
@@ -735,16 +706,18 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         path : string
             A file system path to store the data to.
-        
         buffer_size : int
             This is ignored.
+        
+        Raises
+        ------
+        KeyError :
+            This will raise a key error if the key is not present in the store.
         
         """
         return super(SqliteStore, self).to_file(key, path, buffer_size)
@@ -757,14 +730,11 @@ class SqliteStore(AbstractStore):
                 
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         path : string
             A file system path to read the data from.
-        
         buffer_size : int
             This is ignored.
         
@@ -776,14 +746,17 @@ class SqliteStore(AbstractStore):
         
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         buffer_size : int
             This is ignored.
-        
+               
+        Raises
+        ------
+        KeyError :
+            This will raise a key error if the key is not present in the store.
+ 
         """
         return super(SqliteStore, self).to_bytes(key, buffer_size)
         
@@ -794,14 +767,11 @@ class SqliteStore(AbstractStore):
                 
         Parameters
         ----------
-        
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
         data : bytes
             The data as a bytes object.
-        
         buffer_size : int
             This is ignored.
         
