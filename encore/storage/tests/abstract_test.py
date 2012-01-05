@@ -359,7 +359,9 @@ class AbstractStoreWriteTest(TestCase):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         self.store.set('test3', (data, metadata))
-
+        self.assertEqual(self.store.to_bytes('test3'), 'test4'*10000000)
+        self.assertEqual(self.store.get_metadata('test3'), metadata)
+        
     def test_set_buffer(self):
         """ Test that set works with a different size buffer
         
@@ -378,12 +380,31 @@ class AbstractStoreWriteTest(TestCase):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         self.store.set('test3', (data, metadata), 8000)
+        self.assertEqual(self.store.to_bytes('test3'), 'test4'*8000)
+        self.assertEqual(self.store.get_metadata('test3'), metadata)
 
     def test_set_data(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = StringIO('test4')
         self.store.set_data('test1', data)
+        self.assertEqual(self.store.to_bytes('test1'), 'test4')
+        self.assertEqual(self.store.get_metadata('test1'), {
+            'a_str': 'test3',
+            'an_int': 1,
+            'a_float': 2.0,
+            'a_bool': True,
+            'a_list': ['one', 'two', 'three'],
+            'a_dict': {'one': 1, 'two': 2, 'three': 3}
+        })
+
+    def test_set_data_new(self):
+        if self.store is None:
+            self.skipTest('Abstract test case')
+        data = StringIO('test4')
+        self.store.set_data('test3', data)
+        self.assertEqual(self.store.to_bytes('test3'), 'test4')
+        self.assertEqual(self.store.get_metadata('test3'), {})
 
     def test_set_data_large(self):
         """ Test that set works with large (~50 MB) data
@@ -395,6 +416,7 @@ class AbstractStoreWriteTest(TestCase):
             self.skipTest('Abstract test case')
         data = StringIO('test4'*10000000) # 50 MB of data
         self.store.set_data('test3', data)
+        self.assertEqual(self.store.to_bytes('test3'), 'test4'*10000000)
 
     def test_set_data_buffer(self):
         """ Test that set works with a different-sized buffer
@@ -406,6 +428,7 @@ class AbstractStoreWriteTest(TestCase):
             self.skipTest('Abstract test case')
         data = StringIO('test4'*8000)
         self.store.set_data('test1', data)
+        self.assertEqual(self.store.to_bytes('test1'), 'test4'*8000)
 
     def test_set_metadata(self):
         """ Test that set_metadata works
@@ -424,6 +447,8 @@ class AbstractStoreWriteTest(TestCase):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         self.store.set_metadata('test1', metadata)
+        self.assertEqual(self.store.get_metadata('test1'), metadata)
+        self.assertEqual(self.store.to_bytes('test1'), 'test2\n')
 
     def test_set_metadata_copies(self):
         """ Test that set_metadata copies the provided metadata
@@ -443,6 +468,7 @@ class AbstractStoreWriteTest(TestCase):
         }
         self.store.set_metadata('test3', metadata)
         metadata['extra_key'] = 'extra_value'
+        self.assertNotEqual(self.store.get_metadata('test1'), metadata)
 
     def test_update_metadata(self):
         """ Test that update_metadata works
