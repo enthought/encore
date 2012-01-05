@@ -349,7 +349,9 @@ class JoinedStore(AbstractStore):
 
         """
         if self.stores:
-            self.stores[0].update_metadata(key, metadata)
+            current_metadata = self.get_metadata(key)
+            current_metadata.update(metadata)
+            self.stores[0].set_metadata(key, current_metadata)
             
     
     def exists(self, key):

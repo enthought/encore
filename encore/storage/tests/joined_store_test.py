@@ -76,8 +76,8 @@ class JoinedStoreWriteTest(abstract_test.AbstractStoreWriteTest):
         self.store1 = DictMemoryStore(e)
         self.store2 = DictMemoryStore(e)
         self.store3 = DictMemoryStore(e)
-        self.store1._data['test1'] = 'test2\n'
-        self.store1._metadata['test1'] = {
+        self.store2._data['test1'] = 'test2\n'
+        self.store2._metadata['test1'] = {
             'a_str': 'test3',
             'an_int': 1,
             'a_float': 2.0,
@@ -96,7 +96,6 @@ class JoinedStoreWriteTest(abstract_test.AbstractStoreWriteTest):
 
     def test_multiset_metadata(self):
         super(JoinedStoreWriteTest, self).test_multiset_metadata()
-        print list(self.store1.query_keys())
         keys = ['existing_key'+str(i) for i in range(10)]
         metadatas = [{'meta1': i, 'meta2': True} for i in range(10)]
         for i in range(10):
