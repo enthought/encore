@@ -58,7 +58,7 @@ class AbstractStore(object):
             ``(username, password)`` tuple.
             
         """
-        raise NotImplementedError
+        self._connected = True
     
     
     @abstractmethod
@@ -68,7 +68,21 @@ class AbstractStore(object):
         This method disposes or disconnects to any long-lived resources that the
         store requires.
         """
-        raise NotImplementedError
+        self._connected = False
+    
+    
+    @abstractmethod
+    def is_connected(self):
+        """ Whether or not the store is currently connected
+        
+        Returns
+        -------
+        connected : bool
+            Whether or not the store is currently connected.
+
+        """
+        return self._connected
+
 
     @abstractmethod
     def info(self):
@@ -230,7 +244,7 @@ class AbstractStore(object):
             
 
     @abstractmethod
-    def set_data(self, key, data):
+    def set_data(self, key, data, buffer_size=1048576):
         """ Replace the data for a given key in the key-value store.
         
         Parameters
@@ -241,6 +255,10 @@ class AbstractStore(object):
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
+        buffer_size : int
+            An optional indicator of the number of bytes to read at a time.
+            Implementations are free to ignore this hint or use a different
+            default if they need to.  The default is 1048576 bytes (1 MiB).
 
         Events
         ------
