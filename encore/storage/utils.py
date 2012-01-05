@@ -46,7 +46,7 @@ class DummyTransactionContext(object):
     """
     def __new__(cls, store):
         if getattr(store, '_transaction', None) is None:
-            obj = object.__new__()
+            obj = object.__new__(cls)
             obj.store = store
             store._transaction = obj
         return store._transaction
