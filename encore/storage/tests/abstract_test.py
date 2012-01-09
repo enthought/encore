@@ -41,6 +41,9 @@ class AbstractStoreReadTest(TestCase):
         """
         self.store = None
 
+    def utils_large(self):
+        self.store.from_bytes('test3', 'test4'*10000000)
+
     def test_get(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -264,7 +267,11 @@ class AbstractStoreReadTest(TestCase):
     def test_to_file_large(self):
         if self.store is None:
             self.skipTest('Abstract test case')
-        self.store.from_bytes('test3', 'test4'*10000000)
+        self.utils_large()
+        print list(self.store.query_keys())
+        #print list(self.store1.query_keys())
+        #print list(self.store2.query_keys())
+        #print list(self.store3.query_keys())
         with temp_dir() as directory:
             filepath = os.path.join(directory, 'test')
             self.store.to_file('test3', filepath)
@@ -352,7 +359,9 @@ class AbstractStoreWriteTest(TestCase):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         self.store.set('test3', (data, metadata))
-
+        self.assertEqual(self.store.to_bytes('test3'), 'test4'*10000000)
+        self.assertEqual(self.store.get_metadata('test3'), metadata)
+        
     def test_set_buffer(self):
         """ Test that set works with a different size buffer
         
@@ -371,12 +380,35 @@ class AbstractStoreWriteTest(TestCase):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         self.store.set('test3', (data, metadata), 8000)
+        self.assertEqual(self.store.to_bytes('test3'), 'test4'*8000)
+        self.assertEqual(self.store.get_metadata('test3'), metadata)
 
     def test_set_data(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = StringIO('test4')
         self.store.set_data('test1', data)
+        self.assertEqual(self.store.to_bytes('test1'), 'test4')
+        # for the time being we make no assertions about what happens to the
+        # metadata of an existing object because of behaviour of JoinedStore
+        #self.assertEqual(self.store.get_metadata('test1'), {
+        #    'a_str': 'test3',
+        #    'an_int': 1,
+        #    'a_float': 2.0,
+        #    'a_bool': True,
+        #    'a_list': ['one', 'two', 'three'],
+        #    'a_dict': {'one': 1, 'two': 2, 'three': 3}
+        #})
+
+    def test_set_data_new(self):
+        if self.store is None:
+            self.skipTest('Abstract test case')
+        data = StringIO('test4')
+        self.store.set_data('test3', data)
+        self.assertEqual(self.store.to_bytes('test3'), 'test4')
+        # for the time being we make no assertions about what happens to the
+        # metadata of an new object because of behaviour of JoinedStore
+        #self.assertEqual(self.store.get_metadata('test3'), {})
 
     def test_set_data_large(self):
         """ Test that set works with large (~50 MB) data
@@ -388,6 +420,7 @@ class AbstractStoreWriteTest(TestCase):
             self.skipTest('Abstract test case')
         data = StringIO('test4'*10000000) # 50 MB of data
         self.store.set_data('test3', data)
+        self.assertEqual(self.store.to_bytes('test3'), 'test4'*10000000)
 
     def test_set_data_buffer(self):
         """ Test that set works with a different-sized buffer
@@ -399,6 +432,7 @@ class AbstractStoreWriteTest(TestCase):
             self.skipTest('Abstract test case')
         data = StringIO('test4'*8000)
         self.store.set_data('test1', data)
+        self.assertEqual(self.store.to_bytes('test1'), 'test4'*8000)
 
     def test_set_metadata(self):
         """ Test that set_metadata works
@@ -417,6 +451,10 @@ class AbstractStoreWriteTest(TestCase):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         self.store.set_metadata('test1', metadata)
+        self.assertEqual(self.store.get_metadata('test1'), metadata)
+        # for the time being we make no assertions about what happens to the
+        # data of an existing object because of behaviour of JoinedStore
+        #self.assertEqual(self.store.to_bytes('test1'), 'test2\n')
 
     def test_set_metadata_copies(self):
         """ Test that set_metadata copies the provided metadata
@@ -436,6 +474,7 @@ class AbstractStoreWriteTest(TestCase):
         }
         self.store.set_metadata('test3', metadata)
         metadata['extra_key'] = 'extra_value'
+        self.assertNotEqual(self.store.get_metadata('test1'), metadata)
 
     def test_update_metadata(self):
         """ Test that update_metadata works
@@ -499,9 +538,13 @@ class AbstractStoreWriteTest(TestCase):
         values = ['set_value'+str(i) for i in range(10)]
         datas = [StringIO(value) for value in values]
         self.store.multiset_data(keys, datas)
+        metadatas = [{'meta': True, 'meta1': -i} for i in range(10)]
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
             self.assertEquals(self.store.get_data(keys[i]).read(), values[i])
+            # for the time being we make no assertions about what happens to the
+            # data of an object because of behaviour of JoinedStore
+            #self.assertEquals(self.store.get_metadata(keys[i]), metadatas[i])
 
     def test_multiset_metadata(self):
         if self.store is None:
@@ -509,9 +552,13 @@ class AbstractStoreWriteTest(TestCase):
         keys = ['existing_key'+str(i) for i in range(10)]
         metadatas = [{'meta1': i, 'meta2': True} for i in range(10)]
         self.store.multiset_metadata(keys, metadatas)
+        values = ['existing_value'+str(i) for i in range(10)]
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
             self.assertEquals(self.store.get_metadata(keys[i]), metadatas[i])
+            # for the time being we make no assertions about what happens to the
+            # metadata of an object because of behaviour of JoinedStore
+            #self.assertEquals(self.store.get_data(keys[i]).read(), values[i])
 
     def test_multiupdate_metadata(self):
         if self.store is None:

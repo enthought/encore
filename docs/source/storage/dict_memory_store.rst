@@ -3,7 +3,7 @@
 .. automodule:: encore.storage.dict_memory_store
 
     .. autoclass:: DictMemoryStore
-        :members: connect, disconnect, get, set, delete, exists, transaction,
+        :members: connect, disconnect, is_connected, get, set, delete, exists, transaction,
                 query, query_keys, glob,
                 get_data, get_metadata, set_data, set_metadata, update_metadata,
                 multiget, multiset, multiget_data, multiget_metadata, multiset_data,

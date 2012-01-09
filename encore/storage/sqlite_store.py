@@ -101,6 +101,18 @@ class SqliteStore(AbstractStore):
         self._connection = None
 
 
+    def is_connected(self):
+        """ Whether or not the store is currently connected
+        
+        Returns
+        -------
+        connected : bool
+            Whether or not the store is currently connected.
+
+        """
+        return self._connection is not None
+
+
     def info(self):
         """ Get information about the key-value store
         
@@ -305,6 +317,25 @@ class SqliteStore(AbstractStore):
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
+        buffer_size : int
+            An optional indicator of the number of bytes to read at a time.
+            Implementations are free to ignore this hint or use a different
+            default if they need to.  The default is 1048576 bytes (1 MiB).
+
+        Events
+        ------
+        StoreProgressStartEvent :
+            For buffering implementations, this event should be emitted prior to
+            writing any data to the underlying store.
+        StoreProgressStepEvent :
+            For buffering implementations, this event should be emitted
+            periodically as data is written to the underlying store.
+        StoreProgressEndEvent :
+            For buffering implementations, this event should be emitted after
+            finishing writing to the underlying store.
+        StoreSetEvent :
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
 
         """
         row = self._get_columns_by_key(key, ['metadata'])
@@ -320,7 +351,6 @@ class SqliteStore(AbstractStore):
             chunks = list(buffer_iterator(data, buffer_size, progress))
             data = buffer(b''.join(chunks))
 
-        print 'setting data', key, data            
         with self.transaction('Setting data for "%s"' % key):
             if update:
                 self._update_column(key, 'data', data)

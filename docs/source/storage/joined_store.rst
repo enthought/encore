@@ -1,8 +1,8 @@
-.. currentmodule:: encore.storage.sqlite_store
+.. currentmodule:: encore.storage.joined_store
 
-.. automodule:: encore.storage.sqlite_store
+.. automodule:: encore.storage.joined_store
 
-.. autoclass:: SqliteStore
+.. autoclass:: JoinedStore
     :members: __init__, connect, disconnect, is_connected, get, set, delete, exists, transaction,
             query, query_keys, glob,
             get_data, get_metadata, set_data, set_metadata, update_metadata,
