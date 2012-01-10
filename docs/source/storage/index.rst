@@ -33,6 +33,7 @@ Contents
    utils.rst
    dict_memory_store.rst
    sqlite_store.rst
+   http_store.rst
    joined_store.rst
 
 

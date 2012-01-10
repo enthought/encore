@@ -6,21 +6,41 @@
 #
 
 """
-HTTP Store
+HTTP Stores
 ============
 
+This module contains several different stores that communicate with a remote
+HTTP server which provides the actual data storage.
+
+The simplest of these is the :py:class:`~StaticURLStore` which can be run
+against a static HTTP server which provides a json file with all metadata and
+then serves data from URLS from another path.  It polls the metadata periodically
+for updates.
 
 """
 
+import threading
+import json
 import httplib
+import urllib2
+import urllib
+import time
 
 from .abstract_store import AbstractStore
 from .utils import StoreProgressManager, buffer_iterator, DummyTransactionContext
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 
+
 def basic_auth_factory(**kwargs):
+    """ A factory that creates a :py:class:`~.HTTPBasicAuthHandler` instance
+    
+    The arguments are passed directly through to the :py:meth:`add_password`
+    method of the handler.
+    
+    """
     auth_handler = urllib2.HTTPBasicAuthHandler()
     auth_handler.add_password(**kwargs)
+
 
 class StaticURLStore(AbstractStore):
     """ A read-only key-value store that is a front end for data served via URLs
@@ -46,18 +66,18 @@ class StaticURLStore(AbstractStore):
     implemented by an HTTP, FTP or file server which serves static files.  When
     connecting, if appropriate credentials are supplied then HTTP authentication
     will be used when connecting the remote server
+   
+    .. warning::
+    
+        Since we use urllib2 without any further modifications, HTTPS requests
+        do not validate the server's certificate.
     
     Because of the limited nature of the interface, this store implementation
     is read only, and handles updates via periodic polling of the query prefix
     URL.  This guarantees that the viewed data is always consistent, it just may
     not be current. Most of the work of querying is done on the client side
     using the cached metadata.
-    
-    . warning::
-    
-        Since we use urllib2 without any further modifications, HTTPS requests
-        do not validate the server's certificate.
-    
+     
     Parameters
     ----------
     event_manager :
@@ -70,7 +90,7 @@ class StaticURLStore(AbstractStore):
     query_path : str
         The URL that the metadata is served from.
     poll : float
-        The polling frequency for the polling thread.
+        The polling frequency for the polling thread.  Polls every 5 min by default.
     
         
     """
@@ -109,22 +129,27 @@ class StaticURLStore(AbstractStore):
             method.
             
         """
-        if auth_handler_factory is None:
-            auth_handler_factory = urllib2.HTTPBasicAuthHandler
-        args = {'uri': self.root_url, 'realm': 'encore.storage'}
-        args.update(credentials)
-        auth_handler = auth_handler_factory()
-        auth_handler.add_password(**args)
-        if proxy_handler is None:
-            self._opener = urllib2.build_opener(auth_handler)
+        if credentials is not None:
+            if auth_handler_factory is None:
+                auth_handler_factory = urllib2.HTTPBasicAuthHandler
+            args = {'uri': self.root_url, 'realm': 'encore.storage'}
+            args.update(credentials)
+            auth_handler = auth_handler_factory()
+            auth_handler.add_password(**args)
+            if proxy_handler is None:
+                self._opener = urllib2.build_opener(auth_handler)
+            else:
+                self._opener = urllib2.build_opener(proxy_handler, auth_handler)
         else:
-            self._opener = urllib2.build_opener(proxy_handler, auth_handler)
+            if proxy_handler is None:
+                self._opener = urllib2.build_opener()
+            else:
+                self._opener = urllib2.build_opener(auth_handler)
         
+        self.update_index()
         if self.poll > 0:
             self._index_thread = threading.Thread(target=self._poll)
             self._index_thread.start()
-        else:
-            self._update_index()
 
         
     def disconnect(self):
@@ -182,7 +207,8 @@ class StaticURLStore(AbstractStore):
         -------
         data : file-like
             A readable file-like object that provides stream of data from the
-            key-value store
+            key-value store.  This is the same type of filelike object returned
+            by urllib2's urlopen function.
         metadata : dictionary
             A dictionary of metadata for the key.
         
@@ -228,7 +254,8 @@ class StaticURLStore(AbstractStore):
         -------
         data : file-like
             A readable file-like object the that provides stream of data from the
-            key-value store.
+            key-value store.  This is the same type of filelike object returned
+            by urllib2's urlopen function.
 
         Raises
         ------
@@ -269,8 +296,12 @@ class StaticURLStore(AbstractStore):
             This will raise a key error if the key is not present in the store.
 
         """
-        with self._index_lock():
-            return self._index[key]
+        with self._index_lock:
+            if select is None:
+                return self._index[key].copy()
+            else:
+                metadata = self._index[key]
+                return dict((s, metadata[s]) for s in select if s in metadata)
 
     
     def set_data(self, key, data, buffer_size=1048576):
@@ -315,7 +346,7 @@ class StaticURLStore(AbstractStore):
             Whether or not the key exists in the key-value store.
         
         """
-        with self._index_lock():
+        with self._index_lock:
             return key in self._index
 
         
@@ -343,7 +374,7 @@ class StaticURLStore(AbstractStore):
             This will raise a key error if the key is not present in the store.
         
         """
-        return super(JoinedStore, self).multiget(keys)
+        return super(StaticURLStore, self).multiget(keys)
    
     
     def multiget_data(self, keys):
@@ -366,7 +397,7 @@ class StaticURLStore(AbstractStore):
             This will raise a key error if the key is not present in the store.
         
         """
-        return super(JoinedStore, self).multiget_data(keys)
+        return super(StaticURLStore, self).multiget_data(keys)
 
     
     def multiget_metadata(self, keys, select=None):
@@ -395,7 +426,7 @@ class StaticURLStore(AbstractStore):
             This will raise a key error if the key is not present in the store.
         
         """
-        return super(JoinedStore, self).multiget_metadata(keys, select)
+        return super(StaticURLStore, self).multiget_metadata(keys, select)
             
     
     def multiset(self, keys, values, buffer_size=1048576):
@@ -495,7 +526,7 @@ class StaticURLStore(AbstractStore):
             If a key specified in select is not present in the metadata of a
             particular key, then it will not be present in the returned value.
         """
-        with self._index_lock():
+        with self._index_lock:
             if select is not None:
                 for key, metadata in self._index.items():
                     if all(metadata.get(arg) == value for arg, value in kwargs.items()):
@@ -530,7 +561,7 @@ class StaticURLStore(AbstractStore):
             specified values for the specified metadata keywords.
         
         """
-        with self._index_lock():
+        with self._index_lock:
             for key, metadata in self._index.items():
                 if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                     yield key
@@ -555,23 +586,27 @@ class StaticURLStore(AbstractStore):
             if fnmatch.fnmatchcase(key, pattern):
                 yield key
         
-
     ##########################################################################
     # Utility Methods
     ##########################################################################
 
-    # superclass methods are fine
-
-    
-    ##########################################################################
-    # Private Methods
-    ##########################################################################
-
-    def _update_index(self):
+    def update_index(self):
+        """ Request the most recent version of the metadata
+        
+        This downloads the json file at the query_path location, and updates
+        the local metadata cache with this information.  It then emits events
+        that represent the difference between the old metadata and the new
+        metadata.
+        
+        This method is normally called from the polling thread, but can be called
+        by other code when needed.  It locks the metadata index whilst performing
+        the update.
+        
+        """
         url = self.root_url + self.query_path
-        with self._index_lock():
+        with self._index_lock:
             result = self._opener.open(url)
-            index = json.loads(result)    
+            index = json.loads(result.read())
             old_index = self._index
             self._index = index
 
@@ -583,16 +618,37 @@ class StaticURLStore(AbstractStore):
             for key in (old_keys - new_keys):
                 self.event_manager.emit(StoreDeleteEvent(self, key=key, metadata=old_index[key]))
             for key in (new_keys - old_keys):
-                self.event_manager.emit(StoreSetEvent(self, key=key, metadata=new_index[key]))
+                self.event_manager.emit(StoreSetEvent(self, key=key, metadata=index[key]))
             for key in (new_keys & old_keys):
-                if old_index[key] != new_index[key]:
-                    self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=new_index[key]))
+                if old_index[key] != index[key]:
+                    self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=index[key]))
+
+    def from_file(self, key, path, buffer_size=1048576):
+        """ Efficiently read data from a file into a key in the key-value store.
+        
+        Not implemented.
+        
+        """
+        raise NotImplementedError
+    
+    def from_bytes(self, key, data, buffer_size=1048576):
+        """ Efficiently read data from a bytes object into a key in the key-value store.
+        
+        Not implemented.
+        
+        """
+        raise NotImplementedError
+    
+    ##########################################################################
+    # Private Methods
+    ##########################################################################
     
     def _poll(self):
-        time = time.time()-self.poll
+        t = time.time()
         while self._opener is not None:
-            if time.time()-time >= self.poll:
-                self._update_index()
+            if time.time()-t >= self.poll:
+                self.update_index()
+                t = time.time()
             # tick
             time.sleep(0.5)
         
