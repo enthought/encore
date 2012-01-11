@@ -23,9 +23,9 @@ data values can be stored in the key-value store.
 
 from abc import ABCMeta, abstractmethod
 from itertools import izip
+import fnmatch
 
 from .utils import StoreProgressManager, buffer_iterator
-from .events import ProgressStartEvent, ProgressStepEvent, ProgressEndEvent
 
 class AbstractStore(object):
     """ Abstract base class for Key-Value Store API
@@ -711,7 +711,6 @@ class AbstractStore(object):
         return (key for key, value in self.query(**kwargs))
 
 
-    @abstractmethod
     def glob(self, pattern):
         """ Return keys which match glob-style patterns
         
@@ -726,7 +725,6 @@ class AbstractStore(object):
             A iterable of keys which match the glob pattern.
         
         """
-        import fnmatch
         for key in self.query_keys():
             if fnmatch.fnmatchcase(key, pattern):
                 yield key

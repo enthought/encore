@@ -658,26 +658,6 @@ class DictMemoryStore(AbstractStore):
             if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                 yield key
 
-
-    def glob(self, pattern):
-        """ Return keys which match glob-style patterns
-        
-        Parameters
-        ----------
-        pattern : string
-            Glob-style pattern to match keys with.
-
-        Returns
-        -------
-        result : iterable
-            A iterable of keys which match the glob pattern.
-        
-        """
-        import fnmatch
-        for key in self.query_keys():
-            if fnmatch.fnmatchcase(key, pattern):
-                yield key
-
         
     def to_file(self, key, path, buffer_size=1048576):
         """ Efficiently store the data associated with a key into a file.

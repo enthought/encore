@@ -31,8 +31,16 @@ Contents
    abstract_store.rst
    events.rst
    utils.rst
+
+Implementations
+===============
+
+.. toctree::
+   :maxdepth: 2
+
    dict_memory_store.rst
    sqlite_store.rst
+   static_url_store.rst
    joined_store.rst
 
 

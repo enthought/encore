@@ -240,3 +240,28 @@ def tee(filelike, n=2, buffer_size=1048576):
     """
     iters = itertools.tee(buffer_iterator(filelike, buffer_size), n)
     return [BufferIteratorIO(iter) for iter in iters]
+    
+
+class hashing_file(object):
+    """ File-like wrapper which produces a hash as it is read
+    
+    """
+    def __init__(self, filelike, hash):
+        self.filelike = filelike
+        self.hash = hash
+        self.len = 0
+    
+    def read(self, nbytes):
+        data = self.filelike.read(nbytes)
+        self.hash.update(data)
+        self.len += len(data)
+        return data
+    
+    def close(self):
+        return self.filelike.close()
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.filelike.close()

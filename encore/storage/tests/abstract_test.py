@@ -261,7 +261,7 @@ class AbstractStoreReadTest(TestCase):
         with temp_dir() as directory:
             filepath = os.path.join(directory, 'test')
             self.store.to_file('test1', filepath)
-            written = open(filepath).read()
+            written = open(filepath, 'rb').read()
             self.assertEquals(written, 'test2\n')
     
     def test_to_file_large(self):
