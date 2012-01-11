@@ -12,7 +12,7 @@ HTTP Stores
 This module contains several different stores that communicate with a remote
 HTTP server which provides the actual data storage.
 
-The simplest of these is the :py:class:`~StaticURLStore` which can be run
+The simplest of these is the :py:class:`~HTTPStore` which can be run
 against a static HTTP server which provides a json file with all metadata and
 then serves data from URLS from another path.  It polls the metadata periodically
 for updates.
@@ -42,7 +42,11 @@ def basic_auth_factory(**kwargs):
     auth_handler.add_password(**kwargs)
 
 
-class StaticURLStore(AbstractStore):
+class StoreRequest(urllib2.Request):
+    def get_method(self):
+        return self._method
+
+class HTTPStore(AbstractStore):
     """ A read-only key-value store that is a front end for data served via URLs
     
     All data is assumed to be served from some root url.  In addition
@@ -374,7 +378,7 @@ class StaticURLStore(AbstractStore):
             This will raise a key error if the key is not present in the store.
         
         """
-        return super(StaticURLStore, self).multiget(keys)
+        return super(HTTPStore, self).multiget(keys)
    
     
     def multiget_data(self, keys):
@@ -397,7 +401,7 @@ class StaticURLStore(AbstractStore):
             This will raise a key error if the key is not present in the store.
         
         """
-        return super(StaticURLStore, self).multiget_data(keys)
+        return super(HTTPStore, self).multiget_data(keys)
 
     
     def multiget_metadata(self, keys, select=None):
@@ -426,7 +430,7 @@ class StaticURLStore(AbstractStore):
             This will raise a key error if the key is not present in the store.
         
         """
-        return super(StaticURLStore, self).multiget_metadata(keys, select)
+        return super(HTTPStore, self).multiget_metadata(keys, select)
             
     
     def multiset(self, keys, values, buffer_size=1048576):
@@ -471,8 +475,7 @@ class StaticURLStore(AbstractStore):
             emitted with the key & metadata for each key that was set.
 
         """
-        if self.stores:
-            self.stores[0].multiset_metadata(keys, metadatas)
+        raise NotImplementedError  
    
     
     def multiupdate_metadata(self, keys, metadatas):
@@ -567,25 +570,6 @@ class StaticURLStore(AbstractStore):
                     yield key
 
     
-    def glob(self, pattern):
-        """ Return keys which match glob-style patterns
-        
-        Parameters
-        ----------
-        pattern : string
-            Glob-style pattern to match keys with.
-
-        Returns
-        -------
-        result : iterable
-            A iterable of keys which match the glob pattern.
-        
-        """
-        import fnmatch
-        for key in self.query_keys():
-            if fnmatch.fnmatchcase(key, pattern):
-                yield key
-        
     ##########################################################################
     # Utility Methods
     ##########################################################################
@@ -651,4 +635,5 @@ class StaticURLStore(AbstractStore):
                 t = time.time()
             # tick
             time.sleep(0.5)
-        
+
+

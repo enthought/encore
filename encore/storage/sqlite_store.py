@@ -21,7 +21,6 @@ This class is provided in part as a sample implementation of the API.
 import cStringIO
 import sqlite3
 import cPickle
-from itertools import izip
 from uuid import uuid4
 
 from .abstract_store import AbstractStore
@@ -410,7 +409,6 @@ class SqliteStore(AbstractStore):
 
         """
         row = self._get_columns_by_key(key, ['metadata'])
-        update = row is not None
         if row is not None:
             temp_metadata = row['metadata']
         else:
@@ -714,23 +712,6 @@ class SqliteStore(AbstractStore):
                 yield key
 
 
-    def glob(self, pattern):
-        """ Return keys which match glob-style patterns
-        
-        Parameters
-        ----------
-        pattern : string
-            Glob-style pattern to match keys with.
-
-        Returns
-        -------
-        result : iterable
-            A iterable of keys which match the glob pattern.
-        
-        """
-        return super(SqliteStore, self).glob(pattern)
-
-        
     def to_file(self, key, path, buffer_size=1048576):
         """ Efficiently store the data associated with a key into a file.
         
