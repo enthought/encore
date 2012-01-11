@@ -18,7 +18,7 @@ from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
-from ..http_store import StaticURLStore
+from ..static_url_store import StaticURLStore
 
 class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
     
