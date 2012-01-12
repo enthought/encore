@@ -92,7 +92,9 @@ class JoinedStore(AbstractStore):
         metadata : dict
             A dictionary of metadata giving information about the key-value store.
         """
-        return {}
+        return {
+            'readonly': False,
+        }
 
         
     ##########################################################################

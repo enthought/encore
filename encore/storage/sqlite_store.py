@@ -122,6 +122,7 @@ class SqliteStore(AbstractStore):
 
         """
         return {
+            'readonly': False,
             'location': self.location,
             'table': self.table,
         }

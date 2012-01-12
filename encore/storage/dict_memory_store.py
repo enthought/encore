@@ -92,7 +92,9 @@ class DictMemoryStore(AbstractStore):
             A dictionary of metadata giving information about the key-value store.
 
         """
-        return {}
+        return {
+            'readonly': False
+        }
     
     
     def get(self, key):
