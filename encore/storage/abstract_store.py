@@ -27,8 +27,9 @@ import fnmatch
 
 from .utils import StoreProgressManager, buffer_iterator
 
-class AbstractStore(object):
-    """ Abstract base class for Key-Value Store API
+
+class AbstractReadOnlyStore(object):
+    """ Abstract base class for read-only Key-Value Store API
     
     This class implements some of the API so that it can be used with super()
     where appropriate.
@@ -40,7 +41,13 @@ class AbstractStore(object):
         implements the :py:class:`~.abstract_event_manager.BaseEventManager` API.
         
     """
-    __metaclass__ = ABCMeta    
+    __metaclass__ = ABCMeta
+    
+    @abstractmethod
+    def __init__(self, event_manager):
+        self.event_manager = event_manager
+
+        self._connected = False
     
     @abstractmethod
     def connect(self, credentials=None):
@@ -128,72 +135,6 @@ class AbstractStore(object):
 
 
     @abstractmethod
-    def set(self, key, value, buffer_size=1048576):
-        """ Store a stream of data into a given key in the key-value store.
-        
-        This may be left unimplemented by subclasses that represent a read-only
-        key-value store.
-        
-        Parameters
-        ----------
-        key : string
-            The key for the resource in the key-value store.  They key is a unique
-            identifier for the resource within the key-value store.
-        value : tuple of file-like, dict
-            A pair of objects, the first being a readable file-like object that
-            provides stream of data from the key-value store.  The second is a
-            dictionary of metadata for the key.
-        buffer_size : int
-            An optional indicator of the number of bytes to read at a time.
-            Implementations are free to ignore this hint or use a different
-            default if they need to.  The default is 1048576 bytes (1 MiB).
-        
-        Events
-        ------
-        StoreProgressStartEvent :
-            For buffering implementations, this event should be emitted prior to
-            writing any data to the underlying store.
-        StoreProgressStepEvent :
-            For buffering implementations, this event should be emitted
-            periodically as data is written to the underlying store.
-        StoreProgressEndEvent :
-            For buffering implementations, this event should be emitted after
-            finishing writing to the underlying store.
-        StoreSetEvent :
-            On successful completion of a transaction, a StoreSetEvent should be
-            emitted with the key & metadata
-        
-        """
-        data, metadata = value
-        with self.transaction('Setting key "%s"' % key):
-            self.set_metadata(key, metadata)
-            self.set_data(key, data)
-
-
-    @abstractmethod
-    def delete(self, key):
-        """ Delete a key from the repsository.
-        
-        This may be left unimplemented by subclasses that represent a read-only
-        key-value store.
-        
-        Parameters
-        ----------
-        key : string
-            The key for the resource in the key-value store.  They key is a unique
-            identifier for the resource within the key-value store.
-        
-        Events
-        ------
-        StoreDeleteEvent :
-            On successful completion of a transaction, a StoreDeleteEvent should
-            be emitted with the key.
-        
-        """
-        raise NotImplementedError
-
-
-    @abstractmethod
     def get_data(self, key):
         """ Retrieve a stream from a given key in the key-value store.
         
@@ -241,96 +182,8 @@ class AbstractStore(object):
 
         """
         raise NotImplementedError
-            
 
-    @abstractmethod
-    def set_data(self, key, data, buffer_size=1048576):
-        """ Replace the data for a given key in the key-value store.
-        
-        Parameters
-        ----------
-        key : string
-            The key for the resource in the key-value store.  They key is a unique
-            identifier for the resource within the key-value store.
-        data : file-like
-            A readable file-like object the that provides stream of data from the
-            key-value store.
-        buffer_size : int
-            An optional indicator of the number of bytes to read at a time.
-            Implementations are free to ignore this hint or use a different
-            default if they need to.  The default is 1048576 bytes (1 MiB).
-
-        Events
-        ------
-        StoreProgressStartEvent :
-            For buffering implementations, this event should be emitted prior to
-            writing any data to the underlying store.
-        StoreProgressStepEvent :
-            For buffering implementations, this event should be emitted
-            periodically as data is written to the underlying store.
-        StoreProgressEndEvent :
-            For buffering implementations, this event should be emitted after
-            finishing writing to the underlying store.
-        StoreSetEvent :
-            On successful completion of a transaction, a StoreSetEvent should be
-            emitted with the key & metadata
-
-        """
-        raise NotImplementedError
-        
-
-    @abstractmethod
-    def set_metadata(self, key, metadata):
-        """ Set new metadata for a given key in the key-value store.
-        
-        This replaces the existing metadata set for the key with a new set of
-        metadata.
-        
-        Parameters
-        ----------
-        key : string
-            The key for the resource in the key-value store.  They key is a unique
-            identifier for the resource within the key-value store.
-        metadata : dict
-            A dictionary of metadata to associate with the key.  The dictionary
-            keys should be strings which are valid Python identifiers.
-
-        Events
-        ------
-        StoreSetEvent :
-            On successful completion of a transaction, a StoreSetEvent should be
-            emitted with the key & metadata
-
-        """
-        raise NotImplementedError
-        
-
-    @abstractmethod
-    def update_metadata(self, key, metadata):
-        """ Update the metadata for a given key in the key-value store.
-        
-        This performs a dictionary update on the existing metadata with the
-        provided metadata keys and values
-        
-        Parameters
-        ----------
-        key : string
-            The key for the resource in the key-value store.  They key is a unique
-            identifier for the resource within the key-value store.
-        metadata : dict
-            A dictionary of metadata to associate with the key.  The dictionary
-            keys should be strings which are valid Python identifiers.
-
-        Events
-        ------
-        StoreSetEvent :
-            On successful completion of a transaction, a StoreSetEvent should be
-            emitted with the key & metadata
-
-        """
-        raise NotImplementedError
-            
-            
+                        
     @abstractmethod
     def exists(self, key):
         """ Test whether or not a key exists in the key-value store
@@ -436,6 +289,350 @@ class AbstractStore(object):
         for key in keys:
             yield self.get_metadata(key, select)
         
+        
+    ##########################################################################
+    # Querying Methods
+    ##########################################################################
+        
+    @abstractmethod
+    def query(self, select=None, **kwargs):
+        """ Query for keys and metadata matching metadata provided as keyword arguments
+        
+        This provides a very simple querying interface that returns precise
+        matches with the metadata.  If no arguments are supplied, the query
+        will return the complete set of metadata for the key-value store.
+        
+        Parameters
+        ----------
+        select : iterable of strings or None
+            An optional list of metadata keys to return.  If this is not None,
+            then the metadata dictionaries will only have values for the specified
+            keys populated.        
+        kwargs :
+            Arguments where the keywords are metadata keys, and values are
+            possible values for that metadata item.
+
+        Returns
+        -------
+        result : iterable
+            An iterable of (key, metadata) tuples where metadata matches
+            all the specified values for the specified metadata keywords.
+            If a key specified in select is not present in the metadata of a
+            particular key, then it will not be present in the returned value.
+        """
+        raise NotImplementedError
+
+        
+    def query_keys(self, **kwargs):
+        """ Query for keys matching metadata provided as keyword arguments
+        
+        This provides a very simple querying interface that returns precise
+        matches with the metadata.  If no arguments are supplied, the query
+        will return the complete set of keys for the key-value store.
+        
+        This is equivalent to ``self.query(**kwargs).keys()``, but potentially
+        more efficiently implemented.
+        
+        Parameters
+        ----------
+        kwargs :
+            Arguments where the keywords are metadata keys, and values are
+            possible values for that metadata item.
+
+        Returns
+        -------
+        result : iterable
+            An iterable of key-value store keys whose metadata matches all the
+            specified values for the specified metadata keywords.
+        
+        """
+        return (key for key, value in self.query(**kwargs))
+
+
+    def glob(self, pattern):
+        """ Return keys which match glob-style patterns
+        
+        Parameters
+        ----------
+        pattern : string
+            Glob-style pattern to match keys with.
+
+        Returns
+        -------
+        result : iterable
+            A iterable of keys which match the glob pattern.
+        
+        """
+        for key in self.query_keys():
+            if fnmatch.fnmatchcase(key, pattern):
+                yield key
+        
+
+    ##########################################################################
+    # Utility Methods
+    ##########################################################################
+
+    def to_file(self, key, path, buffer_size=1048576):
+        """ Efficiently store the data associated with a key into a file.
+        
+        This method can be optionally overriden by subclasses to proved a more
+        efficient way of copy the data from the underlying data store to a path
+        in the filesystem.  The default implementation uses the get() method
+        together with chunked reads from the returned data stream to the disk.
+        
+        Parameters
+        ----------
+        key : string
+            The key for the resource in the key-value store.  They key is a unique
+            identifier for the resource within the key-value store.
+        path : string
+            A file system path to store the data to.
+        buffer_size : int
+            An optional indicator of the number of bytes to read at a time.
+            Implementations are free to ignore this hint or use a different
+            default if they need to.  The default is 1048576 bytes (1 MiB).
+        
+        Events
+        ------
+        StoreProgressStartEvent :
+            For buffering implementations, this event should be emitted prior to
+            writing any data to disk.
+        StoreProgressStepEvent :
+            For buffering implementations, this event should be emitted
+            periodically as data is written to disk.
+        StoreProgressEndEvent :
+            For buffering implementations, this event should be emitted after
+            finishing writing to disk.
+        
+        """
+        with open(path, 'wb') as fp:
+            data, metadata = self.get(key)
+            bytes_written = 0
+            with StoreProgressManager(self.event_manager, self, None,
+                    "Saving key '%s' to file '%s'" % (key, path), -1,
+                    key=key, metadata=metadata) as progress:
+                for buffer in buffer_iterator(data, buffer_size):
+                    fp.write(buffer)
+                    bytes_written += len(buffer) 
+                    progress("Saving key '%s' to file '%s' (%d bytes written)"
+                        % (key, path, bytes_written))
+
+
+    def to_bytes(self, key, buffer_size=1048576):
+        """ Efficiently store the data associated with a key into a bytes object.
+        
+        This method can be optionally overriden by subclasses to proved a more
+        efficient way of copy the data from the underlying data store to a bytes
+        object.  The default implementation uses the get() method
+        together with chunked reads from the returned data stream and join.
+        
+        Parameters
+        ----------
+        key : string
+            The key for the resource in the key-value store.  They key is a unique
+            identifier for the resource within the key-value store.
+        buffer_size : int
+            An optional indicator of the number of bytes to read at a time.
+            Implementations are free to ignore this hint or use a different
+            default if they need to.  The default is 1048576 bytes (1 MiB).
+
+        Returns
+        -------
+        bytes :
+            The contents of the file-like object as bytes.
+        
+        Events
+        ------
+        StoreProgressStartEvent :
+            For buffering implementations, this event should be emitted prior to
+            extracting the data.
+        StoreProgressStepEvent :
+            For buffering implementations, this event should be emitted
+            periodically as data is extracted.
+        StoreProgressEndEvent :
+            For buffering implementations, this event should be emitted after
+            extracting the data.
+        
+        """
+        return b''.join(buffer_iterator(self.get_data(key), buffer_size))
+
+
+class AbstractStore(AbstractReadOnlyStore):
+    """ Abstract base class for Key-Value Store API
+    
+    This class implements some of the API so that it can be used with super()
+    where appropriate.
+    
+    Attributes
+    ----------
+    event_manager :
+        Every store is assumed to have an event_manager attribute which
+        implements the :py:class:`~.abstract_event_manager.BaseEventManager` API.
+        
+    """
+    __metaclass__ = ABCMeta
+        
+    ##########################################################################
+    # Basic Create/Read/Update/Delete Methods
+    ##########################################################################
+
+    @abstractmethod
+    def set(self, key, value, buffer_size=1048576):
+        """ Store a stream of data into a given key in the key-value store.
+        
+        This may be left unimplemented by subclasses that represent a read-only
+        key-value store.
+        
+        Parameters
+        ----------
+        key : string
+            The key for the resource in the key-value store.  They key is a unique
+            identifier for the resource within the key-value store.
+        value : tuple of file-like, dict
+            A pair of objects, the first being a readable file-like object that
+            provides stream of data from the key-value store.  The second is a
+            dictionary of metadata for the key.
+        buffer_size : int
+            An optional indicator of the number of bytes to read at a time.
+            Implementations are free to ignore this hint or use a different
+            default if they need to.  The default is 1048576 bytes (1 MiB).
+        
+        Events
+        ------
+        StoreProgressStartEvent :
+            For buffering implementations, this event should be emitted prior to
+            writing any data to the underlying store.
+        StoreProgressStepEvent :
+            For buffering implementations, this event should be emitted
+            periodically as data is written to the underlying store.
+        StoreProgressEndEvent :
+            For buffering implementations, this event should be emitted after
+            finishing writing to the underlying store.
+        StoreSetEvent :
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
+        
+        """
+        data, metadata = value
+        with self.transaction('Setting key "%s"' % key):
+            self.set_metadata(key, metadata)
+            self.set_data(key, data)
+
+
+    @abstractmethod
+    def delete(self, key):
+        """ Delete a key from the repsository.
+        
+        This may be left unimplemented by subclasses that represent a read-only
+        key-value store.
+        
+        Parameters
+        ----------
+        key : string
+            The key for the resource in the key-value store.  They key is a unique
+            identifier for the resource within the key-value store.
+        
+        Events
+        ------
+        StoreDeleteEvent :
+            On successful completion of a transaction, a StoreDeleteEvent should
+            be emitted with the key.
+        
+        """
+        raise NotImplementedError
+            
+
+    @abstractmethod
+    def set_data(self, key, data, buffer_size=1048576):
+        """ Replace the data for a given key in the key-value store.
+        
+        Parameters
+        ----------
+        key : string
+            The key for the resource in the key-value store.  They key is a unique
+            identifier for the resource within the key-value store.
+        data : file-like
+            A readable file-like object the that provides stream of data from the
+            key-value store.
+        buffer_size : int
+            An optional indicator of the number of bytes to read at a time.
+            Implementations are free to ignore this hint or use a different
+            default if they need to.  The default is 1048576 bytes (1 MiB).
+
+        Events
+        ------
+        StoreProgressStartEvent :
+            For buffering implementations, this event should be emitted prior to
+            writing any data to the underlying store.
+        StoreProgressStepEvent :
+            For buffering implementations, this event should be emitted
+            periodically as data is written to the underlying store.
+        StoreProgressEndEvent :
+            For buffering implementations, this event should be emitted after
+            finishing writing to the underlying store.
+        StoreSetEvent :
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
+
+        """
+        raise NotImplementedError
+        
+
+    @abstractmethod
+    def set_metadata(self, key, metadata):
+        """ Set new metadata for a given key in the key-value store.
+        
+        This replaces the existing metadata set for the key with a new set of
+        metadata.
+        
+        Parameters
+        ----------
+        key : string
+            The key for the resource in the key-value store.  They key is a unique
+            identifier for the resource within the key-value store.
+        metadata : dict
+            A dictionary of metadata to associate with the key.  The dictionary
+            keys should be strings which are valid Python identifiers.
+
+        Events
+        ------
+        StoreSetEvent :
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
+
+        """
+        raise NotImplementedError
+        
+
+    @abstractmethod
+    def update_metadata(self, key, metadata):
+        """ Update the metadata for a given key in the key-value store.
+        
+        This performs a dictionary update on the existing metadata with the
+        provided metadata keys and values
+        
+        Parameters
+        ----------
+        key : string
+            The key for the resource in the key-value store.  They key is a unique
+            identifier for the resource within the key-value store.
+        metadata : dict
+            A dictionary of metadata to associate with the key.  The dictionary
+            keys should be strings which are valid Python identifiers.
+
+        Events
+        ------
+        StoreSetEvent :
+            On successful completion of a transaction, a StoreSetEvent should be
+            emitted with the key & metadata
+
+        """
+        raise NotImplementedError
+
+        
+    ##########################################################################
+    # Multiple-key Methods
+    ##########################################################################
             
     def multiset(self, keys, values, buffer_size=1048576):
         """ Set the data and metadata for a collection of keys.
@@ -644,133 +841,10 @@ class AbstractStore(object):
         """
         raise NotImplementedError
         
-    ##########################################################################
-    # Querying Methods
-    ##########################################################################
-        
-    @abstractmethod
-    def query(self, select=None, **kwargs):
-        """ Query for keys and metadata matching metadata provided as keyword arguments
-        
-        This provides a very simple querying interface that returns precise
-        matches with the metadata.  If no arguments are supplied, the query
-        will return the complete set of metadata for the key-value store.
-        
-        Parameters
-        ----------
-        select : iterable of strings or None
-            An optional list of metadata keys to return.  If this is not None,
-            then the metadata dictionaries will only have values for the specified
-            keys populated.        
-        kwargs :
-            Arguments where the keywords are metadata keys, and values are
-            possible values for that metadata item.
-
-        Returns
-        -------
-        result : iterable
-            An iterable of (key, metadata) tuples where metadata matches
-            all the specified values for the specified metadata keywords.
-            If a key specified in select is not present in the metadata of a
-            particular key, then it will not be present in the returned value.
-        """
-        raise NotImplementedError
-
-        
-    def query_keys(self, **kwargs):
-        """ Query for keys matching metadata provided as keyword arguments
-        
-        This provides a very simple querying interface that returns precise
-        matches with the metadata.  If no arguments are supplied, the query
-        will return the complete set of keys for the key-value store.
-        
-        This is equivalent to ``self.query(**kwargs).keys()``, but potentially
-        more efficiently implemented.
-        
-        Parameters
-        ----------
-        kwargs :
-            Arguments where the keywords are metadata keys, and values are
-            possible values for that metadata item.
-
-        Returns
-        -------
-        result : iterable
-            An iterable of key-value store keys whose metadata matches all the
-            specified values for the specified metadata keywords.
-        
-        """
-        return (key for key, value in self.query(**kwargs))
-
-
-    def glob(self, pattern):
-        """ Return keys which match glob-style patterns
-        
-        Parameters
-        ----------
-        pattern : string
-            Glob-style pattern to match keys with.
-
-        Returns
-        -------
-        result : iterable
-            A iterable of keys which match the glob pattern.
-        
-        """
-        for key in self.query_keys():
-            if fnmatch.fnmatchcase(key, pattern):
-                yield key
-        
 
     ##########################################################################
     # Utility Methods
-    ##########################################################################
-
-    def to_file(self, key, path, buffer_size=1048576):
-        """ Efficiently store the data associated with a key into a file.
-        
-        This method can be optionally overriden by subclasses to proved a more
-        efficient way of copy the data from the underlying data store to a path
-        in the filesystem.  The default implementation uses the get() method
-        together with chunked reads from the returned data stream to the disk.
-        
-        Parameters
-        ----------
-        key : string
-            The key for the resource in the key-value store.  They key is a unique
-            identifier for the resource within the key-value store.
-        path : string
-            A file system path to store the data to.
-        buffer_size : int
-            An optional indicator of the number of bytes to read at a time.
-            Implementations are free to ignore this hint or use a different
-            default if they need to.  The default is 1048576 bytes (1 MiB).
-        
-        Events
-        ------
-        StoreProgressStartEvent :
-            For buffering implementations, this event should be emitted prior to
-            writing any data to disk.
-        StoreProgressStepEvent :
-            For buffering implementations, this event should be emitted
-            periodically as data is written to disk.
-        StoreProgressEndEvent :
-            For buffering implementations, this event should be emitted after
-            finishing writing to disk.
-        
-        """
-        with open(path, 'wb') as fp:
-            data, metadata = self.get(key)
-            bytes_written = 0
-            with StoreProgressManager(self.event_manager, self, None,
-                    "Saving key '%s' to file '%s'" % (key, path), -1,
-                    key=key, metadata=metadata) as progress:
-                for buffer in buffer_iterator(data, buffer_size):
-                    fp.write(buffer)
-                    bytes_written += len(buffer) 
-                    progress("Saving key '%s' to file '%s' (%d bytes written)"
-                        % (key, path, bytes_written))
-                        
+    ##########################################################################                        
         
     def from_file(self, key, path, buffer_size=1048576):
         """ Efficiently read data from a file into a key in the key-value store.
@@ -798,45 +872,6 @@ class AbstractStore(object):
         """
         with open(path, 'rb') as fp:
             self.set_data(key, fp, buffer_size=buffer_size)
-
-
-    def to_bytes(self, key, buffer_size=1048576):
-        """ Efficiently store the data associated with a key into a bytes object.
-        
-        This method can be optionally overriden by subclasses to proved a more
-        efficient way of copy the data from the underlying data store to a bytes
-        object.  The default implementation uses the get() method
-        together with chunked reads from the returned data stream and join.
-        
-        Parameters
-        ----------
-        key : string
-            The key for the resource in the key-value store.  They key is a unique
-            identifier for the resource within the key-value store.
-        buffer_size : int
-            An optional indicator of the number of bytes to read at a time.
-            Implementations are free to ignore this hint or use a different
-            default if they need to.  The default is 1048576 bytes (1 MiB).
-
-        Returns
-        -------
-        bytes :
-            The contents of the file-like object as bytes.
-        
-        Events
-        ------
-        StoreProgressStartEvent :
-            For buffering implementations, this event should be emitted prior to
-            extracting the data.
-        StoreProgressStepEvent :
-            For buffering implementations, this event should be emitted
-            periodically as data is extracted.
-        StoreProgressEndEvent :
-            For buffering implementations, this event should be emitted after
-            extracting the data.
-        
-        """
-        return b''.join(buffer_iterator(self.get_data(key), buffer_size))
 
 
     def from_bytes(self, key, data, buffer_size=1048576):
