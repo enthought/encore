@@ -32,10 +32,11 @@ import urllib2
 import urllib
 import time
 
-from .abstract_store import AbstractStore
+from .abstract_store import AbstractReadOnlyStore, Filelike
 from .utils import StoreProgressManager, buffer_iterator
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 
+Filelike.register(urllib.addbase)
 
 def basic_auth_factory(**kwargs):
     """ A factory that creates a :py:class:`~.HTTPBasicAuthHandler` instance
@@ -48,7 +49,7 @@ def basic_auth_factory(**kwargs):
     auth_handler.add_password(**kwargs)
 
 
-class StaticURLStore(AbstractStore):
+class StaticURLStore(AbstractReadOnlyStore):
     """ A read-only key-value store that is a front end for data served via URLs
     
     All data is assumed to be served from some root url.  In addition
@@ -192,7 +193,9 @@ class StaticURLStore(AbstractStore):
         metadata : dict
             A dictionary of metadata giving information about the key-value store.
         """
-        return {}
+        return {
+            'readonly': True
+        }
 
         
     ##########################################################################
@@ -227,24 +230,6 @@ class StaticURLStore(AbstractStore):
         metadata = self.get_metadata(key)
         data = self.get_data(key)
         return (data, metadata)
-        
-    
-    def set(self, key, value, buffer_size=1048576):
-        """ Store a stream of data into a given key in the key-value store.
-        
-        This is unimplemented.
-        
-        """
-        raise NotImplementedError
-
-    
-    def delete(self, key):
-        """ Delete a key from the repsository.
-        
-        This is unimplemented
-                
-        """
-        raise NotImplementedError
 
     
     def get_data(self, key):
@@ -308,33 +293,6 @@ class StaticURLStore(AbstractStore):
             else:
                 metadata = self._index[key]
                 return dict((s, metadata[s]) for s in select if s in metadata)
-
-    
-    def set_data(self, key, data, buffer_size=1048576):
-        """ Replace the data for a given key in the key-value store.
-        
-        This is unimplemented
-                
-        """
-        raise NotImplementedError
-        
-    
-    def set_metadata(self, key, metadata):
-        """ Set new metadata for a given key in the key-value store.
-        
-        This is unimplemented
-                
-        """
-        raise NotImplementedError
-
-    
-    def update_metadata(self, key, metadata):
-        """ Update the metadata for a given key in the key-value store.
-        
-        This is unimplemented
-                
-        """
-        raise NotImplementedError
         
                 
     def exists(self, key):
@@ -357,154 +315,8 @@ class StaticURLStore(AbstractStore):
 
         
     ##########################################################################
-    # Multiple-key Methods
-    ##########################################################################
-   
-    def multiget(self, keys):
-        """ Retrieve the data and metadata for a collection of keys.
-        
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        
-        Returns
-        -------
-        result : iterator of (file-like, dict) tuples
-            An iterator of (data, metadata) pairs.
-        
-        Raises
-        ------
-        KeyError :
-            This will raise a key error if the key is not present in the store.
-        
-        """
-        return super(StaticURLStore, self).multiget(keys)
-   
-    
-    def multiget_data(self, keys):
-        """ Retrieve the data for a collection of keys.
-        
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        
-        Returns
-        -------
-        result : iterator of file-like
-            An iterator of file-like data objects corresponding to the keys.
-        
-        Raises
-        ------
-        KeyError :
-            This will raise a key error if the key is not present in the store.
-        
-        """
-        return super(StaticURLStore, self).multiget_data(keys)
-
-    
-    def multiget_metadata(self, keys, select=None):
-        """ Retrieve the metadata for a collection of keys in the key-value store.
-        
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        select : iterable of strings or None
-            Which metadata keys to populate in the results.  If unspecified, then
-            return the entire metadata dictionary.
-
-        Returns
-        -------
-        metadatas : iterator of dicts
-            An iterator of dictionaries of metadata associated with the key.
-            The dictionaries have keys as specified by the select argument.  If
-            a key specified in select is not present in the metadata, then it
-            will not be present in the returned value.
-        
-        Raises
-        ------
-        KeyError :
-            This will raise a key error if the key is not present in the store.
-        
-        """
-        return super(StaticURLStore, self).multiget_metadata(keys, select)
-            
-    
-    def multiset(self, keys, values, buffer_size=1048576):
-        """ Set the data and metadata for a collection of keys.
-        
-        This is unimplemented
-
-        """
-        raise NotImplementedError   
-    
-    def multiset_data(self, keys, datas, buffer_size=1048576):
-        """ Set the data for a collection of keys.
-        
-        This is unimplemented
-
-        """
-        raise NotImplementedError   
-   
-    
-    def multiset_metadata(self, keys, metadatas):
-        """ Set the metadata for a collection of keys.
-        
-        Where supported by an implementation, this should perform the whole
-        collection of sets as a single transaction.
-                
-        Like zip() if keys and metadatas have different lengths, then any excess
-        values in the longer list should be silently ignored.
-
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        metadatas : iterable of dicts
-            An iterator that provides the metadata dictionaries for the
-            corresponding keys.
-
-        Events
-        ------
-        StoreSetEvent :
-            On successful completion of a transaction, a StoreSetEvent should be
-            emitted with the key & metadata for each key that was set.
-
-        """
-        raise NotImplementedError
-   
-    
-    def multiupdate_metadata(self, keys, metadatas):
-        """ Update the metadata for a collection of keys.
-        
-        This is unimplemented
-
-        """
-        raise NotImplementedError   
-    
-   
-    ##########################################################################
-    # Transaction Methods
-    ##########################################################################
-    
-    def transaction(self, notes):
-        """ Provide a transaction context manager
-        
-        This is unimplemented
-
-        """
-        raise NotImplementedError   
-        
-    ##########################################################################
     # Querying Methods
     ##########################################################################
-        
     
     def query(self, select=None, **kwargs):
         """ Query for keys and metadata matching metadata provided as keyword arguments
@@ -609,22 +421,7 @@ class StaticURLStore(AbstractStore):
                 if old_index[key] != index[key]:
                     self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=index[key]))
 
-    def from_file(self, key, path, buffer_size=1048576):
-        """ Efficiently read data from a file into a key in the key-value store.
         
-        Not implemented.
-        
-        """
-        raise NotImplementedError
-    
-    def from_bytes(self, key, data, buffer_size=1048576):
-        """ Efficiently read data from a bytes object into a key in the key-value store.
-        
-        Not implemented.
-        
-        """
-        raise NotImplementedError
-    
     ##########################################################################
     # Private Methods
     ##########################################################################

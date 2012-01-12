@@ -2,11 +2,20 @@
 
 .. automodule:: encore.storage.abstract_store
 
-    .. autoclass:: AbstractStore
-        :members: connect, disconnect, is_connected, get, set, delete, exists, transaction,
+    .. autoclass:: Filelike
+        :members: read, close
+
+    .. autoclass:: AbstractReadOnlyStore
+        :members: connect, disconnect, is_connected, get, exists, 
             query, query_keys, glob,
-            get_data, get_metadata, set_data, set_metadata, update_metadata,
-            multiget, multiset, multiget_data, multiget_metadata, multiset_data,
+            get_data, get_metadata,
+            multiget, multiget_data, multiget_metadata,
+            to_file, to_bytes
+
+    .. autoclass:: AbstractStore
+        :members: set, delete, transaction,
+            set_data, set_metadata, update_metadata,
+            multiset, multiset_data,
             multiset_metadata, multiupdate_metadata,
-            to_file, from_file, to_bytes, from_bytes
+            from_file, from_bytes
 
