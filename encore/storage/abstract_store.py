@@ -24,8 +24,33 @@ data values can be stored in the key-value store.
 from abc import ABCMeta, abstractmethod
 from itertools import izip
 import fnmatch
+from cStringIO import StringIO
 
 from .utils import StoreProgressManager, buffer_iterator
+
+class Filelike(object):
+    """ Abstract base class for file-like objects used by Key-Value stores
+    
+    """
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def read(self, size=-1):
+        """ Read at most size bytes, returning as a string
+        
+        If size is negative or omitted, then read until EOF.
+        
+        """
+        raise NotImplementedError
+    
+    @abstractmethod
+    def close(self):
+        """ Close the file-like object, releasing any resources
+        """
+        raise NotImplementedError
+
+Filelike.register(file)
+Filelike.register(type(StringIO('')))
 
 
 class AbstractReadOnlyStore(object):
@@ -100,7 +125,6 @@ class AbstractReadOnlyStore(object):
         metadata : dict
             A dictionary of metadata giving information about the key-value store.
         """
-        raise NotImplementedError
         return {
             'readonly': True
         }
@@ -912,5 +936,4 @@ class AbstractStore(AbstractReadOnlyStore):
             default if they need to.  The default is 1048576 bytes (1 MiB).
                 
         """
-        from cStringIO import StringIO
         self.set_data(key, StringIO(data), buffer_size)
