@@ -13,8 +13,7 @@ Joined Store
 """
 
 from .abstract_store import AbstractStore
-from .utils import StoreProgressManager, buffer_iterator, DummyTransactionContext
-from .events import ProgressStartEvent, ProgressStepEvent, ProgressEndEvent
+from .utils import DummyTransactionContext
 
 class JoinedStore(AbstractStore):
     """ A key-value store that joins together several other Key-Value Stores
@@ -722,24 +721,6 @@ class JoinedStore(AbstractStore):
                     yield key
 
     
-    def glob(self, pattern):
-        """ Return keys which match glob-style patterns
-        
-        Parameters
-        ----------
-        pattern : string
-            Glob-style pattern to match keys with.
-
-        Returns
-        -------
-        result : iterable
-            A iterable of keys which match the glob pattern.
-        
-        """
-        for result in super(JoinedStore, self).glob(pattern):
-            yield result
-        
-
     ##########################################################################
     # Utility Methods
     ##########################################################################
