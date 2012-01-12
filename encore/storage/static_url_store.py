@@ -32,10 +32,11 @@ import urllib2
 import urllib
 import time
 
-from .abstract_store import AbstractReadOnlyStore
+from .abstract_store import AbstractReadOnlyStore, Filelike
 from .utils import StoreProgressManager, buffer_iterator
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 
+Filelike.register(urllib.addbase)
 
 def basic_auth_factory(**kwargs):
     """ A factory that creates a :py:class:`~.HTTPBasicAuthHandler` instance
