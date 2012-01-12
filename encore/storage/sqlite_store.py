@@ -418,184 +418,8 @@ class SqliteStore(AbstractStore):
             self._update_column(key, 'metadata', temp_metadata)
             self._update_index(key, metadata)
             self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=temp_metadata))
-   
-   
-    def multiget(self, keys):
-        """ Retrieve the data and metadata for a collection of keys.
-        
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        
-        Returns
-        -------
-        result : iterator of (file-like, dict) tuples
-            An iterator of (data, metadata) pairs.
-        
-        Raises
-        ------
-        KeyError :
-            This will raise a key error if any key is not present in the store.
-        
-        """
-        return super(SqliteStore, self).multiget(keys)
-    
-   
-    def multiget_data(self, keys):
-        """ Retrieve the data for a collection of keys.
-        
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        
-        Returns
-        -------
-        result : iterator of file-like
-            An iterator of file-like data objects corresponding to the keys.
-        
-        Raises
-        ------
-        KeyError :
-            This will raise a key error if any key is not present in the store.
-        
-        """
-        return super(SqliteStore, self).multiget_data(keys)
-    
 
-    def multiget_metadata(self, keys, select=None):
-        """ Retrieve the metadata for a collection of keys in the key-value store.
-        
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        select : iterable of strings or None
-            Which metadata keys to populate in the results.  If unspecified, then
-            return the entire metadata dictionary.
-        
-        Returns
-        -------
-        metadatas : iterator of dicts
-            An iterator of dictionaries of metadata associated with the key.
-            The dictionaries have keys as specified by the select argument.  If
-            a key specified in select is not present in the metadata, then it
-            will not be present in the returned value.
-        
-        Raises
-        ------
-        KeyError :
-            This will raise a key error if any key is not present in the store.
-        
-        """
-        return super(SqliteStore, self).multiget_metadata(keys, select)
-    
       
-    def multiset(self, keys, values, buffer_size=1048576):
-        """ Set the data and metadata for a collection of keys.
-        
-        Where supported by an implementation, this should perform the whole
-        collection of sets as a single transaction.
-        
-        Like zip() if keys and values have different lengths, then any excess
-        values in the longer list should be silently ignored.
-        
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        values : iterable of (file-like, dict) tuples
-            An iterator that provides the (data, metadata) pairs for the
-            corresponding keys.
-        buffer_size : int
-            An optional indicator of the number of bytes to read at a time.
-            Implementations are free to ignore this hint or use a different
-            default if they need to.  The default is 1048576 bytes (1 MiB).
-        
-        """
-        return super(SqliteStore, self).multiset(keys, values, buffer_size)
-    
-   
-    def multiset_data(self, keys, datas, buffer_size=1048576):
-        """ Set the data and metadata for a collection of keys.
-        
-        Where supported by an implementation, this should perform the whole
-        collection of sets as a single transaction.
-                
-        Like zip() if keys and datas have different lengths, then any excess
-        values in the longer list should be silently ignored.
-
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        datas : iterable of file-like objects
-            An iterator that provides the data file-like objects for the
-            corresponding keys.
-        buffer_size : int
-            An optional indicator of the number of bytes to read at a time.
-            Implementations are free to ignore this hint or use a different
-            default if they need to.  The default is 1048576 bytes (1 MiB).
-        
-        """
-        return super(SqliteStore, self).multiset_data(keys, datas, buffer_size)
-    
-   
-    def multiset_metadata(self, keys, metadatas):
-        """ Set the data and metadata for a collection of keys.
-        
-        Where supported by an implementation, this should perform the whole
-        collection of sets as a single transaction.
-                
-        Like zip() if keys and metadatas have different lengths, then any excess
-        values in the longer list should be silently ignored.
-
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        metadatas : iterable of dicts
-            An iterator that provides the metadata dictionaries for the
-            corresponding keys.
-        
-        """
-        return super(SqliteStore, self).multiset_metadata(keys, metadatas)
-
-
-    def multiupdate_metadata(self, keys, metadatas):
-        """ Update the metadata for a collection of keys.
-        
-        Where supported by an implementation, this should perform the whole
-        collection of sets as a single transaction.
-                
-        Like zip() if keys and metadatas have different lengths, then any excess
-        values in the longer list should be silently ignored.
-
-        Parameters
-        ----------
-        keys : iterable of strings
-            The keys for the resources in the key-value store.  Each key is a
-            unique identifier for a resource within the key-value store.
-        metadatas : iterable of dicts
-            An iterator that provides the metadata dictionaries for the
-            corresponding keys.
-        
-        Raises
-        ------
-        KeyError :
-            This will raise a key error if the any is not present in the store.
-        
-        """
-        return super(SqliteStore, self).multiupdate_metadata(keys, metadatas)
-    
-   
     def transaction(self, notes):
         """ Provide a transaction context manager"""
         return SimpleTransactionContext(self)
@@ -603,9 +427,11 @@ class SqliteStore(AbstractStore):
     
     def _commit_transaction(self):
         self._connection.commit()
-    
+
+        
     def _rollback_transaction(self):
         self._connection.rollback()
+
 
     def query(self, select=None, **kwargs):
         """ Query for keys and metadata matching metadata provided as keyword arguments

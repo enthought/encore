@@ -359,7 +359,6 @@ class AbstractStore(object):
     # Multiple-key Methods
     ##########################################################################
    
-    @abstractmethod
     def multiget(self, keys):
         """ Retrieve the data and metadata for a collection of keys.
         
@@ -384,7 +383,6 @@ class AbstractStore(object):
             yield self.get(key)
     
    
-    @abstractmethod
     def multiget_data(self, keys):
         """ Retrieve the data for a collection of keys.
         
@@ -409,7 +407,6 @@ class AbstractStore(object):
             yield self.get_data(key)
     
 
-    @abstractmethod
     def multiget_metadata(self, keys, select=None):
         """ Retrieve the metadata for a collection of keys in the key-value store.
         
@@ -440,7 +437,6 @@ class AbstractStore(object):
             yield self.get_metadata(key, select)
         
             
-    @abstractmethod
     def multiset(self, keys, values, buffer_size=1048576):
         """ Set the data and metadata for a collection of keys.
         
@@ -484,7 +480,6 @@ class AbstractStore(object):
                 self.set(key, value, buffer_size)
     
    
-    @abstractmethod
     def multiset_data(self, keys, datas, buffer_size=1048576):
         """ Set the data for a collection of keys.
         
@@ -528,7 +523,6 @@ class AbstractStore(object):
                 self.set_data(key, data, buffer_size)
     
    
-    @abstractmethod
     def multiset_metadata(self, keys, metadatas):
         """ Set the metadata for a collection of keys.
         
@@ -559,7 +553,6 @@ class AbstractStore(object):
                 self.set_metadata(key, metadata)
    
    
-    @abstractmethod
     def multiupdate_metadata(self, keys, metadatas):
         """ Update the metadata for a collection of keys.
         
@@ -684,7 +677,6 @@ class AbstractStore(object):
         raise NotImplementedError
 
         
-    @abstractmethod
     def query_keys(self, **kwargs):
         """ Query for keys matching metadata provided as keyword arguments
         
