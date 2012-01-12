@@ -101,6 +101,9 @@ class AbstractReadOnlyStore(object):
             A dictionary of metadata giving information about the key-value store.
         """
         raise NotImplementedError
+        return {
+            'readonly': True
+        }
 
         
     ##########################################################################
@@ -471,6 +474,20 @@ class AbstractStore(AbstractReadOnlyStore):
         
     """
     __metaclass__ = ABCMeta
+
+
+    @abstractmethod
+    def info(self):
+        """ Get information about the key-value store
+        
+        Returns
+        -------
+        metadata : dict
+            A dictionary of metadata giving information about the key-value store.
+        """
+        return {
+            'readonly': False
+        }
         
     ##########################################################################
     # Basic Create/Read/Update/Delete Methods
