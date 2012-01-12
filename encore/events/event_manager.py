@@ -100,7 +100,7 @@ class EventInfo(object):
         self._filter_keys = set() # to precompute filters on event emit
         self._disable = False
 
-        self._priority_list_lock = threading.RLock()
+        self._priority_list_lock = threading.Lock()
 
 
     def connect(self, func, filter=None, priority=0, count=0):
