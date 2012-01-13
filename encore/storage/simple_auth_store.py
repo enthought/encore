@@ -9,6 +9,16 @@
 Simple Authenticating Store
 ===========================
 
+This module provides a simple wrapper for a store that implements a simple
+authentication scheme.  This may be used as a base for more complex and fine-grained
+authentication.
+
+By default it authenticates by computing a (salted) hash of the user's password
+and validates it against the hash stored in an appropriate key.  Authenticated
+users then have full access to all keys.
+
+Subclasses can refine this behaviour by overriding the check_permissions()
+method to provide different or more controlled permissioning.
 
 """
 
@@ -445,6 +455,9 @@ class SimpleAuthStore(AbstractStore):
     
     def exists(self, key):
         """ Test whether or not a key exists in the key-value store
+        
+        If a user does not have 'exists' permissions for this key, then it will
+        return ``False``, even if the key exists in the underlying store.
         
         Parameters
         ----------
