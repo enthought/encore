@@ -17,35 +17,43 @@ import hashlib
 from .abstract_store import AbstractStore
 from .utils import DummyTransactionContext
 
-def make_encoder(salt, hasher=lambda s: hashlib.sha1(s).disgest()):
+class AuthenticationError(Exception):
+    pass
+
+def make_encoder(salt, hasher=lambda s: hashlib.sha1(s).digest()):
     """ Create a moderately secure salted encoder
     """
-    return eval("lambda password: hasher("+repr(salt)+"+password)")
+    return eval("lambda password: hasher("+repr(salt)+"+password)", {'hasher': hasher})
 
 class SimpleAuthStore(AbstractStore):
-    """ A key-value store that joins together several other Key-Value Stores
+    """ A key-value store that wraps another store and implements simple authentication
     
-    A joined store is a composite store which takes a list of stores and
-    presents a set of keys that is the union of all the keys that are available
-    in all the stores.  When a key is available in multiple stores, then the
-    store which comes first in the list has priority.
+    This wraps an existing store with no notion of authentication and provides
+    simple username/password authentication, storing a hash of the password in
+    the wrapped store.
     
-    All writes are performed into the first store in the list.
+    The base implementation has all-or-nothing 
     
     Parameters
     ----------
     event_manager :
         An event_manager which implements the :py:class:`~.abstract_event_manager.BaseEventManager`
         API.
-    stores : list of stores
-        The stores that are joined together by this store.
+    store : AbstractStore instance
+        The wrapped store that actually holds the data.
+    encoder : callable
+        A callable that computes the password hash.
+    user_key_path : str
+        The prefix to put before the username for the keys that store the user's
+        information.  At present these keys must simply hold the encoded hash of
+        the user's password.
         
     """
     def __init__(self, event_manager, store, encoder, user_key_path='.user_'):
         self.event_manager = event_manager
         self.store = store
         self.encoder = encoder
-        self.user_key_path
+        self.user_key_path = user_key_path
         
         self._username = None
         self._token = None
@@ -68,7 +76,7 @@ class SimpleAuthStore(AbstractStore):
         self._token = self.encoder(credentials['password'])
         
         if 'connect' not in self._check_permissions():
-            raise AuthenticationError('User "%s" is not permitted to connect')
+            raise AuthenticationError('User "%s" is not authenticated for connection' % self._username)
         self._connected = True
         
         
@@ -183,6 +191,11 @@ class SimpleAuthStore(AbstractStore):
         StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
+
+        Raises
+        ------
+        AuthenticationError :
+            If the user has no rights to set the key, then an Authentication error is raised.
         
         """
         permissions = self._check_permissions(key)
@@ -212,6 +225,11 @@ class SimpleAuthStore(AbstractStore):
         StoreDeleteEvent :
             On successful completion of a transaction, a StoreDeleteEvent should
             be emitted with the key.
+        
+        Raises
+        ------
+        AuthenticationError :
+            If the user has no rights to delete the key, then an Authentication error is raised.
         
         """
         permissions = self._check_permissions(key)
@@ -243,6 +261,9 @@ class SimpleAuthStore(AbstractStore):
         ------
         KeyError :
             This will raise a key error if the key is not present in the store.
+        AuthenticationError :
+            If the user has no rights to get the key, then an Authentication error is raised.
+        
 
         """
         permissions = self._check_permissions(key)
@@ -279,7 +300,9 @@ class SimpleAuthStore(AbstractStore):
         ------
         KeyError :
             This will raise a key error if the key is not present in the store.
-
+        AuthenticationError :
+            If the user has no rights to get the key, then an Authentication error is raised.
+        
         """
         permissions = self._check_permissions(key)
         if 'exists' in permissions:
@@ -323,11 +346,16 @@ class SimpleAuthStore(AbstractStore):
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
 
+        Raises
+        ------
+        AuthenticationError :
+            If the user has no rights to set the key, then an Authentication error is raised.
+        
         """
         permissions = self._check_permissions(key)
         if 'exists' in permissions:
             if 'set' in permissions:
-                return self.store.set_data(key, value, buffer_size)
+                return self.store.set_data(key, data, buffer_size)
             else:
                 raise AuthenticationError('User "%s" is not permitted to set "%s"' % (self._username, key))
         else:
@@ -355,11 +383,16 @@ class SimpleAuthStore(AbstractStore):
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
 
+        Raises
+        ------
+        AuthenticationError :
+            If the user has no rights to set the key, then an Authentication error is raised.
+        
         """
         permissions = self._check_permissions(key)
         if 'exists' in permissions:
             if 'set' in permissions:
-                return self.store.set_metadata(key, value, buffer_size)
+                return self.store.set_metadata(key, metadata)
             else:
                 raise AuthenticationError('User "%s" is not permitted to set "%s"' % (self._username, key))
         else:
@@ -387,11 +420,16 @@ class SimpleAuthStore(AbstractStore):
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
 
+        Raises
+        ------
+        AuthenticationError :
+            If the user has no rights to set the key, then an Authentication error is raised.
+        
         """
         permissions = self._check_permissions(key)
         if 'exists' in permissions:
             if 'set' in permissions:
-                return self.store.update_metadata(key, value, buffer_size)
+                return self.store.update_metadata(key, metadata)
             else:
                 raise AuthenticationError('User "%s" is not permitted to set "%s"' % (self._username, key))
         else:
@@ -420,23 +458,50 @@ class SimpleAuthStore(AbstractStore):
             return False
 
 
+    def transaction(self, note):
+        return self.store.transaction(note)
+
+    def query(self, select=None, **kwargs):
+        for key, metadata in self.store.query(select, **kwargs):
+            if self.exists(key):
+                yield key, metadata
+
+    def query_keys(self, **kwargs):
+        for key in self.store.query_keys(**kwargs):
+            if self.exists(key):
+                yield key
+
     ##########################################################################
     # Private Methods
     ##########################################################################
 
-    def _check_permissions(self, key=None):
+    def check_permissions(self, key=None):
         """ Return permissions that the user has for the provided key
+        
+        The default behaviour gives all authenticated users full access to all
+        keys.  Subclasses may implement finer-grained controls based on user
+        groups or other permissioning systems.
         
         Parameters
         ----------
         key : str or None
             The key which the permissions are being requested for, or the global
             permissions if the key is None.
+        
+        Returns
+        -------
+        permissions : set
+            A set of strings chosen from 'connect', 'exists', 'get', 'set', and/or
+            'delete' which express the permissions that the user has on that
+            particular key.
+        
         """
         if self._username:
             user_key = self.user_key_path + self._username
+            print user_key
             try:
-                token = self.store.get(user_key).read()
+                token = self.store.get_data(user_key).read()
+                print 'token', token
             except KeyError:
                 return set()
             if self._token == token:

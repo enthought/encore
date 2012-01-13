@@ -42,6 +42,7 @@ Implementations
    sqlite_store.rst
    static_url_store.rst
    joined_store.rst
+   simple_auth_store.rst
 
 
 Indices and tables
