@@ -2,6 +2,10 @@
 
 .. automodule:: encore.storage.simple_auth_store
 
+.. autofunction:: make_encoder
+
+.. autofunction:: sha1_hasher
+
 .. autoclass:: SimpleAuthStore
     :members: __init__, connect, disconnect, is_connected, get, set, delete, exists, transaction,
             query, query_keys, glob,

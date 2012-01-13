@@ -20,10 +20,17 @@ from .utils import DummyTransactionContext
 class AuthenticationError(Exception):
     pass
 
-def make_encoder(salt, hasher=lambda s: hashlib.sha1(s).digest()):
+
+def sha1_hasher(s):
+    """ A simple utility function for producing a sha1 digest of a string. """
+    return hashlib.sha1(s).digest()
+
+
+def make_encoder(salt, hasher=sha1_hasher):
     """ Create a moderately secure salted encoder
     """
     return eval("lambda password: hasher("+repr(salt)+"+password)", {'hasher': hasher})
+
 
 class SimpleAuthStore(AbstractStore):
     """ A key-value store that wraps another store and implements simple authentication
