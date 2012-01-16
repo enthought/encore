@@ -38,7 +38,23 @@ def sha1_hasher(s):
 
 def make_encoder(salt, hasher=sha1_hasher):
     """ Create a moderately secure salted encoder
+    
+    Parameters
+    ----------
+    salt : str
+        A salt that is added to the user-supplied password before hashing.
+        This salt should be kept secret, but needs to be remembered across
+        invocations (ie. the same salt needs to be used every time the password
+        is encoded).
+    hasher : callable
+        A callable that takes a string and returns a cryptographic hash of the
+        string.  The default is :py:func:`sha1_hasher`.
+
     """
+    # we eval so that the value of the salt is a little more obscured.  An
+    # attacker who knows what they are doing can probably get at the value, but
+    # if they have the level of access required to see this function then they
+    # probably have access to the raw underlying store as well.
     return eval("lambda password: hasher("+repr(salt)+"+password)", {'hasher': hasher})
 
 
@@ -64,13 +80,16 @@ class SimpleAuthStore(AbstractStore):
         The prefix to put before the username for the keys that store the user's
         information.  At present these keys must simply hold the encoded hash of
         the user's password.
+    user_key_store : AbstractStore instance
+        The store to store the user keys in.  Defaults to the wrapped store.
         
     """
-    def __init__(self, event_manager, store, encoder, user_key_path='.user_'):
+    def __init__(self, event_manager, store, encoder, user_key_path='.user_', user_key_store=None):
         self.event_manager = event_manager
         self.store = store
         self.encoder = encoder
         self.user_key_path = user_key_path
+        self.user_key_store = store if user_key_store is None else user_key_store
         
         self._username = None
         self._token = None
@@ -92,7 +111,7 @@ class SimpleAuthStore(AbstractStore):
         self._username = credentials['username']
         self._token = self.encoder(credentials['password'])
         
-        if 'connect' not in self._check_permissions():
+        if 'connect' not in self.check_permissions():
             raise AuthenticationError('User "%s" is not authenticated for connection' % self._username)
         self._connected = True
         
@@ -164,7 +183,7 @@ class SimpleAuthStore(AbstractStore):
             If the user has no rights to get the key, then an Authentication error is raised.
 
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             if 'get' in permissions:
                 return self.store.get(key)
@@ -215,7 +234,7 @@ class SimpleAuthStore(AbstractStore):
             If the user has no rights to set the key, then an Authentication error is raised.
         
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             if 'set' in permissions:
                 return self.store.set(key, value, buffer_size)
@@ -249,7 +268,7 @@ class SimpleAuthStore(AbstractStore):
             If the user has no rights to delete the key, then an Authentication error is raised.
         
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             if 'delete' in permissions:
                 return self.store.delete(key)
@@ -283,7 +302,7 @@ class SimpleAuthStore(AbstractStore):
         
 
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             if 'get' in permissions:
                 return self.store.get_data(key)
@@ -321,7 +340,7 @@ class SimpleAuthStore(AbstractStore):
             If the user has no rights to get the key, then an Authentication error is raised.
         
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             if 'get' in permissions:
                 return self.store.get_metadata(key, select)
@@ -369,7 +388,7 @@ class SimpleAuthStore(AbstractStore):
             If the user has no rights to set the key, then an Authentication error is raised.
         
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             if 'set' in permissions:
                 return self.store.set_data(key, data, buffer_size)
@@ -406,7 +425,7 @@ class SimpleAuthStore(AbstractStore):
             If the user has no rights to set the key, then an Authentication error is raised.
         
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             if 'set' in permissions:
                 return self.store.set_metadata(key, metadata)
@@ -443,7 +462,7 @@ class SimpleAuthStore(AbstractStore):
             If the user has no rights to set the key, then an Authentication error is raised.
         
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             if 'set' in permissions:
                 return self.store.update_metadata(key, metadata)
@@ -471,7 +490,7 @@ class SimpleAuthStore(AbstractStore):
             Whether or not the key exists in the key-value store.
         
         """
-        permissions = self._check_permissions(key)
+        permissions = self.check_permissions(key)
         if 'exists' in permissions:
             return self.store.exists(key)
         else:
@@ -520,7 +539,7 @@ class SimpleAuthStore(AbstractStore):
             user_key = self.user_key_path + self._username
             print user_key
             try:
-                token = self.store.get_data(user_key).read()
+                token = self.user_key_store.get_data(user_key).read()
                 print 'token', token
             except KeyError:
                 return set()
