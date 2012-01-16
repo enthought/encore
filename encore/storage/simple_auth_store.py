@@ -36,7 +36,7 @@ def sha1_hasher(s):
     return hashlib.sha1(s).digest()
 
 
-def make_encoder(salt, hasher=sha1_hasher):
+def make_encoder(salt, hasher=None):
     """ Create a moderately secure salted encoder
     
     Parameters
@@ -55,6 +55,8 @@ def make_encoder(salt, hasher=sha1_hasher):
     # attacker who knows what they are doing can probably get at the value, but
     # if they have the level of access required to see this function then they
     # probably have access to the raw underlying store as well.
+    if hasher is None:
+        hasher = sha1_hasher
     return eval("lambda password: hasher("+repr(salt)+"+password)", {'hasher': hasher})
 
 
