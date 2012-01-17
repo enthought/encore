@@ -1,0 +1,811 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Simple Authenticating Store &mdash; Encore v0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/et.ico"/>
+    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="up" title="Storage" href="index.html" />
+    <link rel="prev" title="Joined Store" href="joined_store.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="joined_store.html" title="Joined Store"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="joined_store.html"
+                        title="previous chapter">Joined Store</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/storage/simple_auth_store.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="module-encore.storage.simple_auth_store"></span><div class="section" id="simple-authenticating-store">
+<h1>Simple Authenticating Store<a class="headerlink" href="#simple-authenticating-store" title="Permalink to this headline">¶</a></h1>
+<p>This module provides a simple wrapper for a store that implements a simple
+authentication scheme.  This may be used as a base for more complex and fine-grained
+authentication.</p>
+<p>By default it authenticates by computing a (salted) hash of the user&#8217;s password
+and validates it against the hash stored in an appropriate key.  Authenticated
+users then have full access to all keys.</p>
+<p>Subclasses can refine this behaviour by overriding the check_permissions()
+method to provide different or more controlled permissioning.</p>
+</div>
+<dl class="function">
+<dt id="encore.storage.simple_auth_store.make_encoder">
+<tt class="descclassname">encore.storage.simple_auth_store.</tt><tt class="descname">make_encoder</tt><big>(</big><em>salt</em>, <em>hasher=None</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.make_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a moderately secure salted encoder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>salt</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; A salt that is added to the user-supplied password before hashing.
+This salt should be kept secret, but needs to be remembered across
+invocations (ie. the same salt needs to be used every time the password
+is encoded).</li>
+<li><strong>hasher</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#callable" title="(in Python v2.7)"><em>callable</em></a>) &#8211; A callable that takes a string and returns a cryptographic hash of the
+string.  The default is <a class="reference internal" href="#encore.storage.simple_auth_store.sha1_hasher" title="encore.storage.simple_auth_store.sha1_hasher"><tt class="xref py py-func docutils literal"><span class="pre">sha1_hasher()</span></tt></a>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encore.storage.simple_auth_store.sha1_hasher">
+<tt class="descclassname">encore.storage.simple_auth_store.</tt><tt class="descname">sha1_hasher</tt><big>(</big><em>s</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.sha1_hasher" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple utility function for producing a sha1 digest of a string.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore">
+<em class="property">class </em><tt class="descclassname">encore.storage.simple_auth_store.</tt><tt class="descname">SimpleAuthStore</tt><big>(</big><em>event_manager</em>, <em>store</em>, <em>encoder</em>, <em>user_key_path='.user_'</em>, <em>user_key_store=None</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>A key-value store that wraps another store and implements simple authentication</p>
+<p>This wraps an existing store with no notion of authentication and provides
+simple username/password authentication, storing a hash of the password in
+the wrapped store.</p>
+<p>The base implementation has all-or-nothing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event_manager</strong> &#8211; An event_manager which implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><tt class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></tt></a>
+API.</li>
+<li><strong>store</strong> (<em>AbstractStore instance</em>) &#8211; The wrapped store that actually holds the data.</li>
+<li><strong>encoder</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#callable" title="(in Python v2.7)"><em>callable</em></a>) &#8211; A callable that computes the password hash.</li>
+<li><strong>user_key_path</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The prefix to put before the username for the keys that store the user&#8217;s
+information.  At present these keys must simply hold the encoded hash of
+the user&#8217;s password.</li>
+<li><strong>user_key_store</strong> (<em>AbstractStore instance</em>) &#8211; The store to store the user keys in.  Defaults to the wrapped store.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.connect">
+<tt class="descname">connect</tt><big>(</big><em>credentials=None</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to the key-value store, optionally with authentication</p>
+<p>This method creates or connects to any long-lived resources that the
+store requires.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>credentials</strong> &#8211; A dictionary with keys &#8216;username&#8217; and &#8216;password&#8217;.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the key-value store</p>
+<p>This method disposes or disconnects to any long-lived resources that the
+store requires.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.is_connected">
+<tt class="descname">is_connected</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether or not the store is currently connected</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>connected</strong> (bool) - Whether or not the store is currently connected.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.get">
+<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><ul class="simple">
+<li><strong>data</strong> (file-like) - A readable file-like object that provides stream of data from the key-value store</li>
+<li><strong>metadata</strong> (dictionary) - A dictionary of metadata for the key.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><ul class="first last simple">
+<li><strong>KeyError</strong> - If the key is not found in the store, or does not exist for the user, a KeyError is raised.</li>
+<li><strong>AuthenticationError</strong> - If the user has no rights to get the key, then an Authentication error is raised.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.set">
+<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a stream of data into a given key in the key-value store.</p>
+<p>This may be left unimplemented by subclasses that represent a read-only
+key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>value</strong> (<em>tuple of file-like, dict</em>) &#8211; A pair of objects, the first being a readable file-like object that
+provides stream of data from the key-value store.  The second is a
+dictionary of metadata for the key.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>AuthenticationError</strong> - If the user has no rights to set the key, then an Authentication error is raised.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.delete">
+<tt class="descname">delete</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a key from the repsository.</p>
+<p>This may be left unimplemented by subclasses that represent a read-only
+key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key.</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><strong>AuthenticationError</strong> - If the user has no rights to delete the key, then an Authentication error is raised.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.exists">
+<tt class="descname">exists</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether or not a key exists in the key-value store</p>
+<p>If a user does not have &#8216;exists&#8217; permissions for this key, then it will
+return <tt class="xref docutils literal"><span class="pre">False</span></tt>, even if the key exists in the underlying store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>exists</strong> (bool) - Whether or not the key exists in the key-value store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.glob">
+<tt class="descname">glob</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.glob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return keys which match glob-style patterns</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Glob-style pattern to match keys with.</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - A iterable of keys which match the glob pattern.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.get_data">
+<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream from a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><ul class="first last simple">
+<li><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</li>
+<li><strong>AuthenticationError</strong> - If the user has no rights to get the key, then an Authentication error is raised.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.get_metadata">
+<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the metadata for a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the result.  If unspecified, then
+return the entire metadata dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadata</strong> (dict) - A dictionary of metadata associated with the key.  The dictionary has keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><ul class="first last simple">
+<li><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</li>
+<li><strong>AuthenticationError</strong> - If the user has no rights to get the key, then an Authentication error is raised.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.set_data">
+<tt class="descname">set_data</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.set_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the data for a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>data</strong> (<em>file-like</em>) &#8211; A readable file-like object the that provides stream of data from the
+key-value store.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>AuthenticationError</strong> - If the user has no rights to set the key, then an Authentication error is raised.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.set_metadata">
+<tt class="descname">set_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.set_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set new metadata for a given key in the key-value store.</p>
+<p>This replaces the existing metadata set for the key with a new set of
+metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><p class="first"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>AuthenticationError</strong> - If the user has no rights to set the key, then an Authentication error is raised.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.update_metadata">
+<tt class="descname">update_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the metadata for a given key in the key-value store.</p>
+<p>This performs a dictionary update on the existing metadata with the
+provided metadata keys and values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><p class="first"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>AuthenticationError</strong> - If the user has no rights to set the key, then an Authentication error is raised.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.multiget">
+<tt class="descname">multiget</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.multiget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the data and metadata for a collection of keys.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of (file-like, dict) tuples) - An iterator of (data, metadata) pairs.</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.multiset">
+<tt class="descname">multiset</tt><big>(</big><em>keys</em>, <em>values</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.multiset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the data and metadata for a collection of keys.</p>
+<p>Where supported by an implementation, this should perform the whole
+collection of sets as a single transaction.</p>
+<p>Like zip() if keys and values have different lengths, then any excess
+values in the longer list should be silently ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>values</strong> (<em>iterable of (file-like, dict) tuples</em>) &#8211; An iterator that provides the (data, metadata) pairs for the
+corresponding keys.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.multiget_data">
+<tt class="descname">multiget_data</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.multiget_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the data for a collection of keys.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of file-like) - An iterator of file-like data objects corresponding to the keys.</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.multiget_metadata">
+<tt class="descname">multiget_metadata</tt><big>(</big><em>keys</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the results.  If unspecified, then
+return the entire metadata dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadatas</strong> (iterator of dicts) - An iterator of dictionaries of metadata associated with the key. The dictionaries have keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.multiset_data">
+<tt class="descname">multiset_data</tt><big>(</big><em>keys</em>, <em>datas</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.multiset_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the data for a collection of keys.</p>
+<p>Where supported by an implementation, this should perform the whole
+collection of sets as a single transaction.</p>
+<p>Like zip() if keys and datas have different lengths, then any excess
+values in the longer list should be silently ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>datas</strong> (<em>iterable of file-like objects</em>) &#8211; An iterator that provides the data file-like objects for the
+corresponding keys.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.multiset_metadata">
+<tt class="descname">multiset_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the metadata for a collection of keys.</p>
+<p>Where supported by an implementation, this should perform the whole
+collection of sets as a single transaction.</p>
+<p>Like zip() if keys and metadatas have different lengths, then any excess
+values in the longer list should be silently ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
+corresponding keys.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.multiupdate_metadata">
+<tt class="descname">multiupdate_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the metadata for a collection of keys.</p>
+<p>Where supported by an implementation, this should perform the whole
+collection of sets as a single transaction.</p>
+<p>Like zip() if keys and metadatas have different lengths, then any excess
+values in the longer list should be silently ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
+corresponding keys.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.to_file">
+<tt class="descname">to_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently store the data associated with a key into a file.</p>
+<p>This method can be optionally overriden by subclasses to proved a more
+efficient way of copy the data from the underlying data store to a path
+in the filesystem.  The default implementation uses the get() method
+together with chunked reads from the returned data stream to the disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to store the data to.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to disk.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to disk.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to disk.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.from_file">
+<tt class="descname">from_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently read data from a file into a key in the key-value store.</p>
+<p>This method can be optionally overriden by subclasses to proved a more
+efficient way of copy the data from a path in the filesystem to the
+underlying data store.   The default implementation uses the set() method
+together with chunked reads from the disk which are fed into the data
+stream.</p>
+<p>This makes no attempt to set metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to read the data from.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.to_bytes">
+<tt class="descname">to_bytes</tt><big>(</big><em>key</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently store the data associated with a key into a bytes object.</p>
+<p>This method can be optionally overriden by subclasses to proved a more
+efficient way of copy the data from the underlying data store to a bytes
+object.  The default implementation uses the get() method
+together with chunked reads from the returned data stream and join.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>bytes</strong>  - The contents of the file-like object as bytes.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to extracting the data.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is extracted.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after extracting the data.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.from_bytes">
+<tt class="descname">from_bytes</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.from_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently store a bytes object as the data associated with a key.</p>
+<p>This method can be optionally overriden by subclasses to proved a more
+efficient way of copy the data from a bytes object to the underlying
+data store.  The default implementation uses the set() method
+together with a cStringIO.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>data</strong> (<em>bytes</em>) &#8211; The data as a bytes object.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.simple_auth_store.SimpleAuthStore.check_permissions">
+<tt class="descname">check_permissions</tt><big>(</big><em>key=None</em><big>)</big><a class="headerlink" href="#encore.storage.simple_auth_store.SimpleAuthStore.check_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return permissions that the user has for the provided key</p>
+<p>The default behaviour gives all authenticated users full access to all
+keys.  Subclasses may implement finer-grained controls based on user
+groups or other permissioning systems.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>str or None</em>) &#8211; The key which the permissions are being requested for, or the global
+permissions if the key is None.</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>permissions</strong> (set) - A set of strings chosen from &#8216;connect&#8217;, &#8216;exists&#8217;, &#8216;get&#8217;, &#8216;set&#8217;, and/or &#8216;delete&#8217; which express the permissions that the user has on that particular key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="joined_store.html" title="Joined Store"
+             >previous</a> |</li>
+        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Storage</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Enthought, Inc..
+      Last updated on Jan 17, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

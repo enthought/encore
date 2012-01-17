@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Usage &mdash; Encore v0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/et.ico"/>
+    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="up" title="Events" href="index.html" />
+    <link rel="next" title="Abstract Event Manager API" href="abstract_event_manager.html" />
+    <link rel="prev" title="Events" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="abstract_event_manager.html" title="Abstract Event Manager API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Events"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Events</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Usage</a><ul>
+<li><a class="reference internal" href="#event-classes">Event Classes</a></li>
+<li><a class="reference internal" href="#event-managers">Event Managers</a></li>
+<li><a class="reference internal" href="#listeners">Listeners</a></li>
+<li><a class="reference internal" href="#listener-priority">Listener Priority</a></li>
+<li><a class="reference internal" href="#filtering">Filtering</a></li>
+<li><a class="reference internal" href="#example-progress-bar">Example: Progress Bar</a></li>
+<li><a class="reference internal" href="#advanced-features">Advanced Features</a><ul>
+<li><a class="reference internal" href="#disabling-events">Disabling Events</a></li>
+<li><a class="reference internal" href="#pre-and-post-emit-callbacks">Pre- and Post-Emit Callbacks</a></li>
+<li><a class="reference internal" href="#threading">Threading</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Events</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="abstract_event_manager.html"
+                        title="next chapter">Abstract Event Manager API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/events/usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">encore.events</span></tt> package provides a fairly straightforward event
+dispatcher.</p>
+<div class="section" id="event-classes">
+<h2>Event Classes<a class="headerlink" href="#event-classes" title="Permalink to this headline">¶</a></h2>
+<p>Basic filtering is based upon the class of the event, so most users
+will want to define their own set of event classes, but a number of standard
+<tt class="xref py py-mod docutils literal"><span class="pre">BaseEvent</span></tt> subclasses are provided by the module.  An event class can
+be as simple as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">encore.events.api</span> <span class="kn">import</span> <span class="n">BaseEvent</span>
+
+<span class="k">class</span> <span class="nc">SaveEvent</span><span class="p">(</span><span class="n">BaseEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Event generated when a file is saved</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    directory : path</span>
+<span class="sd">        The directory that the file that was saved in.</span>
+<span class="sd">    filename : string</span>
+<span class="sd">        The name of the file that was saved.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>The <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt>&#8216;s <tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt> method takes any
+additional keyword arguments it is supplied, and adds them as attributes on the
+object.  Every event has a source object which is the object which generated the
+event.  You can create an instance of an event like so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">event</span> <span class="o">=</span> <span class="n">SaveEvent</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">obj</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="s">&#39;foo/bar&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s">&#39;baz.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Because filtering of events respects the class heirarchy of events, you will
+frequently want to define some abstract base classes to assist with filtering:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">encore.events.api</span> <span class="kn">import</span> <span class="n">BaseEvent</span>
+
+<span class="k">class</span> <span class="nc">FileEvent</span><span class="p">(</span><span class="n">BaseEvent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Event generated when a file is operated upon</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    directory : path</span>
+<span class="sd">        The directory that the file that was saved in.</span>
+<span class="sd">    filename : string</span>
+<span class="sd">        The name of the file that was saved.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="k">class</span> <span class="nc">OpenEvent</span><span class="p">(</span><span class="n">FileEvent</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">SaveEvent</span><span class="p">(</span><span class="n">FileEvent</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">DeleteEvent</span><span class="p">(</span><span class="n">FileEvent</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>In the above example, you will probably never generate an instance of
+<tt class="xref py py-class docutils literal"><span class="pre">FileEvent</span></tt>, but you may set up listeners for such events.</p>
+</div>
+<div class="section" id="event-managers">
+<h2>Event Managers<a class="headerlink" href="#event-managers" title="Permalink to this headline">¶</a></h2>
+<p>To emit events, you will then need to ensure that your application has a
+(usually unique) event manager to handle the dispatch of events.  Creating an
+event manager is straightforward:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">encore.events.api</span> <span class="kn">import</span> <span class="n">EventManager</span>
+
+<span class="n">event_manager</span> <span class="o">=</span> <span class="n">EventManager</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>More typically you will have some sort of global application state object that
+is responsible for managing things like event managers, and then you might use
+it as follows:</p>
+<div class="highlight-python"><pre>import os
+from uuid import uuid4
+from encore.events.api import EventManager, ProgressManager
+from .app_events import SaveEvent
+
+class App(object):
+    def __init__(self):
+        self.event_manager = EventManager()
+
+class File(object):
+    def __init__(self, app, directory, filename, data=''):
+        self.app = app
+        self.directory = directory
+        self.filename = filename
+        self.data = data
+
+    def save(self):
+        event_manager = self.app.event_manager
+        path = os.path.join(self.directory, self.filename)
+        op_id = uuid4()
+        try:
+            with open(path, 'wb') as fp:
+                steps = range(0, len(data), 2**20)
+                with ProgressManager(event_manager, self, op_id,
+                        'Saving "%s"' % path, len(steps)) as progress:
+                    for i, pos in enumerate(step):
+                        fp.write(self.data[i:i+2**20])
+                        progress('Saving "%s" (%d of %d bytes)' % (path, pos, len(data)),
+                            step=i+1)
+        else:
+            event_manager.emit(SaveEvent(source=self, directory=self.directory,
+                filename=self.filename))</pre>
+</div>
+<p>Notice the use of the standard <tt class="xref py py-class docutils literal"><span class="pre">ProgressManager</span></tt> subclasses to generate
+progress update events while writing out the data.</p>
+</div>
+<div class="section" id="listeners">
+<h2>Listeners<a class="headerlink" href="#listeners" title="Permalink to this headline">¶</a></h2>
+<p>A listener is simply a function which expects to be given an event instance and
+does something with it.  For example, we could write a listener which listens
+for <tt class="xref py py-class docutils literal"><span class="pre">SaveEvents</span></tt> and logs them to a logger:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">save_logger</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Saved file &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once you have a listener, it can be connected to listen for particular classes
+of events via the event manager:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">SaveEvent</span><span class="p">,</span> <span class="n">save_logger</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once the listener is connected, the <tt class="xref py py-func docutils literal"><span class="pre">save_logger()</span></tt> function will be
+called every time that a <tt class="xref py py-class docutils literal"><span class="pre">SaveEvent</span></tt> is emitted.  A listener can be
+explicitly disconnected by calling the <tt class="xref py py-meth docutils literal"><span class="pre">disconnect()</span></tt> method of the event
+manager:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">event_manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">SaveEvent</span><span class="p">,</span> <span class="n">save_logger</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A listener which is a bound method will be disconnected automatically if the
+underlying instance has been garbage-collected, so in many instances you will
+not need to worry about explicitly disconnecting listeners.</p>
+<p>In the above example, you would be more likely to want to log all
+<tt class="xref py py-class docutils literal"><span class="pre">FileEvents</span></tt> rather than save events.  This could be achieved by
+something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">file_event_logger</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">: file &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+
+<span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">FileEvent</span><span class="p">,</span> <span class="n">file_event_logger</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will call the <tt class="xref py py-func docutils literal"><span class="pre">file_event_logger()</span></tt> function every time that a
+subclass of <tt class="xref py py-class docutils literal"><span class="pre">FileEvent</span></tt> is emitted.</p>
+</div>
+<div class="section" id="listener-priority">
+<h2>Listener Priority<a class="headerlink" href="#listener-priority" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to have multiple listeners on a particular class, and you may
+want some listeners to run before other listeners.  In particular, a listener
+may mark an event as &#8220;handled&#8221; in which case processing stops and all lower
+priority listeners do not get to see the event.</p>
+<p>For instance, in the above example, we might want to have both the
+<tt class="xref py py-func docutils literal"><span class="pre">save_logger()</span></tt> and <tt class="xref py py-func docutils literal"><span class="pre">file_event_logger()</span></tt> active.  In that case we
+don&#8217;t want to have save events logged twice, so we can do the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">save_logger</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Saved file &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">mark_as_handled</span><span class="p">()</span>
+
+<span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">SaveEvent</span><span class="p">,</span> <span class="n">save_logger</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">FileEvent</span><span class="p">,</span> <span class="n">file_event_logger</span><span class="p">,</span> <span class="n">piority</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By setting the priority of <tt class="xref py py-func docutils literal"><span class="pre">save_logger()</span></tt> higher than that of
+<tt class="xref py py-func docutils literal"><span class="pre">file_event_logger()</span></tt>, it will get called first, and when it calls the
+event&#8217;s <a class="reference internal" href="abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent.mark_as_handled" title="encore.events.abstract_event_manager.BaseEvent.mark_as_handled"><tt class="xref py py-meth docutils literal"><span class="pre">mark_as_handled()</span></tt></a> method then it will prevent any
+lower-priority events from firing.</p>
+<p>In the default event manager implementation, listeners of the same priority are
+called in the order in which they were connected.</p>
+</div>
+<div class="section" id="filtering">
+<h2>Filtering<a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h2>
+<p>On occassion a listener may only care about events from certain sources or
+matching certain attributes.  The event manager allows a filter to be specified
+when connecting a listener, so that the listener will only be called when the
+filter is matched.</p>
+<p>A filter is simply specified as a dictionary of event attribute, value pairs:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Project</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_needs_compile</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connect_listener</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">directory_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_needs_complie</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">_connect_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">SaveEvent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory_listener</span><span class="p">,</span>
+            <span class="nb">filter</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;directory&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>In this example, a <tt class="xref py py-class docutils literal"><span class="pre">Project</span></tt> instance will have its
+<tt class="xref py py-meth docutils literal"><span class="pre">directory_watcher()</span></tt> method called whenever a file is saved in the
+directory specified by its <tt class="xref py py-attr docutils literal"><span class="pre">directory</span></tt> attribute.</p>
+</div>
+<div class="section" id="example-progress-bar">
+<h2>Example: Progress Bar<a class="headerlink" href="#example-progress-bar" title="Permalink to this headline">¶</a></h2>
+<p>As an example which ties together the concepts which have been shown so far,
+we will write some code which displays progress indications to standard out
+that look something like the following:</p>
+<div class="highlight-python"><pre>Saving "foo/bar/baz.txt":
+[*************************************</pre>
+</div>
+<p>We start with a class which is responsible for listening for the start of a
+progress event.  For simplicty we will assume that there will only be one
+progress sequence happening at any given time, so we will have the class instance
+hook up a listener for <tt class="xref py py-class docutils literal"><span class="pre">ProgressStartEvents</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ProgressDisplay</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_manager</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span> <span class="o">=</span> <span class="n">event_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ProgressStartEvent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_listener</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When a <tt class="xref py py-class docutils literal"><span class="pre">ProgressStartEvent</span></tt> occurs, then we will print out the initial
+text, and set up a listener for the <tt class="xref py py-class docutils literal"><span class="pre">ProgressStepEvent</span></tt> and
+<tt class="xref py py-class docutils literal"><span class="pre">ProgressEndEvent</span></tt> event types:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">start_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="c"># display initial text</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;:</span><span class="se">\n</span><span class="s">[&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+    <span class="c"># create a ProgressWriter instance</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">ProgressWriter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">operation_id</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">writers</span><span class="p">[</span><span class="n">event</span><span class="o">.</span><span class="n">operation_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">writer</span>
+
+    <span class="c"># connect listeners</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ProgressStepEvent</span><span class="p">,</span> <span class="n">writer</span><span class="o">.</span><span class="n">step_listener</span><span class="p">,</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;operation_id&#39;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="n">operation_id</span><span class="p">})</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ProgressEndEvent</span><span class="p">,</span> <span class="n">writer</span><span class="o">.</span><span class="n">end_listener</span><span class="p">,</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;operation_id&#39;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="n">operation_id</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>The writer class handles listening for step and end events.  The end event
+listener simply removes the writer object from the display, which will cause it
+to eventually be garbage-collected and the listeners disconnected automatically:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ProgressWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">operation_id</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_id</span> <span class="o">=</span> <span class="n">operation_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">=</span> <span class="mi">75</span>
+
+    <span class="k">def</span> <span class="nf">step_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">stars</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">step</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_max</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">stars</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;*&#39;</span><span class="o">*</span><span class="p">(</span><span class="n">stars</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="n">stars</span>
+
+    <span class="k">def</span> <span class="nf">end_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">exit_state</span> <span class="o">==</span> <span class="s">&#39;normal&#39;</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;]</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">exit_state</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;: &#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_id</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="advanced-features">
+<h2>Advanced Features<a class="headerlink" href="#advanced-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="disabling-events">
+<h3>Disabling Events<a class="headerlink" href="#disabling-events" title="Permalink to this headline">¶</a></h3>
+<p>The event manager has methods that allow code to temporarily disable events
+of a certain class.  These are accessed via the <a class="reference internal" href="event_manager.html#encore.events.event_manager.EventManager.disable" title="encore.events.event_manager.EventManager.disable"><tt class="xref py py-meth docutils literal"><span class="pre">disable()</span></tt></a>,
+<a class="reference internal" href="event_manager.html#encore.events.event_manager.EventManager.enable" title="encore.events.event_manager.EventManager.enable"><tt class="xref py py-meth docutils literal"><span class="pre">enable()</span></tt></a>, and <a class="reference internal" href="event_manager.html#encore.events.event_manager.EventManager.is_enabled" title="encore.events.event_manager.EventManager.is_enabled"><tt class="xref py py-meth docutils literal"><span class="pre">is_enabled()</span></tt></a> methods.
+Disabling an event class will also disable any of its subclasses, so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">event_manager</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="n">BaseEvent</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will disable all events.</p>
+<p>Enabled/disabled state is kept track of on a per-class basis, so after:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">event_manager</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="n">SaveEvent</span><span class="p">)</span>
+<span class="n">event_manager</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="n">FileEvent</span><span class="p">)</span>
+<span class="n">event_manager</span><span class="o">.</span><span class="n">enable</span><span class="p">(</span><span class="n">FileEvent</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>the <tt class="xref py py-class docutils literal"><span class="pre">SaveEvent</span></tt> events will still be disabled.</p>
+</div>
+<div class="section" id="pre-and-post-emit-callbacks">
+<h3>Pre- and Post-Emit Callbacks<a class="headerlink" href="#pre-and-post-emit-callbacks" title="Permalink to this headline">¶</a></h3>
+<p>The event classes also have two hooks <a class="reference internal" href="abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent.pre_emit" title="encore.events.abstract_event_manager.BaseEvent.pre_emit"><tt class="xref py py-meth docutils literal"><span class="pre">pre_emit()</span></tt></a> and
+<a class="reference internal" href="abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent.post_emit" title="encore.events.abstract_event_manager.BaseEvent.post_emit"><tt class="xref py py-meth docutils literal"><span class="pre">post_emit()</span></tt></a> which get called immediately before and
+immediately after dispatch to listeners.  This potentially allows Event code to
+perform actions based upon interactions with listeners, such as having a
+<a class="reference internal" href="abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent.post_emit" title="encore.events.abstract_event_manager.BaseEvent.post_emit"><tt class="xref py py-meth docutils literal"><span class="pre">post_emit()</span></tt></a> method which does something sensible if an
+event is not handled.  These hooks may also be of use for instrumenting and
+debugging code.</p>
+</div>
+<div class="section" id="threading">
+<h3>Threading<a class="headerlink" href="#threading" title="Permalink to this headline">¶</a></h3>
+<p>By default events are processed on the thread that they were emitted on, and
+the <a class="reference internal" href="event_manager.html#encore.events.event_manager.EventManager.connect" title="encore.events.event_manager.EventManager.connect"><tt class="xref py py-meth docutils literal"><span class="pre">connect()</span></tt></a>, <a class="reference internal" href="event_manager.html#encore.events.event_manager.EventManager.disconnect" title="encore.events.event_manager.EventManager.disconnect"><tt class="xref py py-meth docutils literal"><span class="pre">disconnect()</span></tt></a>
+and <a class="reference internal" href="event_manager.html#encore.events.event_manager.EventManager.emit" title="encore.events.event_manager.EventManager.emit"><tt class="xref py py-meth docutils literal"><span class="pre">emit()</span></tt></a> methods should be thread-safe.  Processing
+an event blocks that thread from further work until all listeners have been
+called.</p>
+<p>The <a class="reference internal" href="event_manager.html#encore.events.event_manager.EventManager.emit" title="encore.events.event_manager.EventManager.emit"><tt class="xref py py-meth docutils literal"><span class="pre">emit()</span></tt></a> method has an optional argument <tt class="docutils literal"><span class="pre">block</span></tt>
+which if <tt class="xref docutils literal"><span class="pre">False</span></tt> will cause the emit method to create a worker thread to
+perform the listener dispatch, and will return that thread from the function
+call.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="abstract_event_manager.html" title="Abstract Event Manager API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Events"
+             >previous</a> |</li>
+        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Events</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Enthought, Inc..
+      Last updated on Jan 17, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

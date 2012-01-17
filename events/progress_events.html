@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Progress Events &mdash; Encore v0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/et.ico"/>
+    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="up" title="Events" href="index.html" />
+    <link rel="next" title="Storage" href="../storage/index.html" />
+    <link rel="prev" title="Event Manager Implementation" href="event_manager.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../storage/index.html" title="Storage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="event_manager.html" title="Event Manager Implementation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Events</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="event_manager.html"
+                        title="previous chapter">Event Manager Implementation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../storage/index.html"
+                        title="next chapter">Storage</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/events/progress_events.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-encore.events.progress_events">
+<span id="progress-events"></span><h1>Progress Events<a class="headerlink" href="#module-encore.events.progress_events" title="Permalink to this headline">¶</a></h1>
+<p>Events and helpers for managing progress indicators</p>
+<dl class="class">
+<dt id="encore.events.progress_events.ProgressManager">
+<em class="property">class </em><tt class="descclassname">encore.events.progress_events.</tt><tt class="descname">ProgressManager</tt><big>(</big><em>event_manager</em>, <em>source</em>, <em>operation_id</em>, <em>message</em>, <em>steps</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility class for managing progress events</p>
+<p>This class provides a context manager that will probably be sufficient in
+most use cases.  The standard method of invoking it will be something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">ProgressManager</span><span class="p">(</span><span class="n">event_manager</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="s">&quot;Performing operation&quot;</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span> <span class="k">as</span> <span class="n">progress</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="o">...</span> <span class="n">do</span> <span class="n">work</span> <span class="o">...</span>
+        <span class="n">progress</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This pattern guarantees that the appropriate Start and Stop events are
+always emitted, even if there is an exception.</p>
+<p>If finer-grained control is needed, the class also provides start(), step()
+and stop() methods that can be invoked in when required.  In particular,
+this pattern may be useful for more fine-grained exception reporting:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressManager</span><span class="p">(</span><span class="n">event_manager</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="s">&quot;Performing operation&quot;</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
+<span class="n">progress</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="o">...</span> <span class="n">do</span> <span class="n">work</span> <span class="o">...</span>
+        <span class="n">progress</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+<span class="k">except</span> <span class="o">...</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="n">progress</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s">&#39;Failure mode 1&#39;</span><span class="p">,</span> <span class="n">end_state</span><span class="o">=</span><span class="s">&#39;warning&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="o">...</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="n">progress</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s">&#39;Failure mode 2&#39;</span><span class="p">,</span> <span class="n">end_state</span><span class="o">=</span><span class="s">&#39;error&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="n">progress</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="n">end_state</span><span class="o">=</span><span class="s">&#39;exception&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">progress</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s">&#39;Success&#39;</span><span class="p">,</span> <span class="n">end_state</span><span class="o">=</span><span class="s">&#39;normal&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressManager.StartEventType">
+<tt class="descname">StartEventType</tt><a class="headerlink" href="#encore.events.progress_events.ProgressManager.StartEventType" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(ProgressStartEvent subclass)</em>
+The actual event class to use when emitting a start event.  The default     is <a class="reference internal" href="#encore.events.progress_events.ProgressStartEvent" title="encore.events.progress_events.ProgressStartEvent"><tt class="xref py py-class docutils literal"><span class="pre">ProgressStartEvent</span></tt></a>, but subclasses may choose to override.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressManager.StepEventType">
+<tt class="descname">StepEventType</tt><a class="headerlink" href="#encore.events.progress_events.ProgressManager.StepEventType" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(ProgressStepEvent subclass)</em>
+The actual event class to use when emitting a step event.  The default     is <a class="reference internal" href="#encore.events.progress_events.ProgressStepEvent" title="encore.events.progress_events.ProgressStepEvent"><tt class="xref py py-class docutils literal"><span class="pre">ProgressStepEvent</span></tt></a>, but subclasses may choose to override.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressManager.EndEventType">
+<tt class="descname">EndEventType</tt><a class="headerlink" href="#encore.events.progress_events.ProgressManager.EndEventType" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(ProgressEndEvent subclass)</em>
+The actual event class to use when emitting an end event.  The default     is <a class="reference internal" href="#encore.events.progress_events.ProgressEndEvent" title="encore.events.progress_events.ProgressEndEvent"><tt class="xref py py-class docutils literal"><span class="pre">ProgressEndEvent</span></tt></a>, but subclasses may choose to override.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.progress_events.ProgressManager.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>event_manager</em>, <em>source</em>, <em>operation_id</em>, <em>message</em>, <em>steps</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a progress manager instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event_manager</strong> (<em>EventManager instance</em>) &#8211; The event manager to use when emitting events.</li>
+<li><strong>source</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#any" title="(in Python v2.7)"><em>any</em></a>) &#8211; The object that is the source of the events.</li>
+<li><strong>operation_id</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#any" title="(in Python v2.7)"><em>any</em></a>) &#8211; The unique identifier for the operation.</li>
+<li><strong>message</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The default message to use for events which are emitted.</li>
+<li><strong>steps</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The number of steps.  If this is not known, use -1.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.progress_events.ProgressManager.start">
+<tt class="descname">start</tt><big>(</big><em>**extra_kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emit a start event</p>
+<p>By default creates an instance of <a class="reference internal" href="#encore.events.progress_events.ProgressManager.StartEventType" title="encore.events.progress_events.ProgressManager.StartEventType"><tt class="xref py py-attr docutils literal"><span class="pre">StartEventType</span></tt></a> with the
+appropriate attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>extra_kwargs</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Additional arguments to be passed through to the event&#8217;s constructor.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.progress_events.ProgressManager.step">
+<tt class="descname">step</tt><big>(</big><em>message=None</em>, <em>step=None</em>, <em>**extra_kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emit a step event</p>
+<p>By default creates an instance of <a class="reference internal" href="#encore.events.progress_events.ProgressManager.StepEventType" title="encore.events.progress_events.ProgressManager.StepEventType"><tt class="xref py py-attr docutils literal"><span class="pre">StepEventType</span></tt></a> with the
+appropriate attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>message</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The message to be passed to the event&#8217;s constructor.  By default will
+use <tt class="docutils literal"><span class="pre">self.message</span></tt>.</li>
+<li><strong>step</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The step number.  By default keeps an internal step count, incremented
+each time this method is called.</li>
+<li><strong>extra_kwargs</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Additional arguments to be passed through to the event&#8217;s constructor.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.progress_events.ProgressManager.end">
+<tt class="descname">end</tt><big>(</big><em>message=None</em>, <em>exit_state='normal'</em>, <em>**extra_kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emit a step event</p>
+<p>By default creates an instance of <a class="reference internal" href="#encore.events.progress_events.ProgressManager.StepEventType" title="encore.events.progress_events.ProgressManager.StepEventType"><tt class="xref py py-attr docutils literal"><span class="pre">StepEventType</span></tt></a> with the
+appropriate attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>message</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The message to be passed to the event&#8217;s constructor.  By default will
+use <tt class="docutils literal"><span class="pre">self.message</span></tt>.</li>
+<li><strong>exit_state</strong> (one of <tt class="docutils literal"><span class="pre">normal</span></tt>, <tt class="docutils literal"><span class="pre">warning</span></tt>, <tt class="docutils literal"><span class="pre">error</span></tt> or <tt class="docutils literal"><span class="pre">exception</span></tt>) &#8211; The exit_state of the event.</li>
+<li><strong>extra_kwargs</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Additional arguments to be passed through to the event&#8217;s constructor.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="encore.events.progress_events.ProgressEvent">
+<em class="property">class </em><tt class="descclassname">encore.events.progress_events.</tt><tt class="descname">ProgressEvent</tt><big>(</big><em>source=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class for all progress events</p>
+<p>This class is provided so that listeners can easily listen for any type
+ProgressEvent.</p>
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressEvent.operation_id">
+<tt class="descname">operation_id</tt><a class="headerlink" href="#encore.events.progress_events.ProgressEvent.operation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique identifier for the operation being performed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressEvent.message">
+<tt class="descname">message</tt><a class="headerlink" href="#encore.events.progress_events.ProgressEvent.message" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(string)</em>
+A human-readable describing the operation being performed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="encore.events.progress_events.ProgressStartEvent">
+<em class="property">class </em><tt class="descclassname">encore.events.progress_events.</tt><tt class="descname">ProgressStartEvent</tt><big>(</big><em>source=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressStartEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Event emitted at the start of an operation</p>
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressStartEvent.operation_id">
+<tt class="descname">operation_id</tt><a class="headerlink" href="#encore.events.progress_events.ProgressStartEvent.operation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique identifier for the operation being performed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressStartEvent.message">
+<tt class="descname">message</tt><a class="headerlink" href="#encore.events.progress_events.ProgressStartEvent.message" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(string)</em>
+A human-readable describing the operation being performed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressStartEvent.steps">
+<tt class="descname">steps</tt><a class="headerlink" href="#encore.events.progress_events.ProgressStartEvent.steps" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(int)</em>
+The number of steps in the operation.  If unknown or variable, use -1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="encore.events.progress_events.ProgressStepEvent">
+<em class="property">class </em><tt class="descclassname">encore.events.progress_events.</tt><tt class="descname">ProgressStepEvent</tt><big>(</big><em>source=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressStepEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Event emitted periodically during an operation</p>
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressStepEvent.operation_id">
+<tt class="descname">operation_id</tt><a class="headerlink" href="#encore.events.progress_events.ProgressStepEvent.operation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique identifier for the operation being performed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressStepEvent.message">
+<tt class="descname">message</tt><a class="headerlink" href="#encore.events.progress_events.ProgressStepEvent.message" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(string)</em>
+A human-readable describing the state of the operation being performed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressStepEvent.step">
+<tt class="descname">step</tt><a class="headerlink" href="#encore.events.progress_events.ProgressStepEvent.step" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(int)</em>
+The count of the step.  If unknown, use -1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="encore.events.progress_events.ProgressEndEvent">
+<em class="property">class </em><tt class="descclassname">encore.events.progress_events.</tt><tt class="descname">ProgressEndEvent</tt><big>(</big><em>source=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressEndEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Event emitted at the end of an operation</p>
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressEndEvent.operation_id">
+<tt class="descname">operation_id</tt><a class="headerlink" href="#encore.events.progress_events.ProgressEndEvent.operation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique identifier for the operation that is finished.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressEndEvent.message">
+<tt class="descname">message</tt><a class="headerlink" href="#encore.events.progress_events.ProgressEndEvent.message" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(string)</em>
+A human-readable describing the state of the operation that ended.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="encore.events.progress_events.ProgressEndEvent.exit_state">
+<tt class="descname">exit_state</tt><a class="headerlink" href="#encore.events.progress_events.ProgressEndEvent.exit_state" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(string)</em>
+A constant describing the end state of the operation.  One of <tt class="docutils literal"><span class="pre">normal</span></tt>,     <tt class="docutils literal"><span class="pre">warning</span></tt>, <tt class="docutils literal"><span class="pre">error</span></tt> or <tt class="docutils literal"><span class="pre">exception</span></tt>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../storage/index.html" title="Storage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="event_manager.html" title="Event Manager Implementation"
+             >previous</a> |</li>
+        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Events</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Enthought, Inc..
+      Last updated on Jan 17, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

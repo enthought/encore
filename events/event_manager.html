@@ -1,0 +1,260 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Event Manager Implementation &mdash; Encore v0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/et.ico"/>
+    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="up" title="Events" href="index.html" />
+    <link rel="next" title="Progress Events" href="progress_events.html" />
+    <link rel="prev" title="Abstract Event Manager API" href="abstract_event_manager.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="progress_events.html" title="Progress Events"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="abstract_event_manager.html" title="Abstract Event Manager API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Events</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="abstract_event_manager.html"
+                        title="previous chapter">Abstract Event Manager API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="progress_events.html"
+                        title="next chapter">Progress Events</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/events/event_manager.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="event-manager-implementation">
+<h1>Event Manager Implementation<a class="headerlink" href="#event-manager-implementation" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-encore.events.event_manager"></span><p>This module defines an event registry, notification and filtering class.</p>
+<p>The main class of the module is the <cite>EventManager</cite>.</p>
+<dl class="class">
+<dt id="encore.events.event_manager.EventManager">
+<em class="property">class </em><tt class="descclassname">encore.events.event_manager.</tt><tt class="descname">EventManager</tt><a class="headerlink" href="#encore.events.event_manager.EventManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>A single registry point for all application events.</p>
+<dl class="method">
+<dt id="encore.events.event_manager.EventManager.emit">
+<tt class="descname">emit</tt><big>(</big><em>evt</em>, <em>block=True</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.emit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notifies all listeners about the event with the specified arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>evt</strong> (instance of <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt>) &#8211; The <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt> instance to emit.</li>
+<li><strong>block</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether to block the call until the event handling is finished.
+If block is False, the event will be emitted in a separate thread
+and the thread will be returned, so you can later query its status
+or do <tt class="docutils literal"><span class="pre">wait()</span></tt> on the thread.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Note</p>
+<p>Listeners of superclasses of the event are also called.
+Eg. a <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt> listener will also be notified about any
+derived class events.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.event_manager.EventManager.connect">
+<tt class="descname">connect</tt><big>(</big><em>cls</em>, <em>func</em>, <em>filter=None</em>, <em>priority=0</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a listener for the event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cls</strong> (<em>class</em>) &#8211; The class of events for which the listener is registered.</li>
+<li><strong>func</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#callable" title="(in Python v2.7)"><em>callable</em></a>) &#8211; A callable to be called when the event is emitted.  The function
+should expect one argument which is the event instance which was
+emitted.</li>
+<li><strong>filter</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; <p>Filters to match for before calling the listener. The listener is
+called only when the event matches all of the filter .</p>
+<dl class="docutils">
+<dt>Filter specification:</dt>
+<dd><ul class="first last">
+<li>key: string which is name of an attribute of the event instance.</li>
+<li>value: the value of the specified attribute.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>priority</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The priority of the listener. Higher priority listeners are called
+before lower priority listeners.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Note</p>
+<p>Reconnecting an already connected listener will disconnect the
+old listener. This may have rammifications in changing the filters
+and the priority.</p>
+<p>The filtering is added so that future optimizations can be done
+on specific events with large number of handlers. For example there
+should be a fast way to filter key events to specific listeners rather
+than iterating through all listeners.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.event_manager.EventManager.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><em>cls</em>, <em>func</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnects a listener from being notified about the event&#8217;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cls</strong> (<em>class</em>) &#8211; The class of events for which the listener is registered.</li>
+<li><strong>func</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#callable" title="(in Python v2.7)"><em>callable</em></a>) &#8211; The callable which was registered for that class.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - if <cite>func</cite> is not already connected.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.event_manager.EventManager.disable">
+<tt class="descname">disable</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable the event from generating notifications.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<em>class</em>) &#8211; The class of events which we want to disable.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.event_manager.EventManager.enable">
+<tt class="descname">enable</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.enable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable the event again to generate notifications.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<em>class</em>) &#8211; The class of events which we want to enable.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.events.event_manager.EventManager.is_enabled">
+<tt class="descname">is_enabled</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.is_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the event is enabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<em>class</em>) &#8211; The class of events which we want check the status of.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="progress_events.html" title="Progress Events"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="abstract_event_manager.html" title="Abstract Event Manager API"
+             >previous</a> |</li>
+        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Events</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Enthought, Inc..
+      Last updated on Jan 17, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
