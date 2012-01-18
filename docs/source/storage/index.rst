@@ -28,6 +28,7 @@ Contents
    :maxdepth: 2
    
    concepts.rst
+   usage.rst
    abstract_store.rst
    events.rst
    utils.rst
