@@ -1,0 +1,17 @@
+<map id="inheritance1ddb2ccabe" name="inheritance1ddb2ccabe">
+<area shape="rect" id="node1" href="#encore.storage.events.StoreDeleteEvent" title="StoreDeleteEvent" alt="" coords="635,49,744,74"/>
+<area shape="rect" id="node2" href="#encore.storage.events.StoreModificationEvent" title="StoreModificationEvent" alt="" coords="423,94,565,119"/>
+<area shape="rect" id="node22" href="#encore.storage.events.StoreUpdateEvent" title="StoreUpdateEvent" alt="" coords="633,94,746,119"/>
+<area shape="rect" id="node36" href="#encore.storage.events.StoreSetEvent" title="StoreSetEvent" alt="" coords="644,139,735,164"/>
+<area shape="rect" id="node4" href="#encore.storage.events.StoreProgressEndEvent" title="StoreProgressEndEvent" alt="" coords="619,228,761,253"/>
+<area shape="rect" id="node5" href="../events/progress_events.html#encore.events.progress_events.ProgressEndEvent" title="ProgressEndEvent" alt="" coords="437,228,551,253"/>
+<area shape="rect" id="node7" href="#encore.storage.events.StoreProgressEvent" title="StoreProgressEvent" alt="" coords="433,184,555,208"/>
+<area shape="rect" id="node11" href="#encore.storage.events.StoreProgressStepEvent" title="StoreProgressStepEvent" alt="" coords="617,184,762,208"/>
+<area shape="rect" id="node18" href="#encore.storage.events.StoreProgressStartEvent" title="StoreProgressStartEvent" alt="" coords="616,273,763,298"/>
+<area shape="rect" id="node9" href="#encore.storage.events.StoreKeyEvent" title="StoreKeyEvent" alt="" coords="255,116,350,141"/>
+<area shape="rect" id="node12" href="../events/progress_events.html#encore.events.progress_events.ProgressStepEvent" title="ProgressStepEvent" alt="" coords="435,139,552,164"/>
+<area shape="rect" id="node15" href="../events/progress_events.html#encore.events.progress_events.ProgressEvent" title="ProgressEvent" alt="" coords="255,184,349,208"/>
+<area shape="rect" id="node19" href="../events/progress_events.html#encore.events.progress_events.ProgressStartEvent" title="ProgressStartEvent" alt="" coords="434,273,553,298"/>
+<area shape="rect" id="node16" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent" title="BaseEvent" alt="" coords="4,144,76,169"/>
+<area shape="rect" id="node24" href="#encore.storage.events.StoreEvent" title="StoreEvent" alt="" coords="117,116,192,141"/>
+</map>
