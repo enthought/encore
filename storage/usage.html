@@ -61,6 +61,7 @@
 <li><a class="reference internal" href="#querying">Querying</a></li>
 <li><a class="reference internal" href="#writing">Writing</a></li>
 <li><a class="reference internal" href="#transactions">Transactions</a></li>
+<li><a class="reference internal" href="#the-multi-methods">The &#8220;Multi&#8221; Methods</a></li>
 <li><a class="reference internal" href="#events">Events</a></li>
 </ul>
 </li>
@@ -237,6 +238,10 @@ that permit you to set just one of the two parts of the value, and there are
 utility methods <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractStore.from_bytes" title="encore.storage.abstract_store.AbstractStore.from_bytes"><tt class="xref py py-meth docutils literal"><span class="pre">from_bytes()</span></tt></a> and <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractStore.from_file" title="encore.storage.abstract_store.AbstractStore.from_file"><tt class="xref py py-meth docutils literal"><span class="pre">from_file()</span></tt></a> that populate
 the data of a key from either a byte string or a binary file.  The latter two
 methods do not set any metadata: that must be done manually if needed.</p>
+<p>If you want to add to the metadata without overwriting it, there is a convenience
+method <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractStore.update_metadata" title="encore.storage.abstract_store.AbstractStore.update_metadata"><tt class="xref py py-meth docutils literal"><span class="pre">update_metadata()</span></tt></a> method that will update the
+metadata dictionary in mych the same way that the standard Python dictionary&#8217;s
+<tt class="docutils literal"><span class="pre">update</span></tt> method works.</p>
 <p>You can delete a key with the <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractStore.delete" title="encore.storage.abstract_store.AbstractStore.delete"><tt class="xref py py-meth docutils literal"><span class="pre">delete()</span></tt></a> method:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">store</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s">&#39;hello&#39;</span><span class="p">)</span>
 </pre></div>
@@ -270,6 +275,13 @@ be committed when the with statement finishes.</p>
 </div>
 <p>The transaction in the function is effectively ignored, with only the outermost
 transaction applying.</p>
+</div>
+<div class="section" id="the-multi-methods">
+<h2>The &#8220;Multi&#8221; Methods<a class="headerlink" href="#the-multi-methods" title="Permalink to this headline">¶</a></h2>
+<p>For convenience there are a collection of methods prefixed by &#8220;multi&#8221;, such as
+<a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractReadOnlyStore.multiget" title="encore.storage.abstract_store.AbstractReadOnlyStore.multiget"><tt class="xref py py-meth docutils literal"><span class="pre">multiget()</span></tt></a> and <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractStore.multiset_data" title="encore.storage.abstract_store.AbstractStore.multiset_data"><tt class="xref py py-meth docutils literal"><span class="pre">multiset_data()</span></tt></a>,
+which perform the specified operations on a collection of keys at once.  If
+transactions are available, then these will be done as a single transaction.</p>
 </div>
 <div class="section" id="events">
 <h2>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h2>
