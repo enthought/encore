@@ -212,15 +212,15 @@ class EventInfo(object):
         else:
             return CallableNotifier(func, notify)
 
-    def get_listeners(self, evt):
+    def get_listeners(self, event):
         """ Return listeners which will be called on specified event.
 
-        If ``evt`` is None, all listeners are returned.
-        If ``eve`` is an event, only listeners which will be called for the
+        If ``event`` is None, all listeners are returned.
+        If ``event`` is an event, only listeners which will be called for the
         event are returned (satisfying any filters on the listeners).
         """
         with self._priority_list_lock:
-            if evt is None or not self._listener_filters:
+            if event is None or not self._listener_filters:
                 return self._priority_list[:]
             ret = []
             l_filter = self._listener_filters
@@ -229,7 +229,7 @@ class EventInfo(object):
                 id = self.get_id(listener())
                 if id in l_filter:
                     for key, value in l_filter[id].iteritems():
-                        if getattr(evt, key) != value:
+                        if getattr(event, key) != value:
                             break
                     else:
                         ret.append(linfo)
@@ -346,12 +346,12 @@ class EventManager(BaseEventManager):
         """
         self.event_map[cls].disconnect(func)
 
-    def emit(self, evt, block=True):
+    def emit(self, event, block=True):
         """ Notifies all listeners about the event with the specified arguments.
 
         Parameters
         ----------
-        evt : instance of :py:class:`BaseEvent`
+        event : instance of :py:class:`BaseEvent`
             The :py:class:`BaseEvent` instance to emit.
         block : bool
             Whether to block the call until the event handling is finished.
@@ -368,31 +368,31 @@ class EventManager(BaseEventManager):
 
         """
         if not block:
-            t = threading.Thread(target=self.emit, args=(evt, True),
-                                 name='Event emit: {0}'.format(evt))
+            t = threading.Thread(target=self.emit, args=(event, True),
+                                 name='Event emit: {0}'.format(event))
             t.start()
             return t
-        cls = type(evt)
+        cls = type(event)
         if not self.is_enabled(cls):
             return
 
-        listeners = self.get_listeners(evt, cls)
+        listeners = self.get_listeners(event, cls)
 
-        evt.pre_emit()
+        event.pre_emit()
 
         for listener in listeners:
             try:
-                listener(evt)
+                listener(event)
             except Exception as e:
                 logger.warn('Exception {0} occurred in listener: {1} for '
-                    'event: {2}:\n{3}'.format(e, listener, evt,
+                    'event: {2}:\n{3}'.format(e, listener, event,
                                               traceback.format_exc()))
-            if evt._handled:
+            if event._handled:
                 logger.info('Event: {0} handled by listener: {1}'.format(
-                                                        evt, listener))
+                                                        event, listener))
                 break
 
-        evt.post_emit()
+        event.post_emit()
 
     def get_event(self, cls=None):
         """ Returns an ``EventInfo`` instance for the event.
