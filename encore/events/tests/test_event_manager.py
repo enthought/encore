@@ -218,12 +218,13 @@ class TestEventManager(unittest.TestCase):
                 self.prop2 = prop2
                 self.prop3 = prop3
 
-        callbacks = [mock.Mock() for i in range(5)]
+        callbacks = [mock.Mock() for i in range(6)]
         self.evt_mgr.connect(MyEvent, callbacks[0])
         self.evt_mgr.connect(MyEvent, callbacks[1], filter={'prop1':'f2'})
         self.evt_mgr.connect(MyEvent, callbacks[2], filter={'prop2':False})
         self.evt_mgr.connect(MyEvent, callbacks[3], filter={'prop3':BaseEvent})
         self.evt_mgr.connect(MyEvent, callbacks[4], filter={'prop1':'f2', 'prop2':False})
+        self.evt_mgr.connect(MyEvent, callbacks[5], filter={'prop1.real':0})
 
         def check_count(evt, *counts):
             self.evt_mgr.emit(evt)
@@ -231,13 +232,19 @@ class TestEventManager(unittest.TestCase):
                 self.assertEqual(callback.call_count, count)
 
         # Notify only 0,1
-        check_count(MyEvent(prop1='f2'), 1, 1, 0, 0, 0)
+        check_count(MyEvent(prop1='f2'), 1, 1, 0, 0, 0, 0)
 
         # Notify only 0, 1, 2, 4
-        check_count(MyEvent(prop1='f2', prop2=False), 2, 2, 1, 0, 1)
+        check_count(MyEvent(prop1='f2', prop2=False), 2, 2, 1, 0, 1, 0)
 
         # Notify only 0, 3
-        check_count(MyEvent(prop3=BaseEvent), 3, 2, 1, 1, 1)
+        check_count(MyEvent(prop3=BaseEvent), 3, 2, 1, 1, 1, 0)
+
+        # Notify only 0; (extended filter fail on AttributeError for 5)
+        check_count(MyEvent(prop1=1), 4, 2, 1, 1, 1, 0)
+
+        # Notify only 0 and 5 (extended attribute filter)
+        check_count(MyEvent(prop1=1j), 5, 2, 1, 1, 1, 1)
 
     def test_exception(self):
         """ Test if exception in handler causes subsequent notifications.

@@ -122,7 +122,9 @@ class EventInfo(object):
             called only when the event matches all of the filter .
             
             Filter specification:
-                - key: string which is name of an attribute of the event instance.
+                - key: string which is extended name of an attribute of the
+                    event instance. For example string 'source.name' will be
+                    the attribute `event.source.name`
                 - value: the value of the specified attribute.
 
         priority : int
@@ -229,7 +231,16 @@ class EventInfo(object):
                 id = self.get_id(listener())
                 if id in l_filter:
                     for key, value in l_filter[id].iteritems():
-                        if getattr(event, key) != value:
+                        attr = event
+                        try:
+                            # Get extended attributes of the event.
+                            for part in key.split('.'):
+                                attr = getattr(attr, part)
+                        except AttributeError as e:
+                            logger.info('Error filtering listener: %s; %s',
+                                        linfo, e)
+                            break
+                        if attr != value:
                             break
                     else:
                         ret.append(linfo)
