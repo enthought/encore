@@ -14,7 +14,7 @@ setup(name='encore',
     url='https://github.com/enthought/encore',
     description='Low-level core modules for building Python applications',
     long_description=open('README.rst').read(),
-    packages=["encore", "encore/events", "encore/storage"],
+    packages=find_packages(exclude=('*.tests',)),
     requires=[],
     install_requires=['distribute'],
 )
