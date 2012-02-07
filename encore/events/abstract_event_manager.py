@@ -88,8 +88,12 @@ class BaseEventManager(object):
             called only when the event matches all of the filter .
             
             Filter specification:
-                - key: string which is name of an attribute of the event instance.
+                - key: string which is extended (`.` separated) name of an
+                       attribute of the event instance.
                 - value: the value of the specified attribute.
+
+            If the attribute does not exist then the filter is considered failed
+            and the listener is not called.
 
         priority : int
             The priority of the listener. Higher priority listeners are called
