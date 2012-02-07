@@ -95,11 +95,12 @@ def convertToHumanReadable(date_time, utc=False):
     if delta.find(',') > 0:
         days, hours = delta.split(',')
         days = int(days.split()[0].strip())
-        hours, minutes = hours.split(':')[0:2]
+        hours, minutes, seconds = hours.split(':')
     else:
-        hours, minutes = delta.split(':')[0:2]
+        hours, minutes, seconds = delta.split(':')
         days = 0
     days, hours, minutes = int(days), int(hours), int(minutes)
+    seconds = int(float(seconds))
     datelets =[]
     years, months, xdays = None, None, None
     plural = lambda x: 's' if x!=1 else ''
@@ -116,8 +117,10 @@ def convertToHumanReadable(date_time, utc=False):
         datelets.append('%d day%s' % (xdays, plural(xdays)))        
     if not (months or years) and hours != 0:
         datelets.append('%d hour%s' % (hours, plural(hours)))        
-    if not (xdays or months or years):
-        datelets.append('%d minute%s' % (minutes, plural(minutes)))        
+    if not (xdays or months or years) and minutes != 0:
+        datelets.append('%d minute%s' % (minutes, plural(minutes)))
+    if not (xdays or months or years or hours or minutes):
+        datelets.append('%d second%s' % (seconds, plural(seconds)))
     return ', '.join(datelets) + ' ago.'
     
 
@@ -143,7 +146,7 @@ def test():
     """
     bkwd_date = lambda x: datetime.datetime.now()-datetime.timedelta(seconds = x)
     siad = 60*60*24
-    xs = [456, 365, 232, 23, 12.5, 0.5, 0.3]
+    xs = [456, 365, 232, 23, 12.5, 0.5, 0.3, 0.0003]
     for x in xs:
         req_datetime = bkwd_date(siad*x)
         log.info("\nINPUT:  %s\nOutput:  %s\n*********" % \
