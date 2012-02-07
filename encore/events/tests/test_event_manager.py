@@ -214,6 +214,16 @@ class TestEventManager(unittest.TestCase):
     def test_filtering(self):
         """ Test if event filtering on arguments works.
         """
+        depth = 5
+        class A(object):
+            count = depth
+            def __init__(self):
+                A.count -= 1
+                if A.count:
+                    self.a = A()
+                else:
+                    self.a = 0
+
         class MyEvent(BaseEvent):
             def __init__(self, prop1="f0", prop2=True, prop3=None):
                 super(MyEvent, self).__init__()
@@ -221,12 +231,15 @@ class TestEventManager(unittest.TestCase):
                 self.prop2 = prop2
                 self.prop3 = prop3
 
-        callbacks = [mock.Mock() for i in range(5)]
+        callbacks = [mock.Mock() for i in range(8)]
         self.evt_mgr.connect(MyEvent, callbacks[0])
         self.evt_mgr.connect(MyEvent, callbacks[1], filter={'prop1':'f2'})
         self.evt_mgr.connect(MyEvent, callbacks[2], filter={'prop2':False})
         self.evt_mgr.connect(MyEvent, callbacks[3], filter={'prop3':BaseEvent})
         self.evt_mgr.connect(MyEvent, callbacks[4], filter={'prop1':'f2', 'prop2':False})
+        self.evt_mgr.connect(MyEvent, callbacks[5], filter={'prop1.real':0})
+        self.evt_mgr.connect(MyEvent, callbacks[6], filter={'prop1.a.a.a.a.a':0})
+        self.evt_mgr.connect(MyEvent, callbacks[7], filter={'prop1.a.a.a.a':0})
 
         def check_count(evt, *counts):
             self.evt_mgr.emit(evt)
@@ -234,13 +247,22 @@ class TestEventManager(unittest.TestCase):
                 self.assertEqual(callback.call_count, count)
 
         # Notify only 0,1
-        check_count(MyEvent(prop1='f2'), 1, 1, 0, 0, 0)
+        check_count(MyEvent(prop1='f2'), 1, 1, 0, 0, 0, 0, 0, 0)
 
         # Notify only 0, 1, 2, 4
-        check_count(MyEvent(prop1='f2', prop2=False), 2, 2, 1, 0, 1)
+        check_count(MyEvent(prop1='f2', prop2=False), 2, 2, 1, 0, 1, 0, 0, 0)
 
         # Notify only 0, 3
-        check_count(MyEvent(prop3=BaseEvent), 3, 2, 1, 1, 1)
+        check_count(MyEvent(prop3=BaseEvent), 3, 2, 1, 1, 1, 0, 0, 0)
+
+        # Notify only 0; (extended filter fail on AttributeError for 5)
+        check_count(MyEvent(prop1=1), 4, 2, 1, 1, 1, 0, 0, 0)
+
+        # Notify only 0 and 5 (extended attribute filter)
+        check_count(MyEvent(prop1=1j), 5, 2, 1, 1, 1, 1, 0, 0)
+
+        # Notify only 0 and 5 (extended attribute filter)
+        check_count(MyEvent(prop1=A()), 6, 2, 1, 1, 1, 1, 1, 0)
 
     def test_exception(self):
         """ Test if exception in handler causes subsequent notifications.
