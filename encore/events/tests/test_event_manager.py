@@ -13,6 +13,9 @@ import threading
 
 # Local imports.
 from encore.events.event_manager import EventManager, BaseEvent
+from encore.events.api import (get_event_manager, set_event_manager,
+                               BaseEventManager)
+import encore.events.package_globals as package_globals
 
 class TestEventManager(unittest.TestCase):
     def setUp(self):
@@ -556,6 +559,18 @@ class TestEventManager(unittest.TestCase):
         self.assertEqual(calls, [2, 1])
         calls[:] = []
 
+    def test_global_event_manager(self):
+        """ Test if getting/setting global event manager works. """
+        evt_mgr = get_event_manager()
+        self.assertIsInstance(evt_mgr, BaseEventManager)
+
+        # Reset the global event_manager
+        package_globals._event_manager = None
+
+        set_event_manager(self.evt_mgr)
+        self.assertEqual(self.evt_mgr, get_event_manager())
+
+        self.assertRaises(ValueError, lambda: set_event_manager(evt_mgr))
 
 class TracingTests(unittest.TestCase):
     def setUp(self):
