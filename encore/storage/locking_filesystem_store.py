@@ -60,7 +60,7 @@ def checked(func):
     writing, and wait till it is unlocked before executing the method. """
     @wraps(func)
     def wrapper(self, key, *args, **kwds):
-        self._unlocking(key)
+        self._wait_if_locked(key)
         return func(self, key, *args, **kwds)
     return wrapper
 
@@ -141,15 +141,15 @@ class LockingFileSystemStore(FileSystemStore):
         items = [(os.path.splitext(os.path.basename(x))[0], x) for x in all_metadata]
         if select is not None:
             for key, path in items:
-                with self._locking(key):
-                    metadata = self._get_metadata(path)
+                self._wait_if_locked(key)
+                metadata = self._get_metadata(path)
                 if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                     yield key, dict((metadata_key, metadata[metadata_key])
                         for metadata_key in select if metadata_key in metadata)
         else:
             for key, path in items:
-                with self._locking(key):
-                    metadata = self._get_metadata(path)
+                self._wait_if_locked(key)
+                metadata = self._get_metadata(path)
                 if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                     yield key, metadata.copy()
     
@@ -180,8 +180,8 @@ class LockingFileSystemStore(FileSystemStore):
         if kwargs:
             items = [(os.path.splitext(os.path.basename(x))[0], x) for x in all_metadata]
             for key, path in items:
-                with self._locking(key):
-                    metadata = self._get_metadata(path)
+                self._wait_if_locked(key)
+                metadata = self._get_metadata(path)
                 if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                     yield key
         else:
@@ -219,7 +219,7 @@ class LockingFileSystemStore(FileSystemStore):
         """
         return FileLock(self._get_lockfile_path(key), uid=id(self))
 
-    def _unlocking(self, key):
+    def _wait_if_locked(self, key):
         """ Wait until the specified key is no longer acquired by someone else
         or writing. It may still be acquired by self. """
         l = self._lock(key)
