@@ -537,7 +537,7 @@ class EventManager(BaseEventManager):
     def set_trace(self, func):
         """ Set a trace method for various actions performed.
 
-        func is a callable function which takes three arguments:
+        func is a callable which takes three arguments:
             name, method and args
 
         name - str
@@ -561,7 +561,7 @@ class EventManager(BaseEventManager):
 
         Note: Calling set_trace with None as the callable argument removes
         existing trace function set. Also, only a single trace method can be
-        active at a time, calling set_trace remove the existing trace function.
+        active at a time, calling set_trace removes the existing trace function.
 
         """
         self._trace_func = func
