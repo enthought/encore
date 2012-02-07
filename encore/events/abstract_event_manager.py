@@ -125,12 +125,12 @@ class BaseEventManager(object):
         raise NotImplementedError
 
     @abstractmethod
-    def emit(self, evt, block=True):
+    def emit(self, event, block=True):
         """ Notifies all listeners about the event with the specified arguments.
 
         Parameters
         ----------
-        evt : instance of :py:class:`BaseEvent`
+        event : instance of :py:class:`BaseEvent`
             The :py:class:`BaseEvent` instance to emit.
         block : bool
             Whether to block the call until the event handling is finished.

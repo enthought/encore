@@ -557,5 +557,98 @@ class TestEventManager(unittest.TestCase):
         calls[:] = []
 
 
+class TracingTests(unittest.TestCase):
+    def setUp(self):
+        self.evt_mgr = EventManager()
+        self.traces = []
+        self.tracedict = {}
+        self.veto_condition = None
+
+    def trace_func(self, name, method, args):
+        """ Trace function for event manager. """
+        save = (name, method, args)
+        self.traces.append(save)
+        self.tracedict.setdefault(name, []).append(save)
+
+    def trace_func_veto(self, name, method, args):
+        """ Trace function to veto actions. """
+        self.trace_func(name, method, args)
+        if self.veto_condition is None or self.veto_condition(name, method, args):
+            return True
+
+    def test_set_trace(self):
+        """ Test whether setting trace method works. """
+        self.evt_mgr.set_trace(self.trace_func)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 1)
+        self.evt_mgr.set_trace(None)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 1)
+
+    def test_trace_emit(self):
+        """ Test whether trace works for all actions. """
+        self.evt_mgr.set_trace(self.trace_func)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 1)
+        self.assertEqual(len(self.tracedict['emit']), 1)
+
+        callback1 = mock.Mock()
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.assertTrue(len(self.traces), 2)
+        self.assertEqual(len(self.tracedict['connect']), 1)
+
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 4)
+        self.assertEqual(len(self.tracedict['emit']), 2)
+        self.assertEqual(len(self.tracedict['listen']), 1)
+        self.assertEqual(callback1.call_count, 1)
+
+        self.evt_mgr.disconnect(BaseEvent, callback1)
+        self.assertTrue(len(self.traces), 5)
+        self.assertEqual(len(self.tracedict['disconnect']), 1)
+        self.assertEqual(callback1.call_count, 1)
+
+    def test_trace_veto(self):
+        """ Test whether vetoing of actions works. """
+        callback1 = mock.Mock()
+        callback2 = mock.Mock()
+        
+        self.evt_mgr.set_trace(self.trace_func_veto)
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 2)
+        self.assertEqual(len(self.tracedict['connect']), 1)
+        self.assertEqual(len(self.tracedict['emit']), 1)
+        self.assertEqual(len(self.tracedict.get('listen', [])), 0)
+        self.assertFalse(callback1.called)
+
+        # Disable calling of callback1
+        self.veto_condition = lambda name, method, args: name == 'listen' and method == callback1
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertEqual(len(self.tracedict['connect']), 2)
+        self.assertEqual(len(self.tracedict['emit']), 2)
+        self.assertEqual(len(self.tracedict['listen']), 1)
+        self.assertFalse(callback1.called)
+
+        # Ensure callback2 is still called.
+        self.evt_mgr.connect(BaseEvent, callback2)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertEqual(len(self.tracedict['connect']), 3)
+        self.assertEqual(len(self.tracedict['emit']), 3)
+        self.assertEqual(len(self.tracedict['listen']), 3)
+        self.assertFalse(callback1.called)
+        self.assertTrue(callback2.called)
+
+        # Disable tracing.
+        self.evt_mgr.set_trace(None)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertEqual(len(self.tracedict['connect']), 3)
+        self.assertEqual(len(self.tracedict['emit']), 3)
+        self.assertEqual(len(self.tracedict['listen']), 3)
+        self.assertTrue(callback1.called)
+        self.assertEqual(callback2.call_count, 2)
+
+
 if __name__ == '__main__':
     unittest.main()
