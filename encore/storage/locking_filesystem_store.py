@@ -13,6 +13,17 @@ store to lock files before modifying so that multiple clients cannot
 simultaneously modify the same key. This also provides a transaction context
 for the store.
 
+Warning
+-------
+The implementation of transaction gets an exclusive lock on keys used in a
+transaction to prevent changes to data/metadata corresponding to the key used
+in a transaction. This means there can be *deadlock* between clients which
+attempt to access keys in different sequence within a transaction.
+
+Ex. Client A reads file1 and then reads file2, whereas client B reads file2
+    then file1. This may result in a deadlock when client A is waiting for
+    lock on file2, whereas client B is waiting for lock on file1.
+
 """
 
 # System library imports.
@@ -22,46 +33,66 @@ from contextlib import contextmanager
 from functools import wraps
 
 # ETS library imports.
-from .filesystem_store import FileSystemStore, init_shared_store
+from .filesystem_store import FileSystemStore
 from .file_lock import FileLock
 from .utils import SimpleTransactionContext
 
 
-def transact(func):
+def transact(function, on_commit=True):
     """ Wrap a store method to add command to transaction instead of executing
     it immediately if within a transaction context. If not in a transaction
-    context, the command is executed immediately. """
-    @wraps(func)
+    context, the command is executed immediately.
+    
+    Parameters
+    ----------
+    function - callable
+        The function to wrap.
+    on_commit - bool (default True)
+        Whether the operation is to be performed when the transaction is
+        committed or whether the transaction is to be performed immediately
+        and the result returned.
+        Note: 'Read' operations need to set on_commit to True,
+              'Write' operations need to set it to False.
+
+    """
+    @wraps(function)
     def wrapper(self, key, *args, **kwds):
         if self._transaction is None:
-            return func(self, key, *args, **kwds)
+            return function(self, key, *args, **kwds)
+        elif not on_commit:
+            context = self._locking(key, recurse=True)
+            self._transaction_locks.append(context)
+            context.__enter__()
+            return function(self, key, *args, **kwds)
         else:
-            self._transaction.commands.append((func, (self, key)+args, kwds))
+            context = self._locking(key, recurse=True)
+            self._transaction_locks.append(context)
+            context.__enter__()
+
+            self._transaction.commands.append((function, (self, key)+args, kwds))
             return len(self._transaction.commands)
     return wrapper
 
-def locking(func_or_recurse, recurse=True):
+def locking(function, recurse=True, shared=False):
     """ Wrap a store method to lock the corresponding key in store from
-    modification by other clients before executing the command. """
-    if callable(func_or_recurse):
-        func = func_or_recurse
-        @wraps(func)
-        def wrapper(self, key, *args, **kwds):
-            with self._locking(key, recurse):
-                ret = func(self, key, *args, **kwds)
-            return ret
-        return wrapper
-    else:
-        recurse = func_or_recurse
-        return lambda func,recurse=recurse: locking(func, recurse)
+    modification by other clients before executing the command.
 
-def checked(func):
-    """ Wrap a store method to check whether corresponding key is locked for
-    writing, and wait till it is unlocked before executing the method. """
-    @wraps(func)
+    Parameters
+    ----------
+    function - callable
+        The function to wrap.
+    recurse - bool
+        Whether the lock can be acquired recursively.
+    shared - bool
+        Whether the lock is a shared (non-exclusive/read) lock. If false, the
+        lock is an exclusive (write) lock.
+
+    """
+    @wraps(function)
     def wrapper(self, key, *args, **kwds):
-        self._wait_if_locked(key)
-        return func(self, key, *args, **kwds)
+        with self._locking(key, recurse, shared):
+            ret = function(self, key, *args, **kwds)
+        return ret
     return wrapper
 
 
@@ -74,7 +105,8 @@ class LockingFileSystemStore(FileSystemStore):
     # Basic Create/Read/Update/Delete Methods
     ##########################################################################
 
-    def __init__(self, event_manager, path, magic_fname='.FSStore'):
+    def __init__(self, event_manager, path, force_lock_timeout=10.0,
+                 magic_fname='.FSStore'):
         """Initializes the store given a path to a store. 
         
         Parameters
@@ -83,12 +115,17 @@ class LockingFileSystemStore(FileSystemStore):
             This is used to emit suitable events.        
         path : str:
             A path to the root of the file system store.
+        force_lock_timeout: float
+            The maximum time a transaction may take. The FileLock is forcibly
+            unlocked if it cannot be acquired within this time.
         magic_fname :
             The name of the magic file in that directory,
 
         """
         super(LockingFileSystemStore, self).__init__(event_manager, path, magic_fname)
+        self._force_lock_timeout = force_lock_timeout
         self._transaction = None
+        self._transaction_locks = []
 
     def transaction(self, notes):
         """ Provide a transaction context manager"""
@@ -100,9 +137,11 @@ class LockingFileSystemStore(FileSystemStore):
 
     delete = transact(locking(FileSystemStore.delete))
 
-    get_data = checked(FileSystemStore.get_data)
+    get_data = transact(locking(FileSystemStore.get_data, shared=True),
+                        on_commit=False)
 
-    get_metadata = checked(FileSystemStore.get_metadata)
+    get_metadata = transact(locking(FileSystemStore.get_metadata, shared=True),
+                            on_commit=False)
 
     set_data = transact(locking(FileSystemStore.set_data))
 
@@ -196,9 +235,18 @@ class LockingFileSystemStore(FileSystemStore):
         return os.path.join(self._root, key + '.lock')
 
     @contextmanager
-    def _locking(self, key, recurse=False):
+    def _locking(self, key, recurse=True, shared=False):
         """ Simple implementation of a recursive lock context. """
         lock = self._lock(key)
+        if shared:
+            if lock.acquired():
+                yield lock
+                return
+            else:
+                with self._lock(key, True) as lock:
+                    yield lock
+                return
+
         if recurse and lock.acquired():
             yield lock
         else:
@@ -209,7 +257,7 @@ class LockingFileSystemStore(FileSystemStore):
         """ Whether the specified is locked for writing by someone. """
         return self._lock(key).locked()
 
-    def _lock(self, key):
+    def _lock(self, key, shared=False):
         """ Return a lock corresponding to the specified key.
 
         Lock is unique for the store instance, so another lock returned
@@ -217,7 +265,8 @@ class LockingFileSystemStore(FileSystemStore):
         acquired() method.
 
         """
-        return FileLock(self._get_lockfile_path(key), uid=id(self))
+        return FileLock(self._get_lockfile_path(key), uid=id(self),
+                        force_timeout=self._force_lock_timeout)
 
     def _wait_if_locked(self, key):
         """ Wait until the specified key is no longer acquired by someone else
@@ -229,24 +278,22 @@ class LockingFileSystemStore(FileSystemStore):
         self._transaction.commands = []
 
     def _rollback_transaction(self):
+        self._release_transaction_locks()
         self._transaction.commands = []
 
     def _commit_transaction(self):
-        """ Execute the methods in the transaction, locking all keys being
-        modified in the transaction.
+        """ Execute the methods in the transaction, releasing all locks in end.
 
         """
         commands = self._transaction.commands
-        keys = [command[1][1] for command in commands]
-        key_locks = []
-        for key in keys:
-            context = self._locking(key, recurse=True)
-            context.__enter__()
-            key_locks.append(context)
         try:
             for command in commands:
                 command[0](*command[1], **command[2])
         finally:
-            for context in key_locks:
-                context.__exit__(None, None, None)
+            self._release_transaction_locks()
+
+    def _release_transaction_locks(self):
+        for context in self._transaction_locks:
+            context.__exit__(None, None, None)
+        self._transaction_locks = []
 

@@ -12,6 +12,20 @@ with some content to identify the host/process which acquired the lock.
 The `FileLock` is also expected to work on NFS shared directories, in
 Linux kernel version 2.6.5 and above.
 
+Basic Usage
+-----------
+
+::
+
+    lock = FileLock('resource_1', '/tmp')
+    lock.acquire()
+    lock.release()
+
+    slock = SharedFileLock('resource_1', '/tmp')
+    slock.acquire()
+    slock2 = SharedFileLock('resource_1', '/tmp')
+    slock2.acquire() # Succeeds because lock is shared.
+
 """
 
 # System library imports.
@@ -20,6 +34,7 @@ import errno
 import socket
 import time
 import getpass
+import shutil
 
 
 class LockError(Exception):
@@ -27,7 +42,7 @@ class LockError(Exception):
 
 
 class FileLock(object):
-    """ A simple file-based lock. """
+    """ A simple file-based discretionary (advisory) exclusive lock. """
     def __init__(self, name, dir=None, poll_interval=1e-2, timeout=0,
                  force_timeout=0, uid=None):
         """ Constructor.
@@ -88,7 +103,13 @@ class FileLock(object):
             try:
                 fd = os.open(self.full_path, self._open_mode)
             except OSError as e:
-                if e.errno != errno.EEXIST:
+                if e.errno in (errno.EISDIR, errno.EEXIST):
+                    try:
+                        os.rmdir(self.full_path)
+                        continue
+                    except OSError as e:
+                        pass
+                else:
                     raise
             else:
                 os.write(fd, self._check_text)
@@ -120,8 +141,14 @@ class FileLock(object):
             raise LockError('Releasing an unlocked lock')
 
     def locked(self):
-        """ Whether the lock is acquired by anyone (including self). """
-        return os.path.exists(self.full_path)
+        """ Returns true if someone has an exclusive lock on the resource, i.e.
+        someone created a LockFile for the given name. """
+        if os.path.isfile(self.full_path):
+            return True
+        elif os.path.isdir(self.full_path):
+            return len(os.listdir(self.full_path))>0
+        else:
+            return False
 
     def acquired(self):
         """ Whether the lock is acquired by self. """
@@ -136,14 +163,21 @@ class FileLock(object):
             return False
 
     def force_break(self):
-        """ Force-break a lock by deleting the lock-file. """
-        try:
-            os.remove(self.full_path)
-        except OSError as e:
-            if e.errno == errno.ENOENT:
-                pass
-            else:
-                return False
+        """ Force-break a lock by deleting the lock-file/directory.
+
+        Returns True if the break was successful.
+
+        """
+        if os.path.isfile(self.full_path):
+            os.remove(self.self.full_path)
+        else:
+            try:
+                shutil.rmtree(self.full_path)
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    return True
+                else:
+                    return False
         return True
 
     def wait(self):
@@ -169,3 +203,142 @@ class FileLock(object):
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.release()
+
+
+class SharedFileLock(object):
+    """ A simple file-based discretionary (advisory) shared lock. """
+    def __init__(self, name, dir=None, poll_interval=1e-2, timeout=0,
+                 force_timeout=0, uid=None):
+        """ Constructor.
+
+        Parameters
+        ----------
+        name - str
+            An identifier for the lock.
+        dir - str
+            The directory where the lock file is stored.
+        poll_interval - float
+            The interval to check for change in status of the lock.
+        timeout - float
+            The time to wait before failing to acquire a lock.
+        force_timeout - float
+            The time to wait before forcefully breaking a lock.
+        uid - str or None
+            A unique identifier for the lock. This will uniquely identify a
+            lock within the same process. For example, a filesystem store
+            could use its id as the identifier, so that all lock instances
+            behave same within the store but any other store instance will
+            have a different lock. If the uid is None, then the id of the
+            lock instance is used, which means every lock instance is unique.
+
+        Notes
+        -----
+        The lock is not released when it is garbage collected to avoid
+        erroneous release when used as anonymous lock within a `with`
+        context. Hence always use it within a `with` context to avoid
+        stale unreleased locks.
+
+        """
+        self.name = name
+        if dir is None:
+            self.dir_path = name + '.lock'
+        else:
+            name = name.lstrip('/').lstrip('\\')
+            self.dir_path = os.path.join(dir, name + '.lock')
+        self.poll_interval = poll_interval
+        self.timeout = timeout
+        self.force_timeout = force_timeout
+        self.uid = id(self) if uid is None else uid
+        self.file_name = '%s__%s__%s__%s.lock'%(socket.gethostname(),
+                                    os.getpid(), getpass.getuser(), self.uid)
+        self.full_path = os.path.join(self.dir_path, self.file_name)
+        self._level = 0
+        self._open_mode = os.O_CREAT | os.O_EXCL | os.O_RDWR
+        if hasattr(os, 'O_BINARY'):
+            self._open_mode |= os.O_BINARY
+
+    def acquire(self):
+        """ Acquire the lock.
+
+        Returns False if timeout is exceeded, else keeps trying.
+
+        """
+        if self._level > 0:
+            self._level += 1
+            return True
+        start_time = time.time()
+        while True:
+            # Try creating the shared lock file.
+            try:
+                fd = os.open(self.full_path, self._open_mode)
+            except OSError as e:
+                if e.errno == errno.ENOTDIR:
+                    # Exclusive lock exists.
+                    pass
+                elif e.errno == errno.ENOENT:
+                    # The shared lock directory does not exist.
+                    try:
+                        os.mkdir(self.dir_path)
+                    except OSError as e:
+                        continue
+            else:
+                os.close(fd)
+                self._level += 1
+                return True
+
+            if 0 < self.timeout < time.time()-start_time:
+                return False
+            if 0 < self.force_timeout < time.time()-start_time:
+                self.force_break()
+                continue
+            time.sleep(self.poll_interval)
+
+    def release(self):
+        """ Release an acquired lock.
+
+        Raises LockError if the lock is acquired by someone else
+        or not acquired at all.
+
+        """
+        if self._level == 0:
+            raise LockError('Releasing an unlocked lock')
+
+        if self._level > 1:
+            self._level -= 1
+            return
+
+        try:
+            os.remove(self.full_path)
+            self._level = 0
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                raise LockError('Releasing an unlocked lock')
+            else:
+                raise
+
+    def locked(self):
+        """ Returns true if someone has an exclusive lock on the resource, i.e.
+        someone created a LockFile for the given name. """
+        return os.path.isfile(self.dir_path)
+
+    def acquired(self):
+        """ Whether the lock is acquired by self. """
+        return os.path.exists(self.full_path)
+
+    def force_break(self):
+        """ Force-break a lock by deleting the lock-file.
+
+        Returns True if the break was successful.
+        """
+        if os.path.isfile(self.dir_path):
+            os.remove(self.dir_path)
+        else:
+            try:
+                os.rmdir(self.full_path)
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    return True
+                else:
+                    return False
+        return True
+
