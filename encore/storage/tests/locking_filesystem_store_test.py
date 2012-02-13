@@ -5,7 +5,10 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
+# Standard Library imports.
+import glob
 
+# Local imports.
 from encore.events.api import EventManager
 from encore.storage.locking_filesystem_store import LockingFileSystemStore
 from .filesystem_store_test import FileSystemStoreReadTest, FileSystemStoreWriteTest
@@ -56,6 +59,18 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
         self.store = LockingFileSystemStore(EventManager(), self.path)
         self.store.connect()
 
+    def test_changelog(self):
+        store = self.store
+        store._logrotate_limit = 10
+        store._log_keep = 1
+        store.set_metadata('key', {'name':'key'})
+        for i in range(12):
+            store.set_metadata('key%d'%i, {'name':'key%d'%i})
+            store.update_metadata('key', {'name':'key-%d'%i})
+
+        log = [line.split(' ', 4) for line in open(self.store._log_file).readlines()]
+        self.assertEqual(log[-1][0], '25')
+        self.assertEqual(len(glob.glob(store._log_file+'.*')), store._log_keep)
 
 if __name__ == '__main__':
     import unittest

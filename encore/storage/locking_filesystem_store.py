@@ -31,6 +31,7 @@ import os
 import glob
 from contextlib import contextmanager
 from functools import wraps
+import datetime
 
 # ETS library imports.
 from .filesystem_store import FileSystemStore
@@ -96,6 +97,33 @@ def locking(function, recurse=True, shared=False):
     return wrapper
 
 
+def write_log(func, event='w'):
+    """ Write an entry for the call into a log file. """
+    @wraps(func)
+    def wrapper(store, key, *args, **kwds):
+        log_path = store._log_file
+        with store._locking(log_path):
+            time = datetime.datetime.utcnow()
+            ret = func(store, key, *args, **kwds)
+            log_file = open(log_path, 'a+b')
+            end_pos = os.stat(log_path).st_size
+            if end_pos > 0:
+                # FIXME: Assuming max line length is 1024
+                log_file.seek(max(0, end_pos-1024))
+                etext = log_file.read()
+                text = etext.splitlines()[-1]
+                id = int(text.split()[0]) + 1
+            else:
+                id = 1
+            new_line = '%d %s %s %s\n'%(id, event, time, key)
+            log_file.write(new_line)
+            log_file.close()
+
+            if id % store._logrotate_limit == 0:
+                store._log_rotate()
+        return ret
+    return wrapper
+
 ################################################################################
 # LockingFileSystemStore class.
 ################################################################################
@@ -127,15 +155,28 @@ class LockingFileSystemStore(FileSystemStore):
         self._transaction = None
         self._transaction_locks = []
 
+        # The store commit log file.
+        self._log_file = os.path.join(path, '__log__.txt')
+        # The approx number of entries to keep in rotated log files.
+        # The active log file may contain double this number of entries.
+        self._logrotate_limit = 10000
+        # The maximum number of old log files to keep.
+        self._log_keep = 5
+        try:
+            # Create the log file atomically.
+            os.close(os.open(self._log_file, os.O_CREAT|os.O_EXCL|os.O_RDWR))
+        except OSError as e:
+            pass
+
     def transaction(self, notes):
         """ Provide a transaction context manager"""
         transaction = SimpleTransactionContext(self)
         transaction.commands = []
         return transaction
 
-    set = transact(locking(FileSystemStore.set))
+    set = transact(locking(write_log(FileSystemStore.set)))
 
-    delete = transact(locking(FileSystemStore.delete))
+    delete = transact(locking(write_log(FileSystemStore.delete)))
 
     get_data = transact(locking(FileSystemStore.get_data, shared=True),
                         on_commit=False)
@@ -143,11 +184,12 @@ class LockingFileSystemStore(FileSystemStore):
     get_metadata = transact(locking(FileSystemStore.get_metadata, shared=True),
                             on_commit=False)
 
-    set_data = transact(locking(FileSystemStore.set_data))
+    set_data = transact(locking(write_log(FileSystemStore.set_data)))
 
-    set_metadata = transact(locking(FileSystemStore.set_metadata))
+    set_metadata = transact(locking(write_log(FileSystemStore.set_metadata)))
 
-    update_metadata = transact(locking(FileSystemStore.update_metadata))
+    update_metadata = transact(locking(write_log(FileSystemStore.update_metadata,
+                                                 event='u')))
 
 
     def query(self, select=None, **kwargs):
@@ -296,4 +338,28 @@ class LockingFileSystemStore(FileSystemStore):
         for context in self._transaction_locks:
             context.__exit__(None, None, None)
         self._transaction_locks = []
+
+    def _log_rotate(self):
+        """ Rotate commit-log files. """
+        log_path = self._log_file
+        with self._locking(self._log_file):
+            size = os.stat(log_path).st_size
+            with open(log_path, 'rb') as f:
+                first_log = f.readline()
+                f.seek(size/2)
+                f.readline()
+                split_pos = f.tell()
+                f.seek(0)
+                with open(log_path+'.%s'%first_log.split(' ',1)[0], 'wb') as f2:
+                    f2.write(f.read(split_pos))
+                new_text = f.read()
+            with open(log_path, 'wb') as f:
+                f.write(new_text)
+
+            log_files = [path for path in glob.iglob(self._log_file+'.*')
+                                if not path.endswith('.lock')]
+            log_files.sort(key=lambda s: int(s.rsplit('.')[-1]), reverse=True)
+            for log_file in log_files[self._log_keep:]:
+                os.remove(log_file)
+
 

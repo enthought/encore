@@ -19,9 +19,6 @@ from ..filesystem_store import FileSystemStore, init_shared_store
 
 class FileSystemStoreMixin(object):
     
-    def tearDown(self):
-        rmtree(self.path)
-
     def utils_large(self):
         self._write_data('test3', 'test4'*10000000)
         self._write_metadata('test3', {})
@@ -78,6 +75,9 @@ class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemSto
         self.store = FileSystemStore(EventManager(), self.path)
         self.store.connect()
 
+    def tearDown(self):
+        rmtree(self.path)
+
     def utils_large(self):
         self._write_data('test3', 'test4'*10000000)
         self._write_metadata('test3', {})
@@ -95,7 +95,7 @@ class FileSystemStoreWriteTest(abstract_test.AbstractStoreWriteTest, FileSystemS
               'a_dict': {'one': 1, 'two': 2, 'three': 3}}
              
             * a series of keys 'existing_key0' through 'existing_key9' with
-              data containing 'existing_value0' throigh 'existing_value9' and
+              data containing 'existing_value0' through 'existing_value9' and
               metadata {'meta': True, 'meta1': 0} through {'meta': True, 'meta1': -9}
        
         and set into 'self.store'.
@@ -122,3 +122,6 @@ class FileSystemStoreWriteTest(abstract_test.AbstractStoreWriteTest, FileSystemS
 
         self.store = FileSystemStore(EventManager(), self.path)
         self.store.connect()
+
+    def tearDown(self):
+        rmtree(self.path)
