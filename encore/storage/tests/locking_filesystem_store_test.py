@@ -8,8 +8,8 @@
 # Standard Library imports.
 import glob
 import threading
-import os
-import shutil
+import datetime
+import time
 
 # Local imports.
 from encore.events.api import EventManager
@@ -102,7 +102,37 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
         store2._remote_poll_thread = None
         thread.join()
 
+    def test_fast_query(self):
+        """ Test fast query for specific cases. """
+        store = self.store
+        # Single machine test, no timedelta.
+        store._max_time_delta = datetime.timedelta()
+
+        old = datetime.datetime.utcnow()
+        store.set_metadata('file.1', {'timestamp':str(old)})
+        time.sleep(1)
+        new = datetime.datetime.utcnow()
+        not_so_old = new - datetime.timedelta(seconds=0.5)
+        store.set_metadata('file.2', {'timestamp':str(new)})
+        store.set_metadata('dir.3', {'timestamp':str(new)})
+        store.set_metadata('foo.4', {'timestamp':str(new)})
+
+        # Query on types.
+        self.assertItemsEqual(store.query_keys(type='file'),
+                              ['file.1', 'file.2'])
+        self.assertItemsEqual(store.query_keys(type='dir'),
+                              ['dir.3'])
+        self.assertItemsEqual(store.query_keys(type='foo'),
+                              [])
+
+        # Note: The timestamp metadata key is not used to return results.
+        # The results are for service side logged last_modified, which
+        # is not a metadata key but a special query.
+        self.assertItemsEqual(store.get_modified_keys(not_so_old),
+                              ['file.2', 'dir.3', 'foo.4'])
+
 
 if __name__ == '__main__':
     import unittest
     unittest.main()
+

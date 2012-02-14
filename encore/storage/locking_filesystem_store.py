@@ -151,7 +151,8 @@ class LockingFileSystemStore(FileSystemStore):
 
     def __init__(self, event_manager, path, force_lock_timeout=10.0,
                  magic_fname='.FSStore',
-                 remote_event_poll_interval=5.0):
+                 remote_event_poll_interval=5.0,
+                 max_time_delta=datetime.timedelta(minutes=1)):
         """Initializes the store given a path to a store. 
         
         Parameters
@@ -168,12 +169,19 @@ class LockingFileSystemStore(FileSystemStore):
         remote_event_poll_interval : float
             The time interval to poll for changes to store by remote clients.
             StoreEvents are polled and emitted at this interval.
+        max_time_delta : datetime.timedelta(minutes=1)
+            The maximum permissible timedelta between different clients.
+            This value is used to return the keys in a query_key when the
+            parameters are ``last_modified__gte=timedelta`` , in this case the
+            max_time_delta is subtracted from the given query timedelta. 
 
         """
         super(LockingFileSystemStore, self).__init__(event_manager, path, magic_fname)
         self._force_lock_timeout = force_lock_timeout
         self._transaction = None
         self._transaction_locks = []
+
+        self._max_time_delta = max_time_delta
 
         # The store commit log file.
         self._log_file = os.path.join(path, '__log__.txt')
@@ -282,6 +290,16 @@ class LockingFileSystemStore(FileSystemStore):
             specified values for the specified metadata keywords.
         
         """
+        # Optimize for special cases.
+        basename = os.path.basename
+        if kwargs.keys() == ['type']:
+            typ =  kwargs['type']
+            if typ in ('file','dir'):
+                pattern = '{0}.*.metadata'.format(typ)
+                for i in glob.iglob(os.path.join(self._root, pattern)):
+                    yield basename(i)[:-9]
+                return
+
         all_metadata = glob.glob(os.path.join(self._root, '*.metadata'))
         if kwargs:
             items = [(os.path.splitext(os.path.basename(x))[0], x) for x in all_metadata]
@@ -292,7 +310,28 @@ class LockingFileSystemStore(FileSystemStore):
                     yield key
         else:
             for x in all_metadata:
-                yield os.path.splitext(os.path.basename(x))[0]
+                yield os.path.splitext(basename(x))[0]
+
+    def get_modified_keys(self, since):
+        """ Get all keys which were modified since the specified time.
+
+        NOTE: The `since` time specified is subtracted with the
+        `_max_time_delta` for comparison.
+
+        """
+        timestamp = since
+        if isinstance(timestamp, basestring):
+            ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+            timestamp = datetime.datetime.strptime(timestamp, ISO_FORMAT)
+        timestamp -= self._max_time_delta
+        write = False
+        modified_keys = []
+        for id,typ,time,key in self._log_iter():
+            if write is False and time > timestamp:
+                write = True
+            if write is True:
+                modified_keys.append(key)
+        return modified_keys
 
     ##########################################################################
     # Private methods
@@ -460,6 +499,27 @@ class LockingFileSystemStore(FileSystemStore):
                     timestamp=datetime.datetime.strptime(date+' '+time,
                                                          ISO_FORMAT))
         self.event_manager.emit(event)
+
+    def _log_iter(self):
+        """ Iterate over each entry in the commit log.
+
+        The yielded value is a tuple of (id, type, timestamp, key), where
+        id is an increasing int identifier for the commit,
+        type is a single character commit type (see `write_log` docstring)
+        timestamp is the datatime.datetime instance of the commit,
+        key is the str key which is modified in the commit.
+
+        """
+        try:
+            with open(self._log_file, 'rb') as log_file:
+                ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+                for line in log_file:
+                    line = line.rstrip('\n')
+                    id, typ, date, time, key = line.split(' ', 4)
+                    yield int(id), typ, datetime.datetime.strptime(date+' '+time,
+                                                         ISO_FORMAT), key
+        except (IOError, ValueError) as e:
+            pass
 
     def __del__(self):
         self._remote_poll_thread = None
