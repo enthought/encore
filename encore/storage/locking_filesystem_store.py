@@ -32,9 +32,13 @@ import glob
 from contextlib import contextmanager
 from functools import wraps
 import datetime
+import time
+import threading
 
 # ETS library imports.
-from .filesystem_store import FileSystemStore
+from .events import StoreSetEvent, StoreUpdateEvent,\
+    StoreDeleteEvent, StoreKeyEvent
+from .filesystem_store import FileSystemStore, init_shared_store
 from .file_lock import FileLock
 from .utils import SimpleTransactionContext
 
@@ -98,11 +102,23 @@ def locking(function, recurse=True, shared=False):
 
 
 def write_log(func, event='w'):
-    """ Write an entry for the call into a log file. """
+    """ Write an entry for the call into a log file.
+
+    Parameters
+    ----------
+    func - callable
+        The callable which is to be called for performing the action.
+    event - str ('w')
+        A single character code for the type of event. Current convention is:
+            'w' - write event
+            'u' - update event
+            'd' - delete event
+
+    """
     @wraps(func)
     def wrapper(store, key, *args, **kwds):
         log_path = store._log_file
-        with store._locking(log_path):
+        with store._locking(log_path, recurse=True):
             time = datetime.datetime.utcnow()
             ret = func(store, key, *args, **kwds)
             log_file = open(log_path, 'a+b')
@@ -134,7 +150,8 @@ class LockingFileSystemStore(FileSystemStore):
     ##########################################################################
 
     def __init__(self, event_manager, path, force_lock_timeout=10.0,
-                 magic_fname='.FSStore'):
+                 magic_fname='.FSStore',
+                 remote_event_poll_interval=5.0):
         """Initializes the store given a path to a store. 
         
         Parameters
@@ -148,6 +165,9 @@ class LockingFileSystemStore(FileSystemStore):
             unlocked if it cannot be acquired within this time.
         magic_fname :
             The name of the magic file in that directory,
+        remote_event_poll_interval : float
+            The time interval to poll for changes to store by remote clients.
+            StoreEvents are polled and emitted at this interval.
 
         """
         super(LockingFileSystemStore, self).__init__(event_manager, path, magic_fname)
@@ -168,6 +188,11 @@ class LockingFileSystemStore(FileSystemStore):
         except OSError as e:
             pass
 
+        self._remote_event_poll_interval = remote_event_poll_interval
+        self._remote_poll_thread = threading.Thread(target=self._remote_event_emit)
+        self._remote_poll_thread.daemon = True
+        self._remote_poll_thread.start()
+
     def transaction(self, notes):
         """ Provide a transaction context manager"""
         transaction = SimpleTransactionContext(self)
@@ -176,7 +201,7 @@ class LockingFileSystemStore(FileSystemStore):
 
     set = transact(locking(write_log(FileSystemStore.set)))
 
-    delete = transact(locking(write_log(FileSystemStore.delete)))
+    delete = transact(locking(write_log(FileSystemStore.delete, event='d')))
 
     get_data = transact(locking(FileSystemStore.get_data, shared=True),
                         on_commit=False)
@@ -342,7 +367,7 @@ class LockingFileSystemStore(FileSystemStore):
     def _log_rotate(self):
         """ Rotate commit-log files. """
         log_path = self._log_file
-        with self._locking(self._log_file):
+        with self._locking(self._log_file, recurse=True):
             size = os.stat(log_path).st_size
             with open(log_path, 'rb') as f:
                 first_log = f.readline()
@@ -362,4 +387,80 @@ class LockingFileSystemStore(FileSystemStore):
             for log_file in log_files[self._log_keep:]:
                 os.remove(log_file)
 
+    # Emit events for changed by other users. #################################
+
+    def _remote_event_emit(self):
+        """ Emit events due to change in store by other users. """
+        last_log = None
+        last_emit = 0
+        while self._remote_poll_thread:
+            if last_emit >= self._remote_event_poll_interval:
+                try:
+                    last_log = self._check_remote_event(last_log)
+                except OSError as e:
+                    # Store got deleted
+                    return
+                last_emit -= self._remote_event_poll_interval
+            # So that application does not wait too long for poller thread to exit.
+            to_sleep = min(self._remote_event_poll_interval, 0.1)
+            last_emit += to_sleep
+            time.sleep(to_sleep)
+
+    def _check_remote_event(self, id=None):
+        """ Check if any new remote changes occurred and emit events. """
+        if id is None:
+            with self._locking(self._log_file, recurse=True):
+                try:
+                    f = open(self._log_file)
+                except IOError as e:
+                    return None
+                size = os.stat(self._log_file).st_size
+                f.seek(max(size-1024, 0))
+                text = f.read(1024)
+                lines = text.splitlines()
+                if lines:
+                    id = lines[-1][0]
+        else:
+            with self._locking(self._log_file, recurse=True):
+                try:
+                    f = open(self._log_file)
+                except IOError as e:
+                    return None
+                text = f.read()
+                seek = self._search_log(id, text)
+                if seek < 0:
+                    return None
+                text = text[seek:]
+                for line in text.splitlines():
+                    try:
+                        id, typ, date, time, key = line.split(' ', 4)
+                        self._emit_remote_event(id, typ, date, time, key)
+                    except ValueError as e:
+                        pass
+        return id
+
+    def _search_log(self, id, text):
+        """ Return the index of the given id in the log text. """
+        id += ' '
+        if text.startswith(id):
+            return 0
+        try:
+            return text.index('\n'+id)+1
+        except ValueError as e:
+            return -1
+
+    def _emit_remote_event(self, id, typ, date, time, key):
+        """ Emit an event of appropriate type based on the log entries. """
+        cls_map = {'w':StoreSetEvent,
+                   'u':StoreUpdateEvent,
+                   'd':StoreDeleteEvent}
+        cls = cls_map.get(typ, StoreKeyEvent)
+        ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+        event = cls(key=key,
+                    timestamp=datetime.datetime.strptime(date+' '+time,
+                                                         ISO_FORMAT))
+        self.event_manager.emit(event)
+
+    def __del__(self):
+        self._remote_poll_thread = None
 

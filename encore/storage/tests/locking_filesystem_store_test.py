@@ -7,11 +7,15 @@
 
 # Standard Library imports.
 import glob
+import threading
+import os
+import shutil
 
 # Local imports.
 from encore.events.api import EventManager
 from encore.storage.locking_filesystem_store import LockingFileSystemStore
 from .filesystem_store_test import FileSystemStoreReadTest, FileSystemStoreWriteTest
+from encore.storage.events import StoreSetEvent
 
 
 class LockingFileSystemStoreReadTest(FileSystemStoreReadTest):
@@ -60,6 +64,7 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
         self.store.connect()
 
     def test_changelog(self):
+        """ Test whether changelog is being written. """
         store = self.store
         store._logrotate_limit = 10
         store._log_keep = 1
@@ -71,6 +76,32 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
         log = [line.split(' ', 4) for line in open(self.store._log_file).readlines()]
         self.assertEqual(log[-1][0], '25')
         self.assertEqual(len(glob.glob(store._log_file+'.*')), store._log_keep)
+
+    def test_remote_change_event(self):
+        """ Test whether changes by other users result in events. """
+        store2 = LockingFileSystemStore(self.store.event_manager, self.path)
+        store2._remote_event_poll_interval = self.store._remote_event_poll_interval = 0.1
+
+        events = []
+        lock = threading.Lock()
+        def callback(event):
+            events.append(event)
+            lock.release()
+        self.store.event_manager.connect(StoreSetEvent, callback)
+        lock.acquire()
+        store2.set_metadata('key', {'name':'key'})
+
+        # Wait until the event is emitted.
+        with lock:
+            self.assertEqual(len(events), 1)
+
+        thread = self.store._remote_poll_thread
+        self.store._remote_poll_thread = None
+        thread.join()
+        thread = store2._remote_poll_thread
+        store2._remote_poll_thread = None
+        thread.join()
+
 
 if __name__ == '__main__':
     import unittest
