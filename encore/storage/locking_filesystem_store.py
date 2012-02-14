@@ -31,9 +31,14 @@ import os
 import glob
 from contextlib import contextmanager
 from functools import wraps
+import datetime
+import time
+import threading
 
 # ETS library imports.
-from .filesystem_store import FileSystemStore
+from .events import StoreSetEvent, StoreUpdateEvent,\
+    StoreDeleteEvent, StoreKeyEvent
+from .filesystem_store import FileSystemStore, init_shared_store
 from .file_lock import FileLock
 from .utils import SimpleTransactionContext
 
@@ -96,6 +101,45 @@ def locking(function, recurse=True, shared=False):
     return wrapper
 
 
+def write_log(func, event='w'):
+    """ Write an entry for the call into a log file.
+
+    Parameters
+    ----------
+    func - callable
+        The callable which is to be called for performing the action.
+    event - str ('w')
+        A single character code for the type of event. Current convention is:
+            'w' - write event
+            'u' - update event
+            'd' - delete event
+
+    """
+    @wraps(func)
+    def wrapper(store, key, *args, **kwds):
+        log_path = store._log_file
+        with store._locking(log_path, recurse=True):
+            time = datetime.datetime.utcnow()
+            ret = func(store, key, *args, **kwds)
+            log_file = open(log_path, 'a+b')
+            end_pos = os.stat(log_path).st_size
+            if end_pos > 0:
+                # FIXME: Assuming max line length is 1024
+                log_file.seek(max(0, end_pos-1024))
+                etext = log_file.read()
+                text = etext.splitlines()[-1]
+                id = int(text.split()[0]) + 1
+            else:
+                id = 1
+            new_line = '%d %s %s %s\n'%(id, event, time, key)
+            log_file.write(new_line)
+            log_file.close()
+
+            if id % store._logrotate_limit == 0:
+                store._log_rotate()
+        return ret
+    return wrapper
+
 ################################################################################
 # LockingFileSystemStore class.
 ################################################################################
@@ -106,7 +150,9 @@ class LockingFileSystemStore(FileSystemStore):
     ##########################################################################
 
     def __init__(self, event_manager, path, force_lock_timeout=10.0,
-                 magic_fname='.FSStore'):
+                 magic_fname='.FSStore',
+                 remote_event_poll_interval=5.0,
+                 max_time_delta=datetime.timedelta(minutes=1)):
         """Initializes the store given a path to a store. 
         
         Parameters
@@ -120,6 +166,14 @@ class LockingFileSystemStore(FileSystemStore):
             unlocked if it cannot be acquired within this time.
         magic_fname :
             The name of the magic file in that directory,
+        remote_event_poll_interval : float
+            The time interval to poll for changes to store by remote clients.
+            StoreEvents are polled and emitted at this interval.
+        max_time_delta : datetime.timedelta(minutes=1)
+            The maximum permissible timedelta between different clients.
+            This value is used to return the keys in a query_key when the
+            parameters are ``last_modified__gte=timedelta`` , in this case the
+            max_time_delta is subtracted from the given query timedelta. 
 
         """
         super(LockingFileSystemStore, self).__init__(event_manager, path, magic_fname)
@@ -127,15 +181,35 @@ class LockingFileSystemStore(FileSystemStore):
         self._transaction = None
         self._transaction_locks = []
 
+        self._max_time_delta = max_time_delta
+
+        # The store commit log file.
+        self._log_file = os.path.join(path, '__log__.txt')
+        # The approx number of entries to keep in rotated log files.
+        # The active log file may contain double this number of entries.
+        self._logrotate_limit = 10000
+        # The maximum number of old log files to keep.
+        self._log_keep = 5
+        try:
+            # Create the log file atomically.
+            os.close(os.open(self._log_file, os.O_CREAT|os.O_EXCL|os.O_RDWR))
+        except OSError as e:
+            pass
+
+        self._remote_event_poll_interval = remote_event_poll_interval
+        self._remote_poll_thread = threading.Thread(target=self._remote_event_emit)
+        self._remote_poll_thread.daemon = True
+        self._remote_poll_thread.start()
+
     def transaction(self, notes):
         """ Provide a transaction context manager"""
         transaction = SimpleTransactionContext(self)
         transaction.commands = []
         return transaction
 
-    set = transact(locking(FileSystemStore.set))
+    set = transact(locking(write_log(FileSystemStore.set)))
 
-    delete = transact(locking(FileSystemStore.delete))
+    delete = transact(locking(write_log(FileSystemStore.delete, event='d')))
 
     get_data = transact(locking(FileSystemStore.get_data, shared=True),
                         on_commit=False)
@@ -143,11 +217,12 @@ class LockingFileSystemStore(FileSystemStore):
     get_metadata = transact(locking(FileSystemStore.get_metadata, shared=True),
                             on_commit=False)
 
-    set_data = transact(locking(FileSystemStore.set_data))
+    set_data = transact(locking(write_log(FileSystemStore.set_data)))
 
-    set_metadata = transact(locking(FileSystemStore.set_metadata))
+    set_metadata = transact(locking(write_log(FileSystemStore.set_metadata)))
 
-    update_metadata = transact(locking(FileSystemStore.update_metadata))
+    update_metadata = transact(locking(write_log(FileSystemStore.update_metadata,
+                                                 event='u')))
 
 
     def query(self, select=None, **kwargs):
@@ -215,6 +290,16 @@ class LockingFileSystemStore(FileSystemStore):
             specified values for the specified metadata keywords.
         
         """
+        # Optimize for special cases.
+        basename = os.path.basename
+        if kwargs.keys() == ['type']:
+            typ =  kwargs['type']
+            if typ in ('file','dir'):
+                pattern = '{0}.*.metadata'.format(typ)
+                for i in glob.iglob(os.path.join(self._root, pattern)):
+                    yield basename(i)[:-9]
+                return
+
         all_metadata = glob.glob(os.path.join(self._root, '*.metadata'))
         if kwargs:
             items = [(os.path.splitext(os.path.basename(x))[0], x) for x in all_metadata]
@@ -225,7 +310,28 @@ class LockingFileSystemStore(FileSystemStore):
                     yield key
         else:
             for x in all_metadata:
-                yield os.path.splitext(os.path.basename(x))[0]
+                yield os.path.splitext(basename(x))[0]
+
+    def get_modified_keys(self, since):
+        """ Get all keys which were modified since the specified time.
+
+        NOTE: The `since` time specified is subtracted with the
+        `_max_time_delta` for comparison.
+
+        """
+        timestamp = since
+        if isinstance(timestamp, basestring):
+            ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+            timestamp = datetime.datetime.strptime(timestamp, ISO_FORMAT)
+        timestamp -= self._max_time_delta
+        write = False
+        modified_keys = []
+        for id,typ,time,key in self._log_iter():
+            if write is False and time > timestamp:
+                write = True
+            if write is True:
+                modified_keys.append(key)
+        return modified_keys
 
     ##########################################################################
     # Private methods
@@ -296,4 +402,125 @@ class LockingFileSystemStore(FileSystemStore):
         for context in self._transaction_locks:
             context.__exit__(None, None, None)
         self._transaction_locks = []
+
+    def _log_rotate(self):
+        """ Rotate commit-log files. """
+        log_path = self._log_file
+        with self._locking(self._log_file, recurse=True):
+            size = os.stat(log_path).st_size
+            with open(log_path, 'rb') as f:
+                first_log = f.readline()
+                f.seek(size/2)
+                f.readline()
+                split_pos = f.tell()
+                f.seek(0)
+                with open(log_path+'.%s'%first_log.split(' ',1)[0], 'wb') as f2:
+                    f2.write(f.read(split_pos))
+                new_text = f.read()
+            with open(log_path, 'wb') as f:
+                f.write(new_text)
+
+            log_files = [path for path in glob.iglob(self._log_file+'.*')
+                                if not path.endswith('.lock')]
+            log_files.sort(key=lambda s: int(s.rsplit('.')[-1]), reverse=True)
+            for log_file in log_files[self._log_keep:]:
+                os.remove(log_file)
+
+    # Emit events for changed by other users. #################################
+
+    def _remote_event_emit(self):
+        """ Emit events due to change in store by other users. """
+        last_log = None
+        last_emit = 0
+        while self._remote_poll_thread:
+            if last_emit >= self._remote_event_poll_interval:
+                try:
+                    last_log = self._check_remote_event(last_log)
+                except OSError as e:
+                    # Store got deleted
+                    return
+                last_emit -= self._remote_event_poll_interval
+            # So that application does not wait too long for poller thread to exit.
+            to_sleep = min(self._remote_event_poll_interval, 0.1)
+            last_emit += to_sleep
+            time.sleep(to_sleep)
+
+    def _check_remote_event(self, id=None):
+        """ Check if any new remote changes occurred and emit events. """
+        if id is None:
+            with self._locking(self._log_file, recurse=True):
+                try:
+                    f = open(self._log_file)
+                except IOError as e:
+                    return None
+                size = os.stat(self._log_file).st_size
+                f.seek(max(size-1024, 0))
+                text = f.read(1024)
+                lines = text.splitlines()
+                if lines:
+                    id = lines[-1][0]
+        else:
+            with self._locking(self._log_file, recurse=True):
+                try:
+                    f = open(self._log_file)
+                except IOError as e:
+                    return None
+                text = f.read()
+                seek = self._search_log(id, text)
+                if seek < 0:
+                    return None
+                text = text[seek:]
+                for line in text.splitlines():
+                    try:
+                        id, typ, date, time, key = line.split(' ', 4)
+                        self._emit_remote_event(id, typ, date, time, key)
+                    except ValueError as e:
+                        pass
+        return id
+
+    def _search_log(self, id, text):
+        """ Return the index of the given id in the log text. """
+        id += ' '
+        if text.startswith(id):
+            return 0
+        try:
+            return text.index('\n'+id)+1
+        except ValueError as e:
+            return -1
+
+    def _emit_remote_event(self, id, typ, date, time, key):
+        """ Emit an event of appropriate type based on the log entries. """
+        cls_map = {'w':StoreSetEvent,
+                   'u':StoreUpdateEvent,
+                   'd':StoreDeleteEvent}
+        cls = cls_map.get(typ, StoreKeyEvent)
+        ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+        event = cls(key=key,
+                    timestamp=datetime.datetime.strptime(date+' '+time,
+                                                         ISO_FORMAT))
+        self.event_manager.emit(event)
+
+    def _log_iter(self):
+        """ Iterate over each entry in the commit log.
+
+        The yielded value is a tuple of (id, type, timestamp, key), where
+        id is an increasing int identifier for the commit,
+        type is a single character commit type (see `write_log` docstring)
+        timestamp is the datatime.datetime instance of the commit,
+        key is the str key which is modified in the commit.
+
+        """
+        try:
+            with open(self._log_file, 'rb') as log_file:
+                ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+                for line in log_file:
+                    line = line.rstrip('\n')
+                    id, typ, date, time, key = line.split(' ', 4)
+                    yield int(id), typ, datetime.datetime.strptime(date+' '+time,
+                                                         ISO_FORMAT), key
+        except (IOError, ValueError) as e:
+            pass
+
+    def __del__(self):
+        self._remote_poll_thread = None
 
