@@ -169,7 +169,7 @@ class FileLock(object):
 
         """
         if os.path.isfile(self.full_path):
-            os.remove(self.self.full_path)
+            os.remove(self.full_path)
         else:
             try:
                 shutil.rmtree(self.full_path)
