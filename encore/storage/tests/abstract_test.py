@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from tempfile import mkdtemp
 from shutil import rmtree
 import os
+import time
 
 @contextmanager
 def temp_dir():
@@ -40,6 +41,7 @@ class AbstractStoreReadTest(TestCase):
         and set into 'self.store'.
         """
         self.store = None
+        self.test_start = time.time()
 
     def utils_large(self):
         self.store.from_bytes('test3', 'test4'*10000000)
@@ -47,9 +49,9 @@ class AbstractStoreReadTest(TestCase):
     def test_get(self):
         if self.store is None:
             self.skipTest('Abstract test case')
-        data, metadata = self.store.get('test1')
-        self.assertEqual(data.read(), 'test2\n')
-        self.assertEqual(metadata, {
+        value = self.store.get('test1')
+        self.assertEqual(value.data.read(), 'test2\n')
+        self.assertEqual(value.metadata, {
             'a_str': 'test3',
             'an_int': 1,
             'a_float': 2.0,
@@ -57,6 +59,11 @@ class AbstractStoreReadTest(TestCase):
             'a_list': ['one', 'two', 'three'],
             'a_dict': {'one': 1, 'two': 2, 'three': 3}
         })
+        self.assertEqual(value.size, 6)
+        # can't guarantee a particular modified and created, but should exist and be
+        # greater than the test start time.
+        self.assertGreaterEqual(value.created, self.test_start)
+        self.assertGreaterEqual(value.modified, self.test_start)
     
     def test_get_copies(self):
         """ Metadata returned from separate get()s should not be same object"""
@@ -123,12 +130,13 @@ class AbstractStoreReadTest(TestCase):
         if self.store is None:
             self.skipTest('Abstract test case')
         result = self.store.multiget('key'+str(i) for i in range(10))
-        for i, (data, metadata) in enumerate(result):
-            self.assertEqual(data.read(), 'value'+str(i))
+        for i, value in enumerate(result):
+            self.assertEqual(value.data.read(), 'value'+str(i))
+            self.assertEqual(value.size, 6)
             expected = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
                 expected['optional'] = True
-            self.assertEqual(expected, metadata)        
+            self.assertEqual(expected, value.metadata)        
     
     def test_multiget_data(self):
         if self.store is None:
@@ -289,7 +297,8 @@ class AbstractStoreWriteTest(TestCase):
             * a key 'test1' with a file-like data object containing the
               bytes 'test2\n' and metadata {'a_str': 'test3', 'an_int': 1,
               'a_float': 2.0, 'a_bool': True, 'a_list': ['one', 'two', 'three'],
-              'a_dict': {'one': 1, 'two': 2, 'three': 3}}
+              'a_dict': {'one': 1, 'two': 2, 'three': 3}} with creation and
+              modification times of 12:00 am 1st January, 2012 localtime
             
             * a series of keys 'existing_key0' through 'existing_key9' with
               data containing 'existing_value0' throigh 'existing_value9' and
@@ -304,6 +313,7 @@ class AbstractStoreWriteTest(TestCase):
         
         Subclasses should call this via super(), then validate that things
         were stored correctly.
+        
         """
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -316,15 +326,25 @@ class AbstractStoreWriteTest(TestCase):
             'a_list_1': ['one', 'two', 'three'],
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
+        test_start = time.time()
         self.store.set('test3', (data, metadata))
+        test_end = time.time()
         self.assertEqual(self.store.to_bytes('test3'), 'test4')
         self.assertEqual(self.store.get_metadata('test3'), metadata)
+
+        value = self.store.get('test3')
+        self.assertEqual(value.size, 5)
+        self.assertGreaterEqual(value.modified, test_start)
+        self.assertGreaterEqual(value.created, test_start)
+        self.assertLessEqual(value.modified, test_end)
+        self.assertLessEqual(value.created, test_end)
 
     def test_set_copies(self):
         """ Test that set copies the provided metadata
         
         Subclasses should call this via super(), then validate that things
         were stored correctly.
+        
         """
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -387,8 +407,15 @@ class AbstractStoreWriteTest(TestCase):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = StringIO('test4')
+        test_start = time.time()
         self.store.set_data('test1', data)
+        test_end = time.time()
         self.assertEqual(self.store.to_bytes('test1'), 'test4')
+        value = self.store.get('test1')
+        self.assertGreaterEqual(value.modified, test_start)
+        self.assertLessEqual(value.created, test_start)
+        self.assertLessEqual(value.modified, test_end)
+        self.assertLessEqual(value.created, test_end)
         # for the time being we make no assertions about what happens to the
         # metadata of an existing object because of behaviour of JoinedStore
         #self.assertEqual(self.store.get_metadata('test1'), {
@@ -404,8 +431,15 @@ class AbstractStoreWriteTest(TestCase):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = StringIO('test4')
+        test_start = time.time()
         self.store.set_data('test3', data)
+        test_end = time.time()
         self.assertEqual(self.store.to_bytes('test3'), 'test4')
+        value = self.store.get('test3')
+        self.assertGreaterEqual(value.modified, test_start)
+        self.assertGreaterEqual(value.created, test_start)
+        self.assertLessEqual(value.modified, test_end)
+        self.assertLessEqual(value.created, test_end)
         # for the time being we make no assertions about what happens to the
         # metadata of an new object because of behaviour of JoinedStore
         #self.assertEqual(self.store.get_metadata('test3'), {})
@@ -450,8 +484,15 @@ class AbstractStoreWriteTest(TestCase):
             'a_list_1': ['one', 'two', 'three'],
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
+        test_start = time.time()
         self.store.set_metadata('test1', metadata)
+        test_end = time.time()
         self.assertEqual(self.store.get_metadata('test1'), metadata)
+        value = self.store.get('test1')
+        self.assertGreaterEqual(value.modified, test_start)
+        self.assertLessEqual(value.created, test_start)
+        self.assertLessEqual(value.modified, test_end)
+        self.assertLessEqual(value.created, test_end)
         # for the time being we make no assertions about what happens to the
         # data of an existing object because of behaviour of JoinedStore
         #self.assertEqual(self.store.to_bytes('test1'), 'test2\n')

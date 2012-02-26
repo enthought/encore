@@ -32,11 +32,11 @@ import urllib2
 import urllib
 import time
 
-from .abstract_store import AbstractReadOnlyStore, Filelike
+from .abstract_store import AbstractReadOnlyStore
 from .utils import StoreProgressManager, buffer_iterator
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
+from .url_value import URLValue
 
-Filelike.register(urllib.addbase)
 
 def basic_auth_factory(**kwargs):
     """ A factory that creates a :py:class:`~.HTTPBasicAuthHandler` instance
@@ -227,9 +227,10 @@ class StaticURLStore(AbstractReadOnlyStore):
             If the key is not found in the store, a KeyError is raised.
 
         """
-        metadata = self.get_metadata(key)
-        data = self.get_data(key)
-        return (data, metadata)
+        url = self.root_url + urllib.quote(self.data_path + key)
+        with self._index_lock:
+            metadata = self._index[key].copy()
+        return URLValue(url, metadata, self._opener)
 
     
     def get_data(self, key):

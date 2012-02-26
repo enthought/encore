@@ -39,6 +39,7 @@ class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
         
         and set into 'self.store'.
         """
+        super(StaticURLStoreReadTest, self).setUp()
         self.path = mkdtemp()
         os.mkdir(os.path.join(self.path, 'data'))
         self._write_data('test1', 'test2\n')

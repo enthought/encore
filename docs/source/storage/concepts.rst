@@ -115,15 +115,21 @@ serialized.
 Values
 ------
 
-The binary data stored in the values is presented through the key-value store API as
-file-like objects which implement at least read() and close().  Frequently this
-will be a standard file, StringIO object, a urllib file-like object or other
-wrapper about a socket.  The read() method should accept an optional number of
-bytes to read, so that buffered reads can be performed.
+The values stored in the key-value store consist of two parts, a binary data
+stream and a metadata dictionary.  These are encapsulated into a light-weight
+data-structure which can hold additional implementation-specific information.
 
-Similarly, for writable repositories, data should be supplied to keys via the
-same sort of file-like object.  This allows copying between repositories using
-code like::
+In particular, implementations should expose attributes or properties 'size',
+'created' and 'modified' which proved the number of bytes in the data stream,
+the creation time of the key, and the most recent modification time of the key.
+These additional attributes are primarily provided for internal use and to assist
+composition and replication of key-value stores.
+
+The Value should contain enough information to extract the data and metadata,
+but does not have to actually open those resources until they are requested.
+
+For writable repositories, data should be supplied to keys via a Value subclass,
+if possible.  This allows copying between repositories using code like::
 
     repo1.set(key, repo1.get(key))
 
@@ -136,6 +142,24 @@ sources for data being stored, the key-value store API provides utility methods
 ``to_file()`` and ``from_file()``.  Simple default implementations of these methods are
 provided, but implementations of the key-value store API may be able to override
 these to be more efficient, depending on the nature of the back-end data store.
+
+For backwards compatibility, value objects express an API that makes them appear
+as a 2-tuple of (data, metadata).
+
+Data
+----
+
+The binary data stored in the values is presented through the key-value store API as
+file-like objects which implement at least read(), close(), __enter__() and
+__exit__() methods as well as having attributes which provide some amount of
+information about the stream, such as length, last modification time, creation
+time, and so forth.  Particular backends may choose to provide additional
+attributes or implement additional methods as needed.
+
+Frequently this will be a wrapper around a standard file, StringIO object, a
+urllib file-like object or other wrapper about a socket.  The read() method
+should accept an optional number of bytes to read, so that buffered reads can be
+performed.
 
 The key-value store API gives no special meaning to the bytes stored in the value.
 However care should be taken that it is in fact bytes being stored, and not a
@@ -191,6 +215,12 @@ following metadata keys are likely to be available:
     
     size
         The size of the binary data in bytes.
+
+Note that there is a difference in intent between the information stored in the
+metadata and the attributes on the value object: value object attributes are
+controlled by the key-value store implementation, whereas metadata are completely
+arbitrary from the point of view of the key-value store and are completely up
+to the user code as to what information is stored.
 
 Connecting and Disconnecting
 ----------------------------

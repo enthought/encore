@@ -21,36 +21,86 @@ data values can be stored in the key-value store.
 
 """
 
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from itertools import izip
 import fnmatch
 from cStringIO import StringIO
+import warnings
 
 from .utils import StoreProgressManager, buffer_iterator
 
-class Filelike(object):
+class Value(object):
     """ Abstract base class for file-like objects used by Key-Value stores
+    
+    Attributes
+    ----------
+    
+    size : int
+        The size of the data in bytes, or None if a continuous stream or unknown.
+    created : timestamp
+        The creation time of the key as a floating point UTC timestamp in seconds
+        after the Unix Epoch.
+    modified : timestamp
+        The modification time of the key as a floating point UTC timestamp in seconds
+        after the Unix Epoch.
     
     """
     __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def read(self, size=-1):
-        """ Read at most size bytes, returning as a string
-        
-        If size is negative or omitted, then read until EOF.
-        
-        """
-        raise NotImplementedError
     
-    @abstractmethod
-    def close(self):
-        """ Close the file-like object, releasing any resources
+    @abstractproperty
+    def data(self):
+        """ The byte stream of data contained in the value
+        
         """
-        raise NotImplementedError
+        raise NotImplemented
+    
+    @abstractproperty
+    def metadata(self):
+        """ The metadata dictionary of the value
+        
+        """
+        raise NotImplemented
+    
+    def __len__(self):
+        """ Value objects appear as a 2-Tuple for backwards compatibility
+        
+        This functionality will be removed before the 1.0 release
 
-Filelike.register(file)
-Filelike.register(type(StringIO('')))
+        """
+        return 2
+    
+    def __getitem__(self, idx):
+        """ Value objects appear as a 2-Tuple for backwards compatibility
+        
+        
+        This functionality will be removed before the 1.0 release
+
+        """
+        warnings.warn('The 2-tuple interface for storage values is deprecated', DeprecationWarning)
+        if idx == 0:
+            return self.data
+        elif idx == 1:
+            return self.metadata
+        else:
+            raise IndexError(idx)
+    
+    def __enter__(self):
+        """ Context manager to ensure data stream is closed when done
+        
+        """
+        return self.data
+    
+    def __exit__(self, exc_type, exc, traceback):
+        """ Context manager to ensure data stream is closed when done
+        
+        """
+        self.data.close()
+    
+    def iterdata(self, buffer_size=1048576, progress=None):
+        """ Return an iterator over the data stream
+        
+        """
+        return buffer_iterator(self.data, buffer_size, progress)
 
 
 class AbstractReadOnlyStore(object):
@@ -158,10 +208,9 @@ class AbstractReadOnlyStore(object):
             If the key is not found in the store, a KeyError is raised.
 
         """
-        return (self.get_data(key), self.get_metadata(key))
+        raise NotImplementedError
 
 
-    @abstractmethod
     def get_data(self, key):
         """ Retrieve a stream from a given key in the key-value store.
         
@@ -183,10 +232,9 @@ class AbstractReadOnlyStore(object):
             This will raise a key error if the key is not present in the store.
 
         """
-        raise NotImplementedError
+        return self.get(key).data
 
 
-    @abstractmethod
     def get_metadata(self, key, select=None):
         """ Retrieve the metadata for a given key in the key-value store.
         
@@ -213,10 +261,13 @@ class AbstractReadOnlyStore(object):
             This will raise a key error if the key is not present in the store.
 
         """
-        raise NotImplementedError
+        metadata = self.get(key).metadata
+        if select is not None:
+            return dict((key, metadata[key]) for key in select)
+        else:
+            return metadata
 
                         
-    @abstractmethod
     def exists(self, key):
         """ Test whether or not a key exists in the key-value store
         
@@ -233,7 +284,7 @@ class AbstractReadOnlyStore(object):
         
         """
         try:
-            self.get_metadata(key)
+            self.get(key)
         except KeyError:
             return False
         else:
