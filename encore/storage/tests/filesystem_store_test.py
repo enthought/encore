@@ -32,6 +32,7 @@ class FileSystemStoreMixin(object):
     
 
 class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemStoreMixin):
+    resolution = 'second'
     
     def setUp(self):
         """ Set up a data store for the test case
@@ -83,7 +84,8 @@ class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemSto
         self._write_metadata('test3', {})
 
 class FileSystemStoreWriteTest(abstract_test.AbstractStoreWriteTest, FileSystemStoreMixin):
-    
+    resolution = 'second'
+
     def setUp(self):
         """ Set up a data store for the test case
         

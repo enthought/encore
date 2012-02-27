@@ -20,6 +20,7 @@ import encore.storage.tests.abstract_test as abstract_test
 from ..static_url_store import StaticURLStore
 
 class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
+    resolution = 'second'
     
     def setUp(self):
         """ Set up a data store for the test case

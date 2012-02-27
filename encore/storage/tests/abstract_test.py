@@ -22,6 +22,7 @@ def temp_dir():
     rmtree(path)
 
 class AbstractStoreReadTest(TestCase):
+    resolution = 'arbitrary'
     
     def setUp(self):
         """ Set up a data store for the test case
@@ -42,6 +43,8 @@ class AbstractStoreReadTest(TestCase):
         """
         self.store = None
         self.test_start = time.time()
+        if self.resolution == 'second':
+            self.test_start = int(self.test_start)
 
     def utils_large(self):
         self.store.from_bytes('test3', 'test4'*10000000)
@@ -288,6 +291,7 @@ class AbstractStoreReadTest(TestCase):
             
 
 class AbstractStoreWriteTest(TestCase):
+    resolution = 'arbitrary'
     
     def setUp(self):
         """ Set up a data store for the test case
@@ -327,6 +331,8 @@ class AbstractStoreWriteTest(TestCase):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         test_start = time.time()
+        if self.resolution == 'second':
+            test_start = int(test_start)
         self.store.set('test3', (data, metadata))
         test_end = time.time()
         self.assertEqual(self.store.to_bytes('test3'), 'test4')
@@ -408,6 +414,8 @@ class AbstractStoreWriteTest(TestCase):
             self.skipTest('Abstract test case')
         data = StringIO('test4')
         test_start = time.time()
+        if self.resolution == 'second':
+            test_start = int(test_start)
         self.store.set_data('test1', data)
         test_end = time.time()
         self.assertEqual(self.store.to_bytes('test1'), 'test4')
@@ -432,6 +440,8 @@ class AbstractStoreWriteTest(TestCase):
             self.skipTest('Abstract test case')
         data = StringIO('test4')
         test_start = time.time()
+        if self.resolution == 'second':
+            test_start = int(test_start)
         self.store.set_data('test3', data)
         test_end = time.time()
         self.assertEqual(self.store.to_bytes('test3'), 'test4')
@@ -485,6 +495,8 @@ class AbstractStoreWriteTest(TestCase):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         test_start = time.time()
+        if self.resolution == 'second':
+            test_start = int(test_start)
         self.store.set_metadata('test1', metadata)
         test_end = time.time()
         self.assertEqual(self.store.get_metadata('test1'), metadata)
