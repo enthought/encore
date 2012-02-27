@@ -4,6 +4,7 @@
 #
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
+import time
 
 from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
@@ -29,27 +30,28 @@ class SimpleAuthStoreReadTest(abstract_test.AbstractStoreReadTest):
         
         and set into 'self.store'.
         """
+        super(SimpleAuthStoreReadTest, self).setUp()
         encoder = make_encoder("test")
         e = EventManager()
         wrapped_store = DictMemoryStore(e)
         self.store = SimpleAuthStore(e, wrapped_store, encoder)
-        wrapped_store._data['.user_test'] = encoder('test')
-        wrapped_store._metadata['.user_test'] = {}
-        wrapped_store._data['test1'] = 'test2\n'
-        wrapped_store._metadata['test1'] = {
+        t = time.time()
+        wrapped_store._store['.user_test'] = (encoder('test'),  {}, t, t)
+        wrapped_store._store['test1'] = ('test2\n', {
             'a_str': 'test3',
             'an_int': 1,
             'a_float': 2.0,
             'a_bool': True,
             'a_list': ['one', 'two', 'three'],
             'a_dict': {'one': 1, 'two': 2, 'three': 3}
-        }
+        }, t, t)
         for i in range(10):
-            wrapped_store._data['key%d'%i] = 'value%d' % i
-            wrapped_store._metadata['key%d'%i] = {'query_test1': 'value',
-                'query_test2': i}
+            t = time.time()
+            wrapped_store._store['key%d'%i] = (
+                'value%d' % i, {'query_test1': 'value', 'query_test2': i},
+                t, t)
             if i % 2 == 0:
-                wrapped_store._metadata['key%d'%i]['optional'] = True
+                wrapped_store._store['key%d'%i][1]['optional'] = True
         
         self.store.connect(credentials={'username': 'test', 'password': 'test'})
 
@@ -76,23 +78,26 @@ class SimpleAuthStoreWriteTest(abstract_test.AbstractStoreWriteTest):
         e = EventManager()
         wrapped_store = DictMemoryStore(e)
         self.store = SimpleAuthStore(e, wrapped_store, encoder)
-        wrapped_store._data['.user_test'] = encoder('test')
-        wrapped_store._metadata['.user_test'] = {}
-        wrapped_store._data['test1'] = 'test2\n'
-        wrapped_store._metadata['test1'] = {
-            'a_str': 'test3',
-            'an_int': 1,
-            'a_float': 2.0,
-            'a_bool': True,
-            'a_list': ['one', 'two', 'three'],
-            'a_dict': {'one': 1, 'two': 2, 'three': 3}
-        }
+        t = time.time()
+        wrapped_store._store['.user_test'] = (encoder('test'),  {}, t, t)
+        wrapped_store._store['test1'] = (
+            'test2\n',
+            {
+                'a_str': 'test3',
+                'an_int': 1,
+                'a_float': 2.0,
+                'a_bool': True,
+                'a_list': ['one', 'two', 'three'],
+                'a_dict': {'one': 1, 'two': 2, 'three': 3}
+            }, t, t
+        )
         for i in range(10):
             key = 'existing_key'+str(i)
             data = 'existing_value'+str(i)
             metadata = {'meta': True, 'meta1': -i}
-            wrapped_store._data[key] = data
-            wrapped_store._metadata[key] = metadata
+            t = time.time()
+            wrapped_store._store[key] = (data, metadata, t, t)
+
         self.store.connect(credentials={'username': 'test', 'password': 'test'})
 
     """
