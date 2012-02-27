@@ -149,7 +149,7 @@ class LockingFileSystemStore(FileSystemStore):
     # Basic Create/Read/Update/Delete Methods
     ##########################################################################
 
-    def __init__(self, event_manager, path, force_lock_timeout=10.0,
+    def __init__(self, path, force_lock_timeout=10.0,
                  magic_fname='.FSStore',
                  remote_event_poll_interval=5.0,
                  max_time_delta=datetime.timedelta(minutes=1)):
@@ -176,7 +176,7 @@ class LockingFileSystemStore(FileSystemStore):
             max_time_delta is subtracted from the given query timedelta. 
 
         """
-        super(LockingFileSystemStore, self).__init__(event_manager, path, magic_fname)
+        super(LockingFileSystemStore, self).__init__(path, magic_fname)
         self._force_lock_timeout = force_lock_timeout
         self._transaction = None
         self._transaction_locks = []

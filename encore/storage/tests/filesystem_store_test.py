@@ -13,7 +13,6 @@ import json
 import time
 import random
 
-from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
 from ..filesystem_store import FileSystemStore, init_shared_store
 
@@ -33,6 +32,7 @@ class FileSystemStoreMixin(object):
     
 
 class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemStoreMixin):
+    resolution = 'second'
     
     def setUp(self):
         """ Set up a data store for the test case
@@ -51,6 +51,7 @@ class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemSto
         
         and set into 'self.store'.
         """
+        super(FileSystemStoreReadTest, self).setUp()
         self.path = mkdtemp()
         init_shared_store(self.path)
         self._write_data('test1', 'test2\n')
@@ -72,7 +73,7 @@ class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemSto
                 metadata['optional'] = True
             self._write_metadata('key%d'%i, metadata)
 
-        self.store = FileSystemStore(EventManager(), self.path)
+        self.store = FileSystemStore(self.path)
         self.store.connect()
 
     def tearDown(self):
@@ -83,7 +84,8 @@ class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemSto
         self._write_metadata('test3', {})
 
 class FileSystemStoreWriteTest(abstract_test.AbstractStoreWriteTest, FileSystemStoreMixin):
-    
+    resolution = 'second'
+
     def setUp(self):
         """ Set up a data store for the test case
         
@@ -100,6 +102,7 @@ class FileSystemStoreWriteTest(abstract_test.AbstractStoreWriteTest, FileSystemS
        
         and set into 'self.store'.
         """
+        super(FileSystemStoreWriteTest, self).setUp()
         self.path = mkdtemp()
         init_shared_store(self.path)
         self._write_data('test1', 'test2\n')
@@ -120,7 +123,7 @@ class FileSystemStoreWriteTest(abstract_test.AbstractStoreWriteTest, FileSystemS
             self._write_data(key, data)
             self._write_metadata(key, metadata)
 
-        self.store = FileSystemStore(EventManager(), self.path)
+        self.store = FileSystemStore(self.path)
         self.store.connect()
 
     def tearDown(self):

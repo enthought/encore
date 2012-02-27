@@ -12,7 +12,6 @@ import datetime
 import time
 
 # Local imports.
-from encore.events.api import EventManager
 from encore.storage.locking_filesystem_store import LockingFileSystemStore
 from .filesystem_store_test import FileSystemStoreReadTest, FileSystemStoreWriteTest
 from encore.storage.events import StoreSetEvent
@@ -38,7 +37,7 @@ class LockingFileSystemStoreReadTest(FileSystemStoreReadTest):
         and set into 'self.store'.
         """
         super(LockingFileSystemStoreReadTest, self).setUp()
-        self.store = LockingFileSystemStore(EventManager(), self.path)
+        self.store = LockingFileSystemStore(self.path)
         self.store.connect()
 
 class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
@@ -60,7 +59,7 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
         and set into 'self.store'.
         """
         super(LockingFileSystemStoreWriteTest, self).setUp()
-        self.store = LockingFileSystemStore(EventManager(), self.path)
+        self.store = LockingFileSystemStore(self.path)
         self.store.connect()
 
     def test_changelog(self):
@@ -79,7 +78,7 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
 
     def test_remote_change_event(self):
         """ Test whether changes by other users result in events. """
-        store2 = LockingFileSystemStore(self.store.event_manager, self.path)
+        store2 = LockingFileSystemStore(self.path)
         store2._remote_event_poll_interval = self.store._remote_event_poll_interval = 0.1
 
         events = []
