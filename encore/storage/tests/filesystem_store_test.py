@@ -51,6 +51,7 @@ class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemSto
         
         and set into 'self.store'.
         """
+        super(FileSystemStoreReadTest, self).setUp()
         self.path = mkdtemp()
         init_shared_store(self.path)
         self._write_data('test1', 'test2\n')
@@ -100,6 +101,7 @@ class FileSystemStoreWriteTest(abstract_test.AbstractStoreWriteTest, FileSystemS
        
         and set into 'self.store'.
         """
+        super(FileSystemStoreWriteTest, self).setUp()
         self.path = mkdtemp()
         init_shared_store(self.path)
         self._write_data('test1', 'test2\n')

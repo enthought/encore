@@ -22,6 +22,7 @@ from itertools import izip
 
 # ETS library imports.
 from .abstract_store import AbstractStore
+from .file_value import FileValue
 from .events import StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent
 from .utils import DummyTransactionContext, buffer_iterator, StoreProgressManager
 
@@ -143,9 +144,9 @@ class FileSystemStore(AbstractStore):
             If the key is not found in the store, a KeyError is raised.
 
         """
-        data = self.get_data(key)
+        data_path = self._get_data_path(key)
         metadata = self.get_metadata(key)
-        return (data, metadata)
+        return FileValue(data_path, metadata)
     
     def set(self, key, value, buffer_size=1048576):
         """ Store a stream of data into a given key in the key-value store.
