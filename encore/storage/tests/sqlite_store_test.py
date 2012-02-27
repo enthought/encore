@@ -9,6 +9,7 @@ import os
 from tempfile import mkdtemp
 from shutil import rmtree
 import sqlite3
+import time
 
 from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
@@ -33,6 +34,7 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
         
         and set into 'self.store'.
         """
+        super(SqliteStoreReadTest, self).setUp()
         self.path = mkdtemp()
         self.db_file = os.path.join(self.path, 'db.sqlite')
         
@@ -42,11 +44,14 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
             create table store (
                 key text primary key,
                 metadata dict,
+                created float,
+                modified float,
                 data blob
             )
             """)
         
-        connection.execute("""insert into store values (?, ?, ?)""", (
+        t = time.time()
+        connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (
             b'test1',
             {
                 'a_str': 'test3',
@@ -55,7 +60,7 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
                 'a_bool': True,
                 'a_list': ['one', 'two', 'three'],
                 'a_dict': {'one': 1, 'two': 2, 'three': 3}
-            },
+            }, t, t,
             buffer(b'test2\n')))
         for i in range(10):
             key = b'key%d'%i
@@ -63,7 +68,7 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
             metadata = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
                 metadata['optional'] = True
-            connection.execute("""insert into store values (?, ?, ?)""", (key, metadata, data))
+            connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (key, metadata, t, t, data))
         connection.commit()
         
         connection = None
@@ -102,11 +107,14 @@ class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
             create table store (
                 key text primary key,
                 metadata dict,
+                created float,
+                modified float,
                 data blob
             )
             """)
         
-        connection.execute("""insert into store values (?, ?, ?)""", (
+        t = time.time()
+        connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (
             b'test1',
             {
                 'a_str': 'test3',
@@ -115,13 +123,13 @@ class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
                 'a_bool': True,
                 'a_list': ['one', 'two', 'three'],
                 'a_dict': {'one': 1, 'two': 2, 'three': 3}
-            },
+            }, t, t,
             buffer(b'test2\n')))
         for i in range(10):
             key = b'existing_key%d'%i
             data = buffer(b'existing_value%d' % i)
             metadata = {'meta': True, 'meta1': -i}
-            connection.execute("""insert into store values (?, ?, ?)""", (key, metadata, data))
+            connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (key, metadata, t, t, data))
         connection.commit()
         
         connection = None

@@ -22,8 +22,10 @@ import cStringIO
 import sqlite3
 import cPickle
 from uuid import uuid4
+import time
 
 from .abstract_store import AbstractStore
+from .string_value import StringValue
 from .events import StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent
 from .utils import buffer_iterator, SimpleTransactionContext, StoreProgressManager
 
@@ -73,10 +75,12 @@ class SqliteStore(AbstractStore):
             (self.table,)
         )
         if len(cursor.fetchall()) == 0:
-            # we need to create the table (substitution OK since table is internal
+            # we need to create the table (substitution OK since self.table is internal
             query = """create table %s (
                     key text primary key,
                     metadata dict,
+                    created float,
+                    modified float,
                     data blob
                 )""" % self.table
             self._connection.execute(query)
@@ -84,7 +88,7 @@ class SqliteStore(AbstractStore):
             # we need to find the names of the existing index columns
             rows = self._connection.execute('PRAGMA table_info(%s)' % self.table)
             index_columns = set(row[0] for row in rows
-                if row[0] not in ('key', 'metadata', 'data'))
+                if row[0] not in ('key', 'metadata', 'created', 'modified', 'data'))
             if not self.index_columns.issubset(index_columns):
                 # being paranoid here
                 self._build_index()
@@ -151,12 +155,11 @@ class SqliteStore(AbstractStore):
             If the key is not found in the store, a KeyError is raised.
 
         """
-        row = self._get_columns_by_key(key, ['metadata', 'data'])
+        row = self._get_columns_by_key(key, ['metadata', 'data', 'created', 'modified'])
         if row is None:
             raise KeyError(key)
-        data = cStringIO.StringIO(row['data'])
-        metadata = row['metadata']
-        return data, metadata
+        return StringValue(str(row['data']), row['metadata'], row['created'],
+            row['modified'])
     
     
     def set(self, key, value, buffer_size=1048576):
@@ -190,7 +193,12 @@ class SqliteStore(AbstractStore):
             data = buffer(b''.join(chunks))
             
         with self.transaction('Setting key "%s"' % key):
-            self._insert_row(key, metadata, data)
+            if update:
+                created = self._get_columns_by_key(key, ['created'])['created']
+                modified = time.time()
+            else:
+                modified = created = time.time()
+            self._insert_row(key, metadata, data, created, modified)
             self._update_index(key, metadata)
 
             if update:
@@ -353,10 +361,12 @@ class SqliteStore(AbstractStore):
 
         with self.transaction('Setting data for "%s"' % key):
             if update:
-                self._update_column(key, 'data', data)
+                modified = time.time()
+                self._update_columns(key, ['data', 'modified'], [data, modified])
                 self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
             else:
-                self._insert_row(key, metadata, data)
+                modified = created = time.time()
+                self._insert_row(key, metadata, data, created, modified)
                 self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
     
     
@@ -379,11 +389,14 @@ class SqliteStore(AbstractStore):
         update = self.exists(key)
         if update:
             with self.transaction('Setting metadata for "%s"' % key):
-                self._update_column(key, 'metadata', metadata)
+                created = self._get_columns_by_key(key, ['created'])['created']
+                modified = time.time()
+                self._update_columns(key, ['metadata', 'modified'], [metadata, modified])
                 self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
         else:
             with self.transaction('Setting metadata for "%s"' % key):
-                self._insert_row(key, metadata, buffer(''))
+                modified = created = time.time()
+                self._insert_row(key, metadata, buffer(''), created, modified)
                 self._update_index(key, metadata)
                 self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
 
@@ -633,14 +646,14 @@ class SqliteStore(AbstractStore):
         else:
             return dict(zip(columns, rows[0]))
 
-    def _insert_row(self, key, metadata, data):
+    def _insert_row(self, key, metadata, data, created, modified):
         """ Insert or replace a row into the underlying sqlite table
         
         This simply constructs and executes the query. It does not attempt any
         sort of transaction control.
         """
-        query = 'insert or replace into %s (key, metadata, data) values (?, ?, ?)' % self.table
-        self._connection.execute(query, (key, metadata, data))    
+        query = 'insert or replace into %s (key, metadata, created, modified, data) values (?, ?, ?, ?, ?)' % self.table
+        self._connection.execute(query, (key, metadata, created, modified, data))    
 
     def _update_column(self, key, column, value):
         """ Update an existing column value in the a row with the given key
