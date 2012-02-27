@@ -27,6 +27,8 @@ import fnmatch
 from cStringIO import StringIO
 import warnings
 
+from encore.events.api import get_event_manager
+
 from .utils import StoreProgressManager, buffer_iterator
 
 class Value(object):
@@ -61,6 +63,24 @@ class Value(object):
         """
         raise NotImplemented
     
+    def __enter__(self):
+        """ Context manager to ensure data stream is closed when done
+        
+        """
+        return self.data
+    
+    def __exit__(self, exc_type, exc, traceback):
+        """ Context manager to ensure data stream is closed when done
+        
+        """
+        self.data.close()
+    
+    def iterdata(self, buffer_size=1048576, progress=None):
+        """ Return an iterator over the data stream
+        
+        """
+        return buffer_iterator(self.data, buffer_size, progress)
+    
     def __len__(self):
         """ Value objects appear as a 2-Tuple for backwards compatibility
         
@@ -83,24 +103,6 @@ class Value(object):
             return self.metadata
         else:
             raise IndexError(idx)
-    
-    def __enter__(self):
-        """ Context manager to ensure data stream is closed when done
-        
-        """
-        return self.data
-    
-    def __exit__(self, exc_type, exc, traceback):
-        """ Context manager to ensure data stream is closed when done
-        
-        """
-        self.data.close()
-    
-    def iterdata(self, buffer_size=1048576, progress=None):
-        """ Return an iterator over the data stream
-        
-        """
-        return buffer_iterator(self.data, buffer_size, progress)
 
 
 class AbstractReadOnlyStore(object):
@@ -119,8 +121,8 @@ class AbstractReadOnlyStore(object):
     __metaclass__ = ABCMeta
     
     @abstractmethod
-    def __init__(self, event_manager):
-        self.event_manager = event_manager
+    def __init__(self):
+        self.event_manager = get_event_manager()
 
         self._connected = False
     

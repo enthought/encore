@@ -45,10 +45,9 @@ class DictMemoryStore(AbstractStore):
 
     """
     
-    def __init__(self, event_manager):
+    def __init__(self):
+        super(DictMemoryStore, self).__init__()
         self._store = {}
-        self.event_manager = event_manager
-        self._connected = False
     
     def connect(self, credentials=None):
         """ Connect to the key-value store

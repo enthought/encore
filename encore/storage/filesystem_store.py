@@ -52,7 +52,7 @@ class FileSystemStore(AbstractStore):
     """
     A store that uses a Shared file system to store the data/metadata.
     """
-    def __init__(self, event_manager, path, magic_fname='.FSStore'):
+    def __init__(self, path, magic_fname='.FSStore'):
         """Initializes the store given a path to a store. 
         
         Parameters
@@ -65,10 +65,9 @@ class FileSystemStore(AbstractStore):
             The name of the magic file in that directory,
 
         """
+        super(FileSystemStore, self).__init__()
         self._root = path
         self._magic_fname = magic_fname
-        self.event_manager = event_manager
-        self._connected = False
         
         if not os.path.exists(path):
             raise FileSystemStoreError('Unable to find path %s'%path)

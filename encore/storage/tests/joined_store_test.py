@@ -7,7 +7,6 @@
 
 import time
 
-from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
 from ..joined_store import JoinedStore
 from ..dict_memory_store import DictMemoryStore
@@ -32,10 +31,9 @@ class JoinedStoreReadTest(abstract_test.AbstractStoreReadTest):
         and set into 'self.store'.
         """
         super(JoinedStoreReadTest, self).setUp()
-        self.event_manager = e = EventManager()
-        self.store1 = DictMemoryStore(e)
-        self.store2 = DictMemoryStore(e)
-        self.store3 = DictMemoryStore(e)
+        self.store1 = DictMemoryStore()
+        self.store2 = DictMemoryStore()
+        self.store3 = DictMemoryStore()
         t = time.time()
         self.store2._store['test1'] = (
             'test2\n',
@@ -56,7 +54,7 @@ class JoinedStoreReadTest(abstract_test.AbstractStoreReadTest):
                 metadata['optional'] = True
             t = time.time()
             stores[i%3]._store['key%d'%i] = ('value%d' % i, metadata, t, t)
-        self.store = JoinedStore(e, stores)
+        self.store = JoinedStore(stores)
 
     #def utils_large(self):
     #    self.store2.from_bytes('test3', '')#'test4'*10000000)
@@ -80,10 +78,9 @@ class JoinedStoreWriteTest(abstract_test.AbstractStoreWriteTest):
         and set into 'self.store'.
         """
         super(JoinedStoreWriteTest, self).setUp()
-        self.event_manager = e = EventManager()
-        self.store1 = DictMemoryStore(e)
-        self.store2 = DictMemoryStore(e)
-        self.store3 = DictMemoryStore(e)
+        self.store1 = DictMemoryStore()
+        self.store2 = DictMemoryStore()
+        self.store3 = DictMemoryStore()
         t = time.time()
         self.store2._store['test1'] = (
             'test2\n',
@@ -103,7 +100,7 @@ class JoinedStoreWriteTest(abstract_test.AbstractStoreWriteTest):
             metadata = {'meta': True, 'meta1': -i}
             t = time.time()
             stores[i%3]._store[key] = (data, metadata, t, t)
-        self.store = JoinedStore(e, stores)
+        self.store = JoinedStore(stores)
 
     def test_multiset_metadata(self):
         super(JoinedStoreWriteTest, self).test_multiset_metadata()

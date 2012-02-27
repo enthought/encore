@@ -16,7 +16,6 @@ import SocketServer
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 
-from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
 from ..static_url_store import StaticURLStore
 
@@ -67,7 +66,7 @@ class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
         time.sleep(1)
 
 
-        self.store = StaticURLStore(EventManager(), self._get_base_url(), 'data/', 'index.json')
+        self.store = StaticURLStore(self._get_base_url(), 'data/', 'index.json')
         self.store.connect()
     
     def tearDown(self):

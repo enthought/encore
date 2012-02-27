@@ -86,8 +86,8 @@ class SimpleAuthStore(AbstractStore):
         The store to store the user keys in.  Defaults to the wrapped store.
         
     """
-    def __init__(self, event_manager, store, encoder, user_key_path='.user_', user_key_store=None):
-        self.event_manager = event_manager
+    def __init__(self, store, encoder, user_key_path='.user_', user_key_store=None):
+        super(SimpleAuthStore, self).__init__()
         self.store = store
         self.encoder = encoder
         self.user_key_path = user_key_path

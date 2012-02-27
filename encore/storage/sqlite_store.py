@@ -52,8 +52,8 @@ class SqliteStore(AbstractStore):
         user-supplied values.  This is particularly important for indexed queries.
     """
     
-    def __init__(self, event_manager, location=':memory:', table='store', index='dynamic', index_columns=None):
-        self.event_manager = event_manager
+    def __init__(self, location=':memory:', table='store', index='dynamic', index_columns=None):
+        super(SqliteStore, self).__init__()
         self.location = location
         self.table = table
         

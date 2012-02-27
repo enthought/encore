@@ -6,7 +6,6 @@
 #
 import time
 
-from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
 from ..dict_memory_store import DictMemoryStore
 from ..simple_auth_store import SimpleAuthStore, make_encoder
@@ -32,9 +31,8 @@ class SimpleAuthStoreReadTest(abstract_test.AbstractStoreReadTest):
         """
         super(SimpleAuthStoreReadTest, self).setUp()
         encoder = make_encoder("test")
-        e = EventManager()
-        wrapped_store = DictMemoryStore(e)
-        self.store = SimpleAuthStore(e, wrapped_store, encoder)
+        wrapped_store = DictMemoryStore()
+        self.store = SimpleAuthStore(wrapped_store, encoder)
         t = time.time()
         wrapped_store._store['.user_test'] = (encoder('test'),  {}, t, t)
         wrapped_store._store['test1'] = ('test2\n', {
@@ -75,9 +73,8 @@ class SimpleAuthStoreWriteTest(abstract_test.AbstractStoreWriteTest):
         and set into 'self.store'.
         """
         encoder = make_encoder("test")
-        e = EventManager()
-        wrapped_store = DictMemoryStore(e)
-        self.store = SimpleAuthStore(e, wrapped_store, encoder)
+        wrapped_store = DictMemoryStore()
+        self.store = SimpleAuthStore(wrapped_store, encoder)
         t = time.time()
         wrapped_store._store['.user_test'] = (encoder('test'),  {}, t, t)
         wrapped_store._store['test1'] = (

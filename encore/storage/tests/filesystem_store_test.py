@@ -13,7 +13,6 @@ import json
 import time
 import random
 
-from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
 from ..filesystem_store import FileSystemStore, init_shared_store
 
@@ -73,7 +72,7 @@ class FileSystemStoreReadTest(abstract_test.AbstractStoreReadTest, FileSystemSto
                 metadata['optional'] = True
             self._write_metadata('key%d'%i, metadata)
 
-        self.store = FileSystemStore(EventManager(), self.path)
+        self.store = FileSystemStore(self.path)
         self.store.connect()
 
     def tearDown(self):
@@ -122,7 +121,7 @@ class FileSystemStoreWriteTest(abstract_test.AbstractStoreWriteTest, FileSystemS
             self._write_data(key, data)
             self._write_metadata(key, metadata)
 
-        self.store = FileSystemStore(EventManager(), self.path)
+        self.store = FileSystemStore(self.path)
         self.store.connect()
 
     def tearDown(self):

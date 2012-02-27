@@ -101,8 +101,8 @@ class StaticURLStore(AbstractReadOnlyStore):
     
         
     """
-    def __init__(self, event_manager, root_url, data_path, query_path, poll=300):
-        self.event_manager = event_manager
+    def __init__(self, root_url, data_path, query_path, poll=300):
+        super(StaticURLStore, self).__init__()
         self.root_url = root_url
         self.data_path = data_path
         self.query_path = query_path

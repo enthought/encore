@@ -6,7 +6,6 @@
 #
 import time
 
-from encore.events.api import EventManager
 import encore.storage.tests.abstract_test as abstract_test
 from ..dict_memory_store import DictMemoryStore
 
@@ -30,7 +29,7 @@ class DictMemoryStoreReadTest(abstract_test.AbstractStoreReadTest):
         and set into 'self.store'.
         """
         super(DictMemoryStoreReadTest, self).setUp()
-        self.store = DictMemoryStore(EventManager())
+        self.store = DictMemoryStore()
         t = time.time()
         self.store._store['test1'] = (
             'test2\n', {
@@ -68,7 +67,7 @@ class DictMemoryStoreWriteTest(abstract_test.AbstractStoreWriteTest):
        
         and set into 'self.store'.
         """
-        self.store = DictMemoryStore(EventManager())
+        self.store = DictMemoryStore()
         t = time.time()
         self.store._store['test1'] = (
             'test2\n',
