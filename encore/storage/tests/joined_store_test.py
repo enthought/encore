@@ -5,7 +5,8 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from encore.events.api import EventManager
+import time
+
 import encore.storage.tests.abstract_test as abstract_test
 from ..joined_store import JoinedStore
 from ..dict_memory_store import DictMemoryStore
@@ -29,27 +30,31 @@ class JoinedStoreReadTest(abstract_test.AbstractStoreReadTest):
         
         and set into 'self.store'.
         """
-        self.event_manager = e = EventManager()
-        self.store1 = DictMemoryStore(e)
-        self.store2 = DictMemoryStore(e)
-        self.store3 = DictMemoryStore(e)
-        self.store2._data['test1'] = 'test2\n'
-        self.store2._metadata['test1'] = {
-            'a_str': 'test3',
-            'an_int': 1,
-            'a_float': 2.0,
-            'a_bool': True,
-            'a_list': ['one', 'two', 'three'],
-            'a_dict': {'one': 1, 'two': 2, 'three': 3}
-        }
+        super(JoinedStoreReadTest, self).setUp()
+        self.store1 = DictMemoryStore()
+        self.store2 = DictMemoryStore()
+        self.store3 = DictMemoryStore()
+        t = time.time()
+        self.store2._store['test1'] = (
+            'test2\n',
+            {
+                'a_str': 'test3',
+                'an_int': 1,
+                'a_float': 2.0,
+                'a_bool': True,
+                'a_list': ['one', 'two', 'three'],
+                'a_dict': {'one': 1, 'two': 2, 'three': 3}
+            }, t, t
+        )
         stores = [self.store1, self.store2, self.store3]
         for i in range(10):
-            stores[i%3]._data['key%d'%i] = 'value%d' % i
-            stores[i%3]._metadata['key%d'%i] = {'query_test1': 'value',
+            metadata = {'query_test1': 'value',
                 'query_test2': i}
             if i % 2 == 0:
-                stores[i%3]._metadata['key%d'%i]['optional'] = True
-        self.store = JoinedStore(e, stores)
+                metadata['optional'] = True
+            t = time.time()
+            stores[i%3]._store['key%d'%i] = ('value%d' % i, metadata, t, t)
+        self.store = JoinedStore(stores)
 
     #def utils_large(self):
     #    self.store2.from_bytes('test3', '')#'test4'*10000000)
@@ -72,27 +77,30 @@ class JoinedStoreWriteTest(abstract_test.AbstractStoreWriteTest):
        
         and set into 'self.store'.
         """
-        self.event_manager = e = EventManager()
-        self.store1 = DictMemoryStore(e)
-        self.store2 = DictMemoryStore(e)
-        self.store3 = DictMemoryStore(e)
-        self.store2._data['test1'] = 'test2\n'
-        self.store2._metadata['test1'] = {
-            'a_str': 'test3',
-            'an_int': 1,
-            'a_float': 2.0,
-            'a_bool': True,
-            'a_list': ['one', 'two', 'three'],
-            'a_dict': {'one': 1, 'two': 2, 'three': 3}
-        }
+        super(JoinedStoreWriteTest, self).setUp()
+        self.store1 = DictMemoryStore()
+        self.store2 = DictMemoryStore()
+        self.store3 = DictMemoryStore()
+        t = time.time()
+        self.store2._store['test1'] = (
+            'test2\n',
+            {
+                'a_str': 'test3',
+                'an_int': 1,
+                'a_float': 2.0,
+                'a_bool': True,
+                'a_list': ['one', 'two', 'three'],
+                'a_dict': {'one': 1, 'two': 2, 'three': 3}
+            }, t, t
+        )
         stores = [self.store1, self.store2, self.store3]
         for i in range(10):
             key = 'existing_key'+str(i)
             data = 'existing_value'+str(i)
             metadata = {'meta': True, 'meta1': -i}
-            stores[i%3]._data[key] = data
-            stores[i%3]._metadata[key] = metadata
-        self.store = JoinedStore(e, stores)
+            t = time.time()
+            stores[i%3]._store[key] = (data, metadata, t, t)
+        self.store = JoinedStore(stores)
 
     def test_multiset_metadata(self):
         super(JoinedStoreWriteTest, self).test_multiset_metadata()

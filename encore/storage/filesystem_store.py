@@ -22,6 +22,7 @@ from itertools import izip
 
 # ETS library imports.
 from .abstract_store import AbstractStore
+from .file_value import FileValue
 from .events import StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent
 from .utils import DummyTransactionContext, buffer_iterator, StoreProgressManager
 
@@ -51,7 +52,7 @@ class FileSystemStore(AbstractStore):
     """
     A store that uses a Shared file system to store the data/metadata.
     """
-    def __init__(self, event_manager, path, magic_fname='.FSStore'):
+    def __init__(self, path, magic_fname='.FSStore'):
         """Initializes the store given a path to a store. 
         
         Parameters
@@ -64,10 +65,9 @@ class FileSystemStore(AbstractStore):
             The name of the magic file in that directory,
 
         """
+        super(FileSystemStore, self).__init__()
         self._root = path
         self._magic_fname = magic_fname
-        self.event_manager = event_manager
-        self._connected = False
         
         if not os.path.exists(path):
             raise FileSystemStoreError('Unable to find path %s'%path)
@@ -143,9 +143,9 @@ class FileSystemStore(AbstractStore):
             If the key is not found in the store, a KeyError is raised.
 
         """
-        data = self.get_data(key)
+        data_path = self._get_data_path(key)
         metadata = self.get_metadata(key)
-        return (data, metadata)
+        return FileValue(data_path, metadata)
     
     def set(self, key, value, buffer_size=1048576):
         """ Store a stream of data into a given key in the key-value store.

@@ -34,10 +34,9 @@ class JoinedStore(AbstractStore):
         The stores that are joined together by this store.
         
     """
-    def __init__(self, event_manager, stores):
-        self.event_manager = event_manager
+    def __init__(self, stores):
+        super(JoinedStore, self).__init__()
         self.stores = stores
-        self._connected = False
 
                 
     def connect(self, credentials=None):

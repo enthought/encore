@@ -31,26 +31,29 @@ cleanly release any resources it may be using, such as database connections.
 Reading
 -------
 
-To read from a store, you use one of the :py:meth:`~.AbstractReadOnlyStore.get` methods::
+To read from a store, you use one of the :py:meth:`~.AbstractReadOnlyStore.get`
+methods::
 
-    document, metadata = store.get('my_document')
+    value = store.get('my_document')
+    datastream = value.data
+    metadata = value.metadata
     
-In this case document is a file-like object that streams bytes::
+In this case datastream is a file-like object that streams bytes::
 
-    data = document.read()
+    data = datastream.read()
     print data
 
 More likely you will have used some sort of serialization format like XML, JSON
 or YAML to store your data in the document, so instead you can do::
 
     import json
-    data = json.load(document)
+    data = json.load(datastream)
 
 If the data is raw bytes to store into a numpy array, you can do something like
 this::
 
     import numpy
-    data = document.read()
+    data = datastream.read()
     dtype = numpy.int32
     size = len(data)/dtype().nbytes
     arr = numpy.empty(shape=size, dtype=dtype)
