@@ -176,6 +176,11 @@ class AbstractReadOnlyStore(object):
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
+        
+        Raises
+        ------
+        KeyError :
+            This will raise a key error if the key is not present in the store.
 
         """
         raise NotImplementedError
@@ -346,6 +351,7 @@ class AbstractReadOnlyStore(object):
             all the specified values for the specified metadata keywords.
             If a key specified in select is not present in the metadata of a
             particular key, then it will not be present in the returned value.
+            
         """
         raise NotImplementedError
 

@@ -88,8 +88,12 @@ class BaseEventManager(object):
             called only when the event matches all of the filter .
             
             Filter specification:
-                - key: string which is name of an attribute of the event instance.
+                - key: string which is extended (`.` separated) name of an
+                       attribute of the event instance.
                 - value: the value of the specified attribute.
+
+            If the attribute does not exist then the filter is considered failed
+            and the listener is not called.
 
         priority : int
             The priority of the listener. Higher priority listeners are called
@@ -125,12 +129,12 @@ class BaseEventManager(object):
         raise NotImplementedError
 
     @abstractmethod
-    def emit(self, evt, block=True):
+    def emit(self, event, block=True):
         """ Notifies all listeners about the event with the specified arguments.
 
         Parameters
         ----------
-        evt : instance of :py:class:`BaseEvent`
+        event : instance of :py:class:`BaseEvent`
             The :py:class:`BaseEvent` instance to emit.
         block : bool
             Whether to block the call until the event handling is finished.
