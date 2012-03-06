@@ -28,6 +28,7 @@ Contents
    :maxdepth: 2
    
    concepts.rst
+   usage.rst
    abstract_store.rst
    events.rst
    utils.rst
@@ -40,6 +41,7 @@ Implementations
 
    dict_memory_store.rst
    sqlite_store.rst
+   filesystem_store.rst
    static_url_store.rst
    joined_store.rst
    simple_auth_store.rst

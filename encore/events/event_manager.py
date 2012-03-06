@@ -28,6 +28,26 @@ from .abstract_event_manager import BaseEvent, BaseEventManager
 
 
 ###############################################################################
+# Logging Trace Function.
+###############################################################################
+class LoggingTracer(object):
+    """ A tracer object for event manager to log events.
+    
+    Usage
+    -----
+    event_manager.set_trace(LoggingTracer())
+
+    """
+    def __init__(self, logger=logger, level=logging.INFO):
+        self._level = level
+        self._logger = logger
+
+    def __call__(self, name, func, *args, **kwds):
+        self._logger.log(self._level,
+                         'event_log: %s, function: %s,\nargs=%s,\nkwds=%s',
+                         name, func, args, kwds)
+
+###############################################################################
 # Notifier classes for callables: lightweight weakref substitutes.
 ###############################################################################
 class CallableNotifier(object):
@@ -122,7 +142,9 @@ class EventInfo(object):
             called only when the event matches all of the filter .
             
             Filter specification:
-                - key: string which is name of an attribute of the event instance.
+                - key: string which is extended name of an attribute of the
+                    event instance. For example string 'source.name' will be
+                    the attribute `event.source.name`
                 - value: the value of the specified attribute.
 
         priority : int
@@ -212,15 +234,15 @@ class EventInfo(object):
         else:
             return CallableNotifier(func, notify)
 
-    def get_listeners(self, evt):
+    def get_listeners(self, event):
         """ Return listeners which will be called on specified event.
 
-        If ``evt`` is None, all listeners are returned.
-        If ``eve`` is an event, only listeners which will be called for the
+        If ``event`` is None, all listeners are returned.
+        If ``event`` is an event, only listeners which will be called for the
         event are returned (satisfying any filters on the listeners).
         """
         with self._priority_list_lock:
-            if evt is None or not self._listener_filters:
+            if event is None or not self._listener_filters:
                 return self._priority_list[:]
             ret = []
             l_filter = self._listener_filters
@@ -229,7 +251,16 @@ class EventInfo(object):
                 id = self.get_id(listener())
                 if id in l_filter:
                     for key, value in l_filter[id].iteritems():
-                        if getattr(evt, key) != value:
+                        attr = event
+                        try:
+                            # Get extended attributes of the event.
+                            for part in key.split('.'):
+                                attr = getattr(attr, part)
+                        except AttributeError as e:
+                            logger.info('Error filtering listener: %s; %s',
+                                        linfo, e)
+                            break
+                        if attr != value:
                             break
                     else:
                         ret.append(linfo)
@@ -266,6 +297,7 @@ class EventManager(BaseEventManager):
     def __init__(self):
         self.event_map = {}
         self.count = itertools.count()
+        self._trace_func = None
 
     ###########################################################################
     # `EventManager` Interface
@@ -324,6 +356,10 @@ class EventManager(BaseEventManager):
         than iterating through all listeners.
 
         """
+        if self._trace_func is not None:
+            if self._trace_func('connect', self.connect,
+                                (cls, func, filter, priority)):
+                return
         if cls not in self.event_map:
             self.register(cls)
         self.event_map[cls].connect(func, filter, priority, next(self.count))
@@ -344,14 +380,18 @@ class EventManager(BaseEventManager):
             if `func` is not already connected.
             
         """
+        if self._trace_func is not None:
+            if self._trace_func('disconnect', self.disconnect,
+                                (cls, func)):
+                return
         self.event_map[cls].disconnect(func)
 
-    def emit(self, evt, block=True):
+    def emit(self, event, block=True):
         """ Notifies all listeners about the event with the specified arguments.
 
         Parameters
         ----------
-        evt : instance of :py:class:`BaseEvent`
+        event : instance of :py:class:`BaseEvent`
             The :py:class:`BaseEvent` instance to emit.
         block : bool
             Whether to block the call until the event handling is finished.
@@ -368,31 +408,40 @@ class EventManager(BaseEventManager):
 
         """
         if not block:
-            t = threading.Thread(target=self.emit, args=(evt, True),
-                                 name='Event emit: {0}'.format(evt))
+            t = threading.Thread(target=self.emit, args=(event, True),
+                                 name='Event emit: {0}'.format(event))
             t.start()
             return t
-        cls = type(evt)
+
+        trace_func = self._trace_func
+        if trace_func is not None:
+            if trace_func('emit', self.emit, (event,)):
+                return
+
+        cls = type(event)
         if not self.is_enabled(cls):
             return
 
-        listeners = self.get_listeners(evt, cls)
+        listeners = self.get_listeners(event, cls)
 
-        evt.pre_emit()
+        event.pre_emit()
 
         for listener in listeners:
             try:
-                listener(evt)
+                if trace_func is not None:
+                    if trace_func('listen', listener, (event,)):
+                        continue
+                listener(event)
             except Exception as e:
                 logger.warn('Exception {0} occurred in listener: {1} for '
-                    'event: {2}:\n{3}'.format(e, listener, evt,
+                    'event: {2}:\n{3}'.format(e, listener, event,
                                               traceback.format_exc()))
-            if evt._handled:
+            if event._handled:
                 logger.info('Event: {0} handled by listener: {1}'.format(
-                                                        evt, listener))
+                                                        event, listener))
                 break
 
-        evt.post_emit()
+        event.post_emit()
 
     def get_event(self, cls=None):
         """ Returns an ``EventInfo`` instance for the event.
@@ -496,3 +545,34 @@ class EventManager(BaseEventManager):
         """
         return cls.__mro__[:self.bmro_clip]
 
+    def set_trace(self, func):
+        """ Set a trace method for various actions performed.
+
+        func is a callable which takes three arguments:
+            name, method and args
+
+        name - str
+            An identifiable name of the method being called
+            Either of 'connect', 'disconnect', 'emit' or 'listen'
+            The subsequent arguments depend on this value.
+        method - callable
+            The method which would be called as a consequence of the action
+            If name=='listen', this is the listener which would be called.
+        args - tuple
+            The arguments specific to each method name are specified below:
+                connect - cls, func, filter, priority
+                disconnect - cls, func
+                emit - event
+                listen - event
+
+        If the trace function returns a True-like value: the corresponding
+        action is not performed. For listen action, the corresponding listener
+        is not called, but subsequent ones are called (depending on return
+        value for their trace function calls).
+
+        Note: Calling set_trace with None as the callable argument removes
+        existing trace function set. Also, only a single trace method can be
+        active at a time, calling set_trace removes the existing trace function.
+
+        """
+        self._trace_func = func

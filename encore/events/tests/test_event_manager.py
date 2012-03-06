@@ -13,6 +13,9 @@ import threading
 
 # Local imports.
 from encore.events.event_manager import EventManager, BaseEvent
+from encore.events.api import (get_event_manager, set_event_manager,
+                               BaseEventManager)
+import encore.events.package_globals as package_globals
 
 class TestEventManager(unittest.TestCase):
     def setUp(self):
@@ -211,6 +214,16 @@ class TestEventManager(unittest.TestCase):
     def test_filtering(self):
         """ Test if event filtering on arguments works.
         """
+        depth = 5
+        class A(object):
+            count = depth
+            def __init__(self):
+                A.count -= 1
+                if A.count:
+                    self.a = A()
+                else:
+                    self.a = 0
+
         class MyEvent(BaseEvent):
             def __init__(self, prop1="f0", prop2=True, prop3=None):
                 super(MyEvent, self).__init__()
@@ -218,12 +231,15 @@ class TestEventManager(unittest.TestCase):
                 self.prop2 = prop2
                 self.prop3 = prop3
 
-        callbacks = [mock.Mock() for i in range(5)]
+        callbacks = [mock.Mock() for i in range(8)]
         self.evt_mgr.connect(MyEvent, callbacks[0])
         self.evt_mgr.connect(MyEvent, callbacks[1], filter={'prop1':'f2'})
         self.evt_mgr.connect(MyEvent, callbacks[2], filter={'prop2':False})
         self.evt_mgr.connect(MyEvent, callbacks[3], filter={'prop3':BaseEvent})
         self.evt_mgr.connect(MyEvent, callbacks[4], filter={'prop1':'f2', 'prop2':False})
+        self.evt_mgr.connect(MyEvent, callbacks[5], filter={'prop1.real':0})
+        self.evt_mgr.connect(MyEvent, callbacks[6], filter={'prop1.a.a.a.a.a':0})
+        self.evt_mgr.connect(MyEvent, callbacks[7], filter={'prop1.a.a.a.a':0})
 
         def check_count(evt, *counts):
             self.evt_mgr.emit(evt)
@@ -231,13 +247,22 @@ class TestEventManager(unittest.TestCase):
                 self.assertEqual(callback.call_count, count)
 
         # Notify only 0,1
-        check_count(MyEvent(prop1='f2'), 1, 1, 0, 0, 0)
+        check_count(MyEvent(prop1='f2'), 1, 1, 0, 0, 0, 0, 0, 0)
 
         # Notify only 0, 1, 2, 4
-        check_count(MyEvent(prop1='f2', prop2=False), 2, 2, 1, 0, 1)
+        check_count(MyEvent(prop1='f2', prop2=False), 2, 2, 1, 0, 1, 0, 0, 0)
 
         # Notify only 0, 3
-        check_count(MyEvent(prop3=BaseEvent), 3, 2, 1, 1, 1)
+        check_count(MyEvent(prop3=BaseEvent), 3, 2, 1, 1, 1, 0, 0, 0)
+
+        # Notify only 0; (extended filter fail on AttributeError for 5)
+        check_count(MyEvent(prop1=1), 4, 2, 1, 1, 1, 0, 0, 0)
+
+        # Notify only 0 and 5 (extended attribute filter)
+        check_count(MyEvent(prop1=1j), 5, 2, 1, 1, 1, 1, 0, 0)
+
+        # Notify only 0 and 5 (extended attribute filter)
+        check_count(MyEvent(prop1=A()), 6, 2, 1, 1, 1, 1, 1, 0)
 
     def test_exception(self):
         """ Test if exception in handler causes subsequent notifications.
@@ -555,6 +580,111 @@ class TestEventManager(unittest.TestCase):
         self.evt_mgr.emit(BaseEvent())
         self.assertEqual(calls, [2, 1])
         calls[:] = []
+
+    def test_global_event_manager(self):
+        """ Test if getting/setting global event manager works. """
+        evt_mgr = get_event_manager()
+        self.assertIsInstance(evt_mgr, BaseEventManager)
+
+        # Reset the global event_manager
+        package_globals._event_manager = None
+
+        set_event_manager(self.evt_mgr)
+        self.assertEqual(self.evt_mgr, get_event_manager())
+
+        self.assertRaises(ValueError, lambda: set_event_manager(evt_mgr))
+
+class TracingTests(unittest.TestCase):
+    def setUp(self):
+        self.evt_mgr = EventManager()
+        self.traces = []
+        self.tracedict = {}
+        self.veto_condition = None
+
+    def trace_func(self, name, method, args):
+        """ Trace function for event manager. """
+        save = (name, method, args)
+        self.traces.append(save)
+        self.tracedict.setdefault(name, []).append(save)
+
+    def trace_func_veto(self, name, method, args):
+        """ Trace function to veto actions. """
+        self.trace_func(name, method, args)
+        if self.veto_condition is None or self.veto_condition(name, method, args):
+            return True
+
+    def test_set_trace(self):
+        """ Test whether setting trace method works. """
+        self.evt_mgr.set_trace(self.trace_func)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 1)
+        self.evt_mgr.set_trace(None)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 1)
+
+    def test_trace_emit(self):
+        """ Test whether trace works for all actions. """
+        self.evt_mgr.set_trace(self.trace_func)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 1)
+        self.assertEqual(len(self.tracedict['emit']), 1)
+
+        callback1 = mock.Mock()
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.assertTrue(len(self.traces), 2)
+        self.assertEqual(len(self.tracedict['connect']), 1)
+
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 4)
+        self.assertEqual(len(self.tracedict['emit']), 2)
+        self.assertEqual(len(self.tracedict['listen']), 1)
+        self.assertEqual(callback1.call_count, 1)
+
+        self.evt_mgr.disconnect(BaseEvent, callback1)
+        self.assertTrue(len(self.traces), 5)
+        self.assertEqual(len(self.tracedict['disconnect']), 1)
+        self.assertEqual(callback1.call_count, 1)
+
+    def test_trace_veto(self):
+        """ Test whether vetoing of actions works. """
+        callback1 = mock.Mock()
+        callback2 = mock.Mock()
+        
+        self.evt_mgr.set_trace(self.trace_func_veto)
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertTrue(len(self.traces), 2)
+        self.assertEqual(len(self.tracedict['connect']), 1)
+        self.assertEqual(len(self.tracedict['emit']), 1)
+        self.assertEqual(len(self.tracedict.get('listen', [])), 0)
+        self.assertFalse(callback1.called)
+
+        # Disable calling of callback1
+        self.veto_condition = lambda name, method, args: name == 'listen' and method == callback1
+        self.evt_mgr.connect(BaseEvent, callback1)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertEqual(len(self.tracedict['connect']), 2)
+        self.assertEqual(len(self.tracedict['emit']), 2)
+        self.assertEqual(len(self.tracedict['listen']), 1)
+        self.assertFalse(callback1.called)
+
+        # Ensure callback2 is still called.
+        self.evt_mgr.connect(BaseEvent, callback2)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertEqual(len(self.tracedict['connect']), 3)
+        self.assertEqual(len(self.tracedict['emit']), 3)
+        self.assertEqual(len(self.tracedict['listen']), 3)
+        self.assertFalse(callback1.called)
+        self.assertTrue(callback2.called)
+
+        # Disable tracing.
+        self.evt_mgr.set_trace(None)
+        self.evt_mgr.emit(BaseEvent())
+        self.assertEqual(len(self.tracedict['connect']), 3)
+        self.assertEqual(len(self.tracedict['emit']), 3)
+        self.assertEqual(len(self.tracedict['listen']), 3)
+        self.assertTrue(callback1.called)
+        self.assertEqual(callback2.call_count, 2)
 
 
 if __name__ == '__main__':

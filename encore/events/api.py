@@ -10,3 +10,4 @@ from .abstract_event_manager import BaseEvent, BaseEventManager
 from .event_manager import EventManager
 from .progress_events import (ProgressEvent, ProgressStartEvent,
     ProgressStepEvent, ProgressEndEvent, ProgressManager)
+from .package_globals import get_event_manager, set_event_manager
