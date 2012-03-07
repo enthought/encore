@@ -183,13 +183,22 @@ class SqliteStore(AbstractStore):
             default if they need to.  The default is 1048576 bytes (1 MiB).
      
         """
-        data, metadata = value
+        if isinstance(value, tuple):
+            data_stream, metadata = value
+            metadata = metadata.copy()
+            steps = -1
+        else:
+            data_stream = value.data
+            metadata = value.metadata
+            steps = value.size
         update = self.exists(key)
+
+        progress = StoreProgressManager(source=self, steps=steps,
+                message="Setting data into '%s'" % (key,), key=key,
+                metadata=metadata)
         
-        with StoreProgressManager(self.event_manager, self, uuid4(),
-                "Setting data into '%s'" % (key,), -1,
-                key=key, metadata=metadata) as progress:
-            chunks = list(buffer_iterator(data, buffer_size, progress))
+        with progress:
+            chunks = list(buffer_iterator(data_stream, buffer_size, progress))
             data = buffer(b''.join(chunks))
             
         with self.transaction('Setting key "%s"' % key):
@@ -201,10 +210,10 @@ class SqliteStore(AbstractStore):
             self._insert_row(key, metadata, data, created, modified)
             self._update_index(key, metadata)
 
-            if update:
-                self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
-            else:
-                self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
+        if update:
+            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
+        else:
+            self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
 
     def delete(self, key):
         """ Delete a key from the repsository.
@@ -347,27 +356,11 @@ class SqliteStore(AbstractStore):
 
         """
         row = self._get_columns_by_key(key, ['metadata'])
-        update = row is not None
-        if update:
+        if row is not None:
             metadata = row['metadata']
         else:
             metadata = {}
-                    
-        with StoreProgressManager(self.event_manager, self, uuid4(),
-                "Setting data for '%s'" % (key,), -1,
-                key=key, metadata=metadata) as progress:
-            chunks = list(buffer_iterator(data, buffer_size, progress))
-            data = buffer(b''.join(chunks))
-
-        with self.transaction('Setting data for "%s"' % key):
-            if update:
-                modified = time.time()
-                self._update_columns(key, ['data', 'modified'], [data, modified])
-                self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
-            else:
-                modified = created = time.time()
-                self._insert_row(key, metadata, data, created, modified)
-                self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
+        self.set(key, (data, metadata), buffer_size)
     
     
     def set_metadata(self, key, metadata):
