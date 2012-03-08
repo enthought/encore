@@ -69,17 +69,16 @@ class StoreApplication(object):
             response_headers.add_header('Content-Type', 'text/plain'),
             response_headers.add_header('Content-Length', str(len('Not Found')))
             
-            start_response(status, str(response_headers))
+            start_response(status, response_headers.items())
             return ['Not Found']
     
 def key_error(response, key):
     result = 'KeyError: "%s" not found' % key
     status = '404 Not Found'
-    response_headers = [
-        ('Content-Type', 'text/plain'),
-        ('Content-Length', str(len(result)))
-    ]
-    response.start_response(status, response_headers)
+    response_headers = Headers([])
+    response_headers.add_header('Content-Type', 'text/plain'),
+    response_headers.add_header('Content-Length', str(len(result)))
+    response.start_response(status, response_headers.items())
     return [result]
     
     
@@ -87,9 +86,10 @@ def key_error(response, key):
 def get_data(response, key):
     try:
         data, metadata = response.store.get(key)
+        print list(buffer_iterator(data))
         status = '200 OK'
         response.start_response(status, [])
-        return buffer_iterator(data)
+        return list(buffer_iterator(data))
     except KeyError as exc:
         return key_error(response, key)
 
@@ -103,7 +103,7 @@ def set_data(response, key):
     response_headers = Headers([])
     response_headers.add_header('Content-Type', 'text/plain'),
     response_headers.add_header('Content-Length', str(len(result)))
-    response.start_response(status, str(response_headers))
+    response.start_response(status, response_headers.items())
     return [result]
 
 
@@ -117,7 +117,7 @@ def get_metadata(response, key):
         response_headers = Headers([])
         response_headers.add_header('Content-Type', 'text/json'),
         response_headers.add_header('Content-Length', str(len(result)))
-        response.start_response(status, str(response_headers))
+        response.start_response(status, response_headers.items())
         return [result]
     except KeyError as exc:
         return key_error(response, key)
@@ -132,7 +132,7 @@ def set_metadata(response, key):
     response_headers = Headers([])
     response_headers.add_header('Content-Type', 'text/json'),
     response_headers.add_header('Content-Length', str(len(result)))
-    response.start_response(status, str(response_headers))
+    response.start_response(status, response_headers.items())
     return [result]
 
 
@@ -143,7 +143,7 @@ def exists(response, key):
     response_headers = Headers([])
     response_headers.add_header('Content-Type', 'text/json'),
     response_headers.add_header('Content-Length', str(len(result)))
-    response.start_response(status, str(response_headers))
+    response.start_response(status, response_headers.items())
     return [result]
 
 
@@ -156,7 +156,7 @@ def delete_key(response, key):
         response_headers = Headers([])
         response_headers.add_header('Content-Type', 'text/json'),
         response_headers.add_header('Content-Length', str(len(result)))
-        response.start_response(status, str(response_headers))
+        response.start_response(status, response_headers.items())
         return [result]
     except KeyError as exc:
         return key_error(response, key)
@@ -244,11 +244,10 @@ def serve(address, port, store):
 
 if __name__ == '__main__':
     import sys
-    from encore.events.api import EventManager
     from encore.storage.dict_memory_store import DictMemoryStore
     address = sys.argv[1]
     port = int(sys.argv[2])
-    store = DictMemoryStore(EventManager())
+    store = DictMemoryStore()
     store.from_bytes('test_path', 'foo')
     store.set_metadata('test_path', {'mimetype': 'text/plain', 'len': 3})
     store.from_bytes('test_path_2', 'foobar')
