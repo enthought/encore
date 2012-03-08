@@ -8,7 +8,6 @@
 
 import time
 import random
-from uuid import uuid4
 from encore.events.api import ProgressManager
 from encore.terminal.api import ProgressDisplay
 

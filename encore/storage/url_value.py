@@ -7,7 +7,6 @@
 
 import urllib2
 import rfc822
-import time
 
 from .abstract_store import Value
 
@@ -16,7 +15,7 @@ class URLValue(Value):
     def __init__(self, url, metadata=None, opener=None):
         self._url = url
         self._metadata = metadata if metadata is not None else {}
-        self._opener = opener if opener is not None else urlib2.urlopen
+        self._opener = opener if opener is not None else urllib2.urlopen
         self._data_stream = None
         self._size = None
         self._created = None

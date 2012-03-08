@@ -38,7 +38,7 @@ import threading
 # ETS library imports.
 from .events import StoreSetEvent, StoreUpdateEvent,\
     StoreDeleteEvent, StoreKeyEvent
-from .filesystem_store import FileSystemStore, init_shared_store
+from .filesystem_store import FileSystemStore
 from .file_lock import FileLock
 from .utils import SimpleTransactionContext
 
@@ -193,7 +193,7 @@ class LockingFileSystemStore(FileSystemStore):
         try:
             # Create the log file atomically.
             os.close(os.open(self._log_file, os.O_CREAT|os.O_EXCL|os.O_RDWR))
-        except OSError as e:
+        except OSError:
             pass
 
         self._remote_event_poll_interval = remote_event_poll_interval
@@ -326,8 +326,8 @@ class LockingFileSystemStore(FileSystemStore):
         timestamp -= self._max_time_delta
         write = False
         modified_keys = []
-        for id,typ,time,key in self._log_iter():
-            if write is False and time > timestamp:
+        for id, typ, mtime, key in self._log_iter():
+            if write is False and mtime > timestamp:
                 write = True
             if write is True:
                 modified_keys.append(key)
@@ -436,7 +436,7 @@ class LockingFileSystemStore(FileSystemStore):
             if last_emit >= self._remote_event_poll_interval:
                 try:
                     last_log = self._check_remote_event(last_log)
-                except OSError as e:
+                except OSError:
                     # Store got deleted
                     return
                 last_emit -= self._remote_event_poll_interval
@@ -451,7 +451,7 @@ class LockingFileSystemStore(FileSystemStore):
             with self._locking(self._log_file, recurse=True):
                 try:
                     f = open(self._log_file)
-                except IOError as e:
+                except IOError:
                     return None
                 size = os.stat(self._log_file).st_size
                 f.seek(max(size-1024, 0))
@@ -463,7 +463,7 @@ class LockingFileSystemStore(FileSystemStore):
             with self._locking(self._log_file, recurse=True):
                 try:
                     f = open(self._log_file)
-                except IOError as e:
+                except IOError:
                     return None
                 text = f.read()
                 seek = self._search_log(id, text)
@@ -474,7 +474,7 @@ class LockingFileSystemStore(FileSystemStore):
                     try:
                         id, typ, date, time, key = line.split(' ', 4)
                         self._emit_remote_event(id, typ, date, time, key)
-                    except ValueError as e:
+                    except ValueError:
                         pass
         return id
 
@@ -485,7 +485,7 @@ class LockingFileSystemStore(FileSystemStore):
             return 0
         try:
             return text.index('\n'+id)+1
-        except ValueError as e:
+        except ValueError:
             return -1
 
     def _emit_remote_event(self, id, typ, date, time, key):
@@ -518,7 +518,7 @@ class LockingFileSystemStore(FileSystemStore):
                     id, typ, date, time, key = line.split(' ', 4)
                     yield int(id), typ, datetime.datetime.strptime(date+' '+time,
                                                          ISO_FORMAT), key
-        except (IOError, ValueError) as e:
+        except (IOError, ValueError):
             pass
 
     def __del__(self):

@@ -18,8 +18,6 @@ This class is provided in part as a sample implementation of the API.
 """
 
 from cStringIO import StringIO
-from itertools import izip
-from uuid import uuid4
 import time
 
 from .abstract_store import AbstractStore

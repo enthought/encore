@@ -33,7 +33,6 @@ import urllib
 import time
 
 from .abstract_store import AbstractReadOnlyStore
-from .utils import StoreProgressManager, buffer_iterator
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 from .url_value import URLValue
 

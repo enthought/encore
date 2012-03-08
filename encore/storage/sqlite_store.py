@@ -21,7 +21,6 @@ This class is provided in part as a sample implementation of the API.
 import cStringIO
 import sqlite3
 import cPickle
-from uuid import uuid4
 import time
 
 from .abstract_store import AbstractStore

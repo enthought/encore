@@ -18,7 +18,6 @@ metadata files with name key+'.metadata'.
 import os
 import json
 import glob
-from itertools import izip
 
 # ETS library imports.
 from .abstract_store import AbstractStore
