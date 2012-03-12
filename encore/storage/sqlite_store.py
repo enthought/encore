@@ -467,15 +467,16 @@ class SqliteStore(AbstractStore):
             columns = list(column for column in kwargs if column in self.index_columns)
             unindexed_columns = set(kwargs) - set(columns)
             if columns:
-                query = 'select key, metadata from %s where %s' % (self.table,
-                    ' and '.join(column+'=?' for column in columns))
+                query = 'select key, metadata from "%s" where %s' % (self.table,
+                    ' and '.join('"'+column+'"=?' for column in columns))
             else:
-                query = 'select key, metadata from %s' % (self.table,)
+                query = 'select key, metadata from "%s"' % (self.table,)
             rows = self._connection.execute(query, [buffer(cPickle.dumps(kwargs[column], protocol=2))
                 for column in columns])
         else:
             unindexed_columns = set(kwargs)
-            rows = self._connection.execute('select key, metadata from '+self.table)
+            rows = self._connection.execute('select key, metadata from "' +
+                self.table + '"')
             
         if select is not None:
             for key, metadata in rows:
@@ -516,24 +517,26 @@ class SqliteStore(AbstractStore):
             unindexed_columns = set(kwargs) - set(columns)
             if unindexed_columns:
                 if columns:
-                    query = 'select key, metadata from %s where %s' % (self.table,
-                        ' and '.join(column+'=?' for column in columns))
+                    query = 'select key, metadata from "%s" where %s' % (self.table,
+                        ' and '.join('"'+column+'"=?' for column in columns))
                 else:
-                    query = 'select key, metadata from %s' % (self.table,)
+                    query = 'select key, metadata from "%s"' % (self.table,)
             else:
                 if columns:
-                    query = 'select key from %s where %s' % (self.table,
-                        ' and '.join(column+'=?' for column in columns))
+                    query = 'select key from %s where "%s"' % (self.table,
+                        ' and '.join('"'+column+'"=?' for column in columns))
                 else:
-                    query = 'select key from %s' % (self.table,)
+                    query = 'select key from "%s"' % (self.table,)
             rows = self._connection.execute(query, [buffer(cPickle.dumps(kwargs[column], protocol=2))
                 for column in columns])
         else:
             unindexed_columns = set(kwargs)
             if unindexed_columns:
-                rows = self._connection.execute('select key, metadata from '+self.table)
+                rows = self._connection.execute('select key, metadata from "'
+                    + self.table + '"')
             else:
-                rows = self._connection.execute('select key from '+self.table)
+                rows = self._connection.execute('select key from "' +
+                    self.table + '"')
             
         if unindexed_columns:
             for key, metadata in rows:
@@ -629,7 +632,8 @@ class SqliteStore(AbstractStore):
         columns = columns if columns is not None else ['metadata', 'data']
         
         # substitution OK, since these values are not user-defined
-        query = 'select %s from %s where key == ?' % (','.join(columns), self.table)
+        query = 'select %s from "%s" where key == ?' % (', '.join('"'+column+'"'
+            for column in columns), self.table)
         rows = self._connection.execute(query, (key,)).fetchall()
         
         # only expect 0 or 1 row, since primary key is unique
@@ -644,7 +648,7 @@ class SqliteStore(AbstractStore):
         This simply constructs and executes the query. It does not attempt any
         sort of transaction control.
         """
-        query = 'insert or replace into %s (key, metadata, created, modified, data) values (?, ?, ?, ?, ?)' % self.table
+        query = 'insert or replace into "%s" (key, metadata, created, modified, data) values (?, ?, ?, ?, ?)' % self.table
         self._connection.execute(query, (key, metadata, created, modified, data))    
 
     def _update_column(self, key, column, value):
@@ -653,7 +657,7 @@ class SqliteStore(AbstractStore):
         This simply constructs and executes the query. It does not attempt any
         sort of transaction control.
         """
-        query = 'update %s set %s=? where key=?' % (self.table, column)
+        query = 'update "%s" set "%s"=? where key=?' % (self.table, column)
         self._connection.execute(query, (value, key))
 
     def _update_columns(self, key, columns, values):
@@ -662,8 +666,8 @@ class SqliteStore(AbstractStore):
         This simply constructs and executes the query. It does not attempt any
         sort of transaction control.
         """
-        query = 'update %s set %s where key=?' % (self.table,
-            ', '.join(column+'=?' for column in columns))
+        query = 'update "%s" set %s where key=?' % (self.table,
+            ', '.join('"'+column+'"=?' for column in columns))
         self._connection.execute(query, tuple(values)+(key,))
     
     def _update_index(self, key, metadata):
@@ -672,8 +676,8 @@ class SqliteStore(AbstractStore):
         if self._index == 'dynamic':
             missing_columns = set(column for column in metadata
                 if column not in self.index_columns)
-            query1 = 'alter table %s add column %s blob'
-            query2 = 'create index %s on %s (%s)'
+            query1 = 'alter table "%s" add column "%s" blob'
+            query2 = 'create index "%s" on "%s" ("%s")'
             for column in missing_columns:
                 self._connection.execute(query1 % (self.table, column))
                 self._connection.execute(query2 % (column, self.table, column))
@@ -685,6 +689,7 @@ class SqliteStore(AbstractStore):
             self._update_columns(key, columns, values)
     
     def _build_index(self):
-        for row in self._connection.execute('select key, metadata from %s' % self.table):
+        for row in self._connection.execute('select key, metadata from "%s"' % self.table):
             self._update_index(*row)
             self._commit_transaction()
+            
