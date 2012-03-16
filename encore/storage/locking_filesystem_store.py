@@ -127,6 +127,7 @@ def write_log(func, event='w'):
                 # FIXME: Assuming max line length is 1024
                 log_file.seek(max(0, end_pos-1024))
                 etext = log_file.read()
+                log_file.seek(0) # Needed on windows to be able to write.
                 text = etext.splitlines()[-1]
                 id = int(text.split()[0]) + 1
             else:
