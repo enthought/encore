@@ -126,7 +126,8 @@ class ProgressManager(object):
     StepEventType = ProgressStepEvent
     EndEventType = ProgressEndEvent
     
-    def __init__(self, event_manager, source, operation_id, message, steps, **kwargs):
+    def __init__(self, event_manager=None, source=None, operation_id=None,
+            message='Performing operation', steps=-1, **kwargs):
         """ Create a progress manager instance
         
         Arguments
@@ -147,9 +148,20 @@ class ProgressManager(object):
             The number of steps.  If this is not known, use -1.
         
         """
+        if event_manager is None:
+            from .package_globals import get_event_manager
+            event_manager = get_event_manager()
         self.event_manager = event_manager
+        
+        if source is None:
+            source = self
         self.source = source
+        
+        if operation_id is None:
+            from uuid import uuid4
+            operation_id = uuid4()
         self.operation_id = operation_id
+        
         self.message = message
         self.steps = steps
         self.kwargs = kwargs

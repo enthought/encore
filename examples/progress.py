@@ -1,31 +1,37 @@
+#
+# (C) Copyright 2011-2012 Enthought, Inc., Austin, TX
+# All right reserved.
+#
+# This file is open source software distributed according to the terms in
+# LICENSE.txt
+#
+
 import time
 import random
-from uuid import uuid4
-from encore.events.api import EventManager, ProgressManager
+from encore.events.api import ProgressManager
 from encore.terminal.api import ProgressDisplay
+
 
 class CosmicRayError(Exception):
     """ An artifical exception type to play with """
     pass
 
+
 class ProgressApplication(object):
     """ A simple application that demonstrates ProgressManagers and ProgressDisplays """
     
     def __init__(self):
-        self.event_manager = EventManager()
-        self.display = ProgressDisplay(self.event_manager)
+        self.display = ProgressDisplay()
     
     def run(self):
         # create some dummy progress bars
         for j in range(10):
-            operation_id = uuid4()
             steps = random.randint(0,600)
             known = random.randint(0,4)
             fail_point = random.randint(0, 2400)
             
             # create a progress manager
-            progress = ProgressManager(self.event_manager, source=self,
-                operation_id=operation_id,
+            progress = ProgressManager(source=self,
                 steps=steps if known else -1,
                 message="Doing something %d" % j)
             try:

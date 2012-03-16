@@ -1,0 +1,17 @@
+
+Processing Pipeline External API
+
+Given a Dataflow, you can:
+    
+    * add/remove a unit to/from the dataflow
+    
+    * connect/disconnect a variable in a unit to/from another variable in a unit
+    
+    * set an input of a unit to a constant value
+    
+    * request a value from a unit
+    
+    * set up a listener on a unit (fires when unit invalidated)
+
+
+
