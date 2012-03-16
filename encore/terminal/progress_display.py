@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011 Enthought, Inc., Austin, TX
+# (C) Copyright 2011-2012 Enthought, Inc., Austin, TX
 # All right reserved.
 #
 # This file is open source software distributed according to the terms in LICENSE.txt
@@ -78,7 +78,10 @@ class ProgressDisplay(object):
     progress_writer = ProgressWriter
     spin_writer = SpinWriter
     
-    def __init__(self, event_manager):
+    def __init__(self, event_manager=None):
+        if event_manager is None:
+            from encore.events.api import get_event_manager
+            event_manager = get_event_manager()
         self.event_manager = event_manager
         self.writers = {}
         self._format = '%s:\n'

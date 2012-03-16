@@ -18,8 +18,6 @@ This class is provided in part as a sample implementation of the API.
 """
 
 from cStringIO import StringIO
-from itertools import izip
-from uuid import uuid4
 import time
 
 from .abstract_store import AbstractStore
@@ -163,14 +161,18 @@ class DictMemoryStore(AbstractStore):
         if isinstance(value, tuple):
             data_stream, metadata = value
             metadata = metadata.copy()
+            steps = -1
         else:
             data_stream = value.data
             metadata = value.metadata
+            steps = value.size
 
-        with StoreProgressManager(self.event_manager, self, uuid4(),
-                "Setting data into '%s'" % (key,), -1,
-                key=key, metadata=metadata) as progress:
-            chunks = list(buffer_iterator(data_stream, buffer_size, progress))
+        progress = StoreProgressManager(source=self, steps=steps,
+                message="Setting data into '%s'" % (key,), key=key,
+                metadata=metadata)
+                
+        with progress:
+            chunks = buffer_iterator(data_stream, buffer_size, progress)
             data = b''.join(chunks)
             update = key in self._store
             if update:
@@ -181,9 +183,11 @@ class DictMemoryStore(AbstractStore):
             self._store[key] = (data, metadata, created, modified)
         
         if update:
-            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
+            self.event_manager.emit(StoreUpdateEvent(self, key=key,
+                metadata=metadata))
         else:
-            self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
+            self.event_manager.emit(StoreSetEvent(self, key=key,
+                metadata=metadata))
 
 
     def delete(self, key):
@@ -204,7 +208,8 @@ class DictMemoryStore(AbstractStore):
         """
         metadata = self._store[key][1]
         del self._store[key]
-        self.event_manager.emit(StoreDeleteEvent(self, key=key, metadata=metadata))
+        self.event_manager.emit(StoreDeleteEvent(self, key=key,
+            metadata=metadata))
     
     
     def exists(self, key):

@@ -137,7 +137,7 @@ class FileLock(object):
                 else:
                     f.close()
                     os.remove(self.full_path)
-        except IOError as e:
+        except IOError:
             raise LockError('Releasing an unlocked lock')
 
     def locked(self):
@@ -159,7 +159,7 @@ class FileLock(object):
                     return True
                 else:
                     return False
-        except IOError as e:
+        except IOError:
             return False
 
     def force_break(self):

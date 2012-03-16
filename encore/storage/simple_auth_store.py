@@ -25,7 +25,6 @@ method to provide different or more controlled permissioning.
 import hashlib
 
 from .abstract_store import AbstractStore
-from .utils import DummyTransactionContext
 
 class AuthenticationError(Exception):
     pass

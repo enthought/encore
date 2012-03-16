@@ -6,7 +6,6 @@
 #
 
 import os
-import time
 
 from .abstract_store import Value
 
@@ -32,8 +31,6 @@ class FileValue(Value):
         stat = os.stat(self._path)
         self.size = stat.st_size
         self.created = None
-        #self.created = created if created is not None else time.time()
         self.modified = stat.st_mtime
-        #self.permissions = permissions if permissions is not None else set(['exists', 'get', 'set', 'delete'])
             
             

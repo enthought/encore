@@ -18,7 +18,6 @@ metadata files with name key+'.metadata'.
 import os
 import json
 import glob
-from itertools import izip
 
 # ETS library imports.
 from .abstract_store import AbstractStore
@@ -186,14 +185,21 @@ class FileSystemStore(AbstractStore):
         update = self.exists(key)
         metadata_path = self._get_metadata_path(key)
         data_path = self._get_data_path(key)
-        data_stream, metadata = value
+        if isinstance(value, tuple):
+            data_stream, metadata = value
+            steps = -1
+        else:
+            data_stream = value.data
+            metadata = value.metadata
+            steps = value.size
         json.dump(metadata, open(metadata_path, 'wb'))
 
         with open(data_path, 'wb') as fp:
             bytes_written = 0
-            with StoreProgressManager(self.event_manager, self, None,
-                    "Setting key '%s'" % key, -1,
-                    key=key, metadata=metadata) as progress:
+            progress = StoreProgressManager(source=self, steps=steps,
+                    message="Setting key '%s'" % key, key=key,
+                    metadata=metadata)
+            with progress:
                 for buffer in buffer_iterator(data_stream, buffer_size):
                     fp.write(buffer)
                     fp.flush()
@@ -330,32 +336,12 @@ class FileSystemStore(AbstractStore):
 
         """
         # FIXME: Add support for events and buffering.
-        data_path = self._get_data_path(key)
         metadata_path = self._get_metadata_path(key)
         if not os.path.exists(metadata_path):
             metadata = {}
-            json.dump(metadata, open(metadata_path, 'wb'))
-            update = False
         else:
             metadata = self._get_metadata(metadata_path)
-            update = True
-        
-        with open(data_path, 'wb') as fp:
-            bytes_written = 0
-            with StoreProgressManager(self.event_manager, self, None,
-                    "Setting key '%s'" % key, -1,
-                    key=key, metadata=metadata) as progress:
-                for buffer in buffer_iterator(data, buffer_size):
-                    fp.write(buffer)
-                    fp.flush()
-                    bytes_written += len(buffer) 
-                    progress("Setting key '%s' (%d bytes written)"
-                        % (key, bytes_written))
-        
-        if update:
-            self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
-        else:
-            self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
+        self.set(key, (data, metadata), buffer_size)
     
     
     def set_metadata(self, key, metadata):
@@ -382,6 +368,7 @@ class FileSystemStore(AbstractStore):
         """
         metadata_path = self._get_metadata_path(key)
         json.dump(metadata, open(metadata_path, 'wb'))
+        self._touch(key)
     
     def update_metadata(self, key, metadata):
         """ Update the metadata for a given key in the key-value store.
@@ -530,5 +517,12 @@ class FileSystemStore(AbstractStore):
         
     def _get_metadata(self, path):
         md = json.load(open(path, 'rb'))
-        return md    
+        return md
+    
+    def _touch(self, key):
+        path = self._get_data_path(key)
+        if os.path.exists(path):
+            os.utime(path, None)
+        else:
+            open(path, 'a').close()
    
