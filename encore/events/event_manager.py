@@ -437,8 +437,10 @@ class EventManager(BaseEventManager):
                     'event: {2}:\n{3}'.format(e, listener, event,
                                               traceback.format_exc()))
             if event._handled:
-                logger.info('Event: {0} handled by listener: {1}'.format(
-                                                        event, listener))
+                # Only enable when debugging -- very slow even if it doesn't get emitted because 
+                # it must still do the string formatting.
+                #logger.debug('Event: {0} handled by listener: {1}'.format(
+                #                                        event, listener))
                 break
 
         event.post_emit()
