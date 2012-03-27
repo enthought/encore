@@ -339,7 +339,7 @@ class LockingFileSystemStore(FileSystemStore):
     ##########################################################################
 
     def _get_lockfile_path(self, key):
-        return os.path.join(self._root, key + '.lock')
+        return os.path.join(self._root, key)
 
     @contextmanager
     def _locking(self, key, recurse=True, shared=False):
