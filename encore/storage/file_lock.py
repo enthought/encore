@@ -103,7 +103,7 @@ class FileLock(object):
             try:
                 fd = os.open(self.full_path, self._open_mode)
             except OSError as e:
-                if e.errno in (errno.EISDIR, errno.EEXIST):
+                if e.errno in (errno.EISDIR, errno.EEXIST, errno.EACCES):
                     try:
                         os.rmdir(self.full_path)
                         continue
@@ -132,11 +132,22 @@ class FileLock(object):
         try:
             with open(self.full_path, 'rb') as f:
                 text = f.read()
+                f.close()
                 if text != self._check_text:
                     raise LockError('Releasing an unacquired lock')
                 else:
-                    f.close()
-                    os.remove(self.full_path)
+                    while True:
+                        # While loop is needed here because delete may be
+                        # denied on windows in case file is open by some other
+                        # lock for checking by reading the file contents.
+                        try:
+                            os.remove(self.full_path)
+                            break
+                        except OSError as e:
+                            if e.errno == errno.EACCES:
+                                time.sleep(0.01)
+                            else:
+                                raise
         except IOError:
             raise LockError('Releasing an unlocked lock')
 
@@ -280,12 +291,12 @@ class SharedFileLock(object):
                     try:
                         os.mkdir(self.dir_path)
                     except OSError as e:
-                        continue
+                        if not os.path.exists(self.dir_path):
+                            continue
             else:
                 os.close(fd)
                 self._level += 1
                 return True
-
             if 0 < self.timeout < time.time()-start_time:
                 return False
             if 0 < self.force_timeout < time.time()-start_time:
