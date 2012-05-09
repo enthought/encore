@@ -56,8 +56,6 @@ class FileSystemStore(AbstractStore):
         
         Parameters
         ----------        
-        event_manager : Event Manager instance
-            This is used to emit suitable events.        
         path : str:
             A path to the root of the file system store.
         magic_fname :
