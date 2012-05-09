@@ -6,11 +6,17 @@
 # LICENSE.txt
 #
 
+import sys
 import time
 import threading
 
 from .abstract_event_manager import BaseEvent
 from .package_globals import get_event_manager
+
+if sys.platform == 'win32':
+    accurate_time = time.clock
+else:
+    accurate_time = time.time
 
 class HeartbeatEvent(BaseEvent):
     """ Event which is emitted periodically
@@ -41,12 +47,12 @@ class Heartbeat(object):
         self.state = 'running'
         while self.state in ['running', 'paused']:
             if self.state == 'running':
-                t = time.time()
+                t = accurate_time()
                 self.event_manager.emit(HeartbeatEvent(source=self, time=t,
                     frame=self.frame_count, interval=self.interval))
                 self.frame_count += 1
                 # try to ensure regular heartbeat, but always sleep for at least 1ms
-                wait = max(t+self.interval-time.time(), 0.001)
+                wait = max(t+self.interval-accurate_time(), 0.001)
             else:
                 wait = self.interval
             time.sleep(wait)
