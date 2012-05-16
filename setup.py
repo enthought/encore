@@ -1,4 +1,4 @@
-# Copyright (c) 2011 by Enthought, Inc.
+# Copyright (c) 2011-2012 by Enthought, Inc.
 # All rights reserved.
 
 from setuptools import setup, find_packages
@@ -14,5 +14,4 @@ setup(
     long_description=open('README.rst').read(),
     packages=find_packages(exclude=('*.tests',)),
     requires=[],
-    install_requires=['distribute'],
 )
