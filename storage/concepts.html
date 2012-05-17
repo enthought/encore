@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Key-Value Store Concepts &mdash; Encore v0.1 documentation</title>
+    <title>Key-Value Store Concepts &mdash; Encore 0.1 documentation</title>
+    
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -23,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.1 documentation" href="../index.html" />
     <link rel="up" title="Storage" href="index.html" />
     <link rel="next" title="Usage" href="usage.html" />
     <link rel="prev" title="Storage" href="index.html" /> 
@@ -44,7 +47,7 @@
         <li class="right" >
           <a href="index.html" title="Storage"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
@@ -59,6 +62,7 @@
 <li><a class="reference internal" href="#discussion">Discussion</a></li>
 <li><a class="reference internal" href="#keys">Keys</a></li>
 <li><a class="reference internal" href="#values">Values</a></li>
+<li><a class="reference internal" href="#data">Data</a></li>
 <li><a class="reference internal" href="#metadata">Metadata</a></li>
 <li><a class="reference internal" href="#connecting-and-disconnecting">Connecting and Disconnecting</a></li>
 <li><a class="reference internal" href="#querying">Querying</a></li>
@@ -83,7 +87,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -130,7 +134,7 @@ trade-offs, and the trade-offs may end up being inappropriate for particular use
 cases (eg. &#8220;Now I need to have an in-memory code-block store for efficiency, and
 my store&#8217;s optimized for remote access...&#8221;).</p>
 <p class="graphviz">
-<img src="../_images/graphviz-42631ffe512fc8689fd20372b1364780e64ad4f5.png" alt="digraph diagram1 {
+<img src="../_images/graphviz-d72272f4ddade45ab7c700db34c9bb7f02e2cb45.png" alt="digraph diagram1 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store&quot; -&gt; &quot;General Implementation&quot;;
 &quot;Code Block Store&quot; -&gt; &quot;General Implementation&quot;;
@@ -145,7 +149,7 @@ of the implementation may make it inappropriate for particular use cases (eg.
 &#8220;Now I need a code-block store, so I&#8217;ll wrap up my code-blocks as eggs and use
 an egg store... but now they&#8217;re 100 times bigger than they need to be...&#8221;)</p>
 <p class="graphviz">
-<img src="../_images/graphviz-517d5f7c4c2834a960a898116da14ac157615d87.png" alt="digraph diagram2 {
+<img src="../_images/graphviz-cd912d97e026ade897130acc415509ff561b34c1.png" alt="digraph diagram2 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store API&quot; -&gt; &quot;Memory Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;Disk Store&quot;
@@ -166,7 +170,7 @@ implements the API, and join them together&#8221;).  Not every combination may m
 sense (an in-memory egg store is probably a bad idea, for example), but the
 ability to pick and choose allows a great deal of flexibility.</p>
 <p class="graphviz">
-<img src="../_images/graphviz-89597671e406556ff5818dbc95fd52cb0832a048.png" alt="digraph diagram2 {
+<img src="../_images/graphviz-0a67c9692c62bcbcb0fc6152e9585f22a3b392cf.png" alt="digraph diagram2 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store&quot; -&gt; &quot;Key-Value Store API&quot;
 &quot;Code Block Store&quot; -&gt; &quot;Key-Value Store API&quot;
@@ -208,14 +212,18 @@ serialized.</p>
 </div>
 <div class="section" id="values">
 <h2>Values<a class="headerlink" href="#values" title="Permalink to this headline">¶</a></h2>
-<p>The binary data stored in the values is presented through the key-value store API as
-file-like objects which implement at least read() and close().  Frequently this
-will be a standard file, StringIO object, a urllib file-like object or other
-wrapper about a socket.  The read() method should accept an optional number of
-bytes to read, so that buffered reads can be performed.</p>
-<p>Similarly, for writable repositories, data should be supplied to keys via the
-same sort of file-like object.  This allows copying between repositories using
-code like:</p>
+<p>The values stored in the key-value store consist of two parts, a binary data
+stream and a metadata dictionary.  These are encapsulated into a light-weight
+data-structure which can hold additional implementation-specific information.</p>
+<p>In particular, implementations should expose attributes or properties &#8216;size&#8217;,
+&#8216;created&#8217; and &#8216;modified&#8217; which proved the number of bytes in the data stream,
+the creation time of the key, and the most recent modification time of the key.
+These additional attributes are primarily provided for internal use and to assist
+composition and replication of key-value stores.</p>
+<p>The Value should contain enough information to extract the data and metadata,
+but does not have to actually open those resources until they are requested.</p>
+<p>For writable repositories, data should be supplied to keys via a Value subclass,
+if possible.  This allows copying between repositories using code like:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">repo1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">repo1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -228,6 +236,21 @@ sources for data being stored, the key-value store API provides utility methods
 <tt class="docutils literal"><span class="pre">to_file()</span></tt> and <tt class="docutils literal"><span class="pre">from_file()</span></tt>.  Simple default implementations of these methods are
 provided, but implementations of the key-value store API may be able to override
 these to be more efficient, depending on the nature of the back-end data store.</p>
+<p>For backwards compatibility, value objects express an API that makes them appear
+as a 2-tuple of (data, metadata).</p>
+</div>
+<div class="section" id="data">
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<p>The binary data stored in the values is presented through the key-value store API as
+file-like objects which implement at least read(), close(), __enter__() and
+__exit__() methods as well as having attributes which provide some amount of
+information about the stream, such as length, last modification time, creation
+time, and so forth.  Particular backends may choose to provide additional
+attributes or implement additional methods as needed.</p>
+<p>Frequently this will be a wrapper around a standard file, StringIO object, a
+urllib file-like object or other wrapper about a socket.  The read() method
+should accept an optional number of bytes to read, so that buffered reads can be
+performed.</p>
 <p>The key-value store API gives no special meaning to the bytes stored in the value.
 However care should be taken that it is in fact bytes being stored, and not a
 (possibly unicode) string; in particular, if an actual file is being used it should
@@ -274,6 +297,11 @@ since the Unix Epoch.</dd>
 <dd>The size of the binary data in bytes.</dd>
 </dl>
 </div></blockquote>
+<p>Note that there is a difference in intent between the information stored in the
+metadata and the attributes on the value object: value object attributes are
+controlled by the key-value store implementation, whereas metadata are completely
+arbitrary from the point of view of the key-value store and are completely up
+to the user code as to what information is stored.</p>
 </div>
 <div class="section" id="connecting-and-disconnecting">
 <h2>Connecting and Disconnecting<a class="headerlink" href="#connecting-and-disconnecting" title="Permalink to this headline">¶</a></h2>
@@ -349,14 +377,14 @@ will put the store into the correct state.</dd>
         <li class="right" >
           <a href="index.html" title="Storage"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li>
           <li><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Enthought, Inc..
-      Last updated on Jan 18, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Last updated on May 16, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

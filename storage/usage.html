@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Usage &mdash; Encore v0.1 documentation</title>
+    <title>Usage &mdash; Encore 0.1 documentation</title>
+    
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -23,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.1 documentation" href="../index.html" />
     <link rel="up" title="Storage" href="index.html" />
     <link rel="next" title="Key-Value Store API" href="abstract_store.html" />
     <link rel="prev" title="Key-Value Store Concepts" href="concepts.html" /> 
@@ -44,7 +47,7 @@
         <li class="right" >
           <a href="concepts.html" title="Key-Value Store Concepts"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
@@ -81,7 +84,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -126,32 +129,35 @@ cleanly release any resources it may be using, such as database connections.</p>
 </div>
 <div class="section" id="reading">
 <h2>Reading<a class="headerlink" href="#reading" title="Permalink to this headline">¶</a></h2>
-<p>To read from a store, you use one of the <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractReadOnlyStore.get" title="encore.storage.abstract_store.AbstractReadOnlyStore.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> methods:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">document</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;my_document&#39;</span><span class="p">)</span>
+<p>To read from a store, you use one of the <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractReadOnlyStore.get" title="encore.storage.abstract_store.AbstractReadOnlyStore.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a>
+methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">value</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;my_document&#39;</span><span class="p">)</span>
+<span class="n">datastream</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">data</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">metadata</span>
 </pre></div>
 </div>
-<p>In this case document is a file-like object that streams bytes:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">data</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<p>In this case datastream is a file-like object that streams bytes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">data</span> <span class="o">=</span> <span class="n">datastream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 <span class="k">print</span> <span class="n">data</span>
 </pre></div>
 </div>
 <p>More likely you will have used some sort of serialization format like XML, JSON
 or YAML to store your data in the document, so instead you can do:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datastream</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If the data is raw bytes to store into a numpy array, you can do something like
 this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">datastream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 <span class="n">dtype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int32</span>
 <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">/</span><span class="n">dtype</span><span class="p">()</span><span class="o">.</span><span class="n">nbytes</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 <span class="n">arr</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.Filelike.read" title="encore.storage.abstract_store.Filelike.read"><tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt></a> method supports buffered reads if your data is larger than
+<p>The <tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt> method supports buffered reads if your data is larger than
 would comfortably fit into memory.</p>
 <p>The metadata stores auxilliary information about the data that is stored in the
 key.  It is a dictionary of reasonably serializable values (frequently it will
@@ -224,7 +230,7 @@ the <a class="reference internal" href="abstract_store.html#encore.storage.abstr
 <h2>Writing<a class="headerlink" href="#writing" title="Permalink to this headline">¶</a></h2>
 <p>Most, but not all, stores also allow you to write data to keys.  The basic method
 is <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractStore.set" title="encore.storage.abstract_store.AbstractStore.set"><tt class="xref py py-meth docutils literal"><span class="pre">set()</span></tt></a> which is the inverse of <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractReadOnlyStore.get" title="encore.storage.abstract_store.AbstractReadOnlyStore.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a>.  It expects a
-file-like object with a <a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.Filelike.read" title="encore.storage.abstract_store.Filelike.read"><tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt></a> method that can do buffering, and a
+file-like object with a <tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt> method that can do buffering, and a
 dictionary of metadata as arguments:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">cStringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
 
@@ -312,14 +318,14 @@ emitted are referenced in the documentation for each method.</p>
         <li class="right" >
           <a href="concepts.html" title="Key-Value Store Concepts"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li>
           <li><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Enthought, Inc..
-      Last updated on Jan 18, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Last updated on May 16, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

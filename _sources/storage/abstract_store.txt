@@ -2,9 +2,6 @@
 
 .. automodule:: encore.storage.abstract_store
 
-    .. autoclass:: Filelike
-        :members: read, close
-
     .. autoclass:: AbstractReadOnlyStore
         :members: connect, disconnect, is_connected, get, exists, 
             query, query_keys, glob,

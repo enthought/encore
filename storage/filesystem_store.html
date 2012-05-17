@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>File System Store &mdash; Encore v0.1 documentation</title>
+    <title>File System Store &mdash; Encore 0.1 documentation</title>
+    
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -23,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.1 documentation" href="../index.html" />
     <link rel="up" title="Storage" href="index.html" />
     <link rel="next" title="Static URL Store" href="static_url_store.html" />
     <link rel="prev" title="Sqlite Store" href="sqlite_store.html" /> 
@@ -44,7 +47,7 @@
         <li class="right" >
           <a href="sqlite_store.html" title="Sqlite Store"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
@@ -67,7 +70,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -100,7 +103,7 @@ the store for the first time.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>path</strong> &#8211; The directory that will be used for the file store.</li>
 <li><strong>magic_fname</strong> &#8211; The name of the magic file in that directory,</li>
 </ul>
@@ -112,18 +115,17 @@ the store for the first time.</p>
 
 <dl class="class">
 <dt id="encore.storage.filesystem_store.FileSystemStore">
-<em class="property">class </em><tt class="descclassname">encore.storage.filesystem_store.</tt><tt class="descname">FileSystemStore</tt><big>(</big><em>event_manager</em>, <em>path</em>, <em>magic_fname='.FSStore'</em><big>)</big><a class="headerlink" href="#encore.storage.filesystem_store.FileSystemStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">encore.storage.filesystem_store.</tt><tt class="descname">FileSystemStore</tt><big>(</big><em>path</em>, <em>magic_fname='.FSStore'</em><big>)</big><a class="headerlink" href="#encore.storage.filesystem_store.FileSystemStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>A store that uses a Shared file system to store the data/metadata.</p>
 <dl class="method">
 <dt id="encore.storage.filesystem_store.FileSystemStore.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>event_manager</em>, <em>path</em>, <em>magic_fname='.FSStore'</em><big>)</big><a class="headerlink" href="#encore.storage.filesystem_store.FileSystemStore.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>path</em>, <em>magic_fname='.FSStore'</em><big>)</big><a class="headerlink" href="#encore.storage.filesystem_store.FileSystemStore.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes the store given a path to a store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>event_manager</strong> (<em>Event Manager instance</em>) &#8211; This is used to emit suitable events.</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>path</strong> (<em>str:</em>) &#8211; A path to the root of the file system store.</li>
 <li><strong>magic_fname</strong> &#8211; The name of the magic file in that directory,</li>
 </ul>
@@ -141,7 +143,7 @@ the store for the first time.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>credentials</strong> &#8211; These are not used by default.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>credentials</strong> &#8211; These are not used by default.</td>
 </tr>
 </tbody>
 </table>
@@ -163,7 +165,7 @@ does nothing</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>connected</strong> (bool) - Whether or not the store is currently connected.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>connected</strong> (bool) - Whether or not the store is currently connected.</td>
 </tr>
 </tbody>
 </table>
@@ -177,16 +179,16 @@ does nothing</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
 <li><strong>data</strong> (file-like) - A readable file-like object that provides stream of data from the key-value store</li>
 <li><strong>metadata</strong> (dictionary) - A dictionary of metadata for the key.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
 </tr>
 </tbody>
 </table>
@@ -202,8 +204,8 @@ key-value store.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>value</strong> (<em>tuple of file-like, dict</em>) &#8211; A pair of objects, the first being a readable file-like object that
 provides stream of data from the key-value store.  The second is a
@@ -214,7 +216,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store</li>
@@ -236,10 +238,10 @@ key-value store.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key.</td>
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key.</td>
 </tr>
 </tbody>
 </table>
@@ -253,10 +255,10 @@ identifier for the resource within the key-value store.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>exists</strong> (bool) - Whether or not the key exists in the key-value store.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>exists</strong> (bool) - Whether or not the key exists in the key-value store.</td>
 </tr>
 </tbody>
 </table>
@@ -280,7 +282,7 @@ will return the complete set of metadata for the key-value store.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; An optional list of metadata keys to return.  If this is not None,
 then the metadata dictionaries will only have values for the specified
 keys populated.</li>
@@ -289,7 +291,7 @@ possible values for that metadata item.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>result</strong> (iterable) - An iterable of (key, metadata) tuples where metadata matches all the specified values for the specified metadata keywords. If a key specified in select is not present in the metadata of a particular key, then it will not be present in the returned value.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>result</strong> (iterable) - An iterable of (key, metadata) tuples where metadata matches all the specified values for the specified metadata keywords. If a key specified in select is not present in the metadata of a particular key, then it will not be present in the returned value.</p>
 </td>
 </tr>
 </tbody>
@@ -309,10 +311,10 @@ more efficiently implemented.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; Arguments where the keywords are metadata keys, and values are
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; Arguments where the keywords are metadata keys, and values are
 possible values for that metadata item.</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - An iterable of key-value store keys whose metadata matches all the specified values for the specified metadata keywords.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - An iterable of key-value store keys whose metadata matches all the specified values for the specified metadata keywords.</td>
 </tr>
 </tbody>
 </table>
@@ -326,9 +328,9 @@ possible values for that metadata item.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Glob-style pattern to match keys with.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Glob-style pattern to match keys with.</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - A iterable of keys which match the glob pattern.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - A iterable of keys which match the glob pattern.</td>
 </tr>
 </tbody>
 </table>
@@ -342,12 +344,12 @@ possible values for that metadata item.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.</td>
 </tr>
-<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
 </tr>
 </tbody>
 </table>
@@ -361,18 +363,18 @@ identifier for the resource within the key-value store.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the result.  If unspecified, then
 return the entire metadata dictionary.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadata</strong> (dict) - A dictionary of metadata associated with the key.  The dictionary has keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadata</strong> (dict) - A dictionary of metadata associated with the key.  The dictionary has keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
 </td>
 </tr>
 </tbody>
@@ -387,8 +389,8 @@ return the entire metadata dictionary.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>data</strong> (<em>file-like</em>) &#8211; A readable file-like object the that provides stream of data from the
 key-value store.</li>
@@ -398,7 +400,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
@@ -420,15 +422,15 @@ metadata.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
 keys should be strings which are valid Python identifiers.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
 </td>
 </tr>
 </tbody>
@@ -445,15 +447,15 @@ provided metadata keys and values</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
 keys should be strings which are valid Python identifiers.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
 </td>
 </tr>
 </tbody>
@@ -468,12 +470,12 @@ keys should be strings which are valid Python identifiers.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
 unique identifier for a resource within the key-value store.</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of (file-like, dict) tuples) - An iterator of (data, metadata) pairs.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of (file-like, dict) tuples) - An iterator of (data, metadata) pairs.</td>
 </tr>
-<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
 </tr>
 </tbody>
 </table>
@@ -491,7 +493,7 @@ values in the longer list should be silently ignored.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
 unique identifier for a resource within the key-value store.</li>
 <li><strong>values</strong> (<em>iterable of (file-like, dict) tuples</em>) &#8211; An iterator that provides the (data, metadata) pairs for the
@@ -502,7 +504,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
@@ -522,12 +524,12 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
 unique identifier for a resource within the key-value store.</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of file-like) - An iterator of file-like data objects corresponding to the keys.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of file-like) - An iterator of file-like data objects corresponding to the keys.</td>
 </tr>
-<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
 </tr>
 </tbody>
 </table>
@@ -541,7 +543,7 @@ unique identifier for a resource within the key-value store.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
 unique identifier for a resource within the key-value store.</li>
 <li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the results.  If unspecified, then
@@ -549,10 +551,10 @@ return the entire metadata dictionary.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadatas</strong> (iterator of dicts) - An iterator of dictionaries of metadata associated with the key. The dictionaries have keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadatas</strong> (iterator of dicts) - An iterator of dictionaries of metadata associated with the key. The dictionaries have keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
 </td>
 </tr>
 </tbody>
@@ -571,7 +573,7 @@ values in the longer list should be silently ignored.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
 unique identifier for a resource within the key-value store.</li>
 <li><strong>datas</strong> (<em>iterable of file-like objects</em>) &#8211; An iterator that provides the data file-like objects for the
@@ -582,7 +584,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
@@ -606,7 +608,7 @@ values in the longer list should be silently ignored.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
 unique identifier for a resource within the key-value store.</li>
 <li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
@@ -614,7 +616,7 @@ corresponding keys.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
 </td>
 </tr>
 </tbody>
@@ -633,7 +635,7 @@ values in the longer list should be silently ignored.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
 unique identifier for a resource within the key-value store.</li>
 <li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
@@ -641,7 +643,7 @@ corresponding keys.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
 </td>
 </tr>
 </tbody>
@@ -660,17 +662,17 @@ together with chunked reads from the returned data stream to the disk.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
-<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to store the data to.</li>
+<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to store the data to.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
 default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to disk.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to disk.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to disk.</li>
@@ -695,10 +697,10 @@ stream.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
-<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to read the data from.</li>
+<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to read the data from.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
 default if they need to.  The default is 1048576 bytes (1 MiB).</li>
@@ -721,8 +723,8 @@ together with chunked reads from the returned data stream and join.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
@@ -730,10 +732,10 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>bytes</strong>  - The contents of the file-like object as bytes.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>bytes</strong>  - The contents of the file-like object as bytes.</p>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to extracting the data.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is extracted.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after extracting the data.</li>
@@ -756,8 +758,8 @@ together with a cStringIO.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>data</strong> (<em>bytes</em>) &#8211; The data as a bytes object.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
@@ -794,14 +796,14 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
         <li class="right" >
           <a href="sqlite_store.html" title="Sqlite Store"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li>
           <li><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Enthought, Inc..
-      Last updated on Jan 18, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Last updated on May 16, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

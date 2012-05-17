@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Storage &mdash; Encore v0.1 documentation</title>
+    <title>Storage &mdash; Encore 0.1 documentation</title>
+    
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -23,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.1 documentation" href="../index.html" />
     <link rel="next" title="Key-Value Store Concepts" href="concepts.html" />
     <link rel="prev" title="Progress Events" href="../events/progress_events.html" /> 
   </head>
@@ -43,7 +46,7 @@
         <li class="right" >
           <a href="../events/progress_events.html" title="Progress Events"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -62,6 +65,7 @@
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#util-human-date-module">util.human_date module</a></li>
 </ul>
 </li>
 </ul>
@@ -80,7 +84,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -123,6 +127,7 @@ that we develop.</p>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html#discussion">Discussion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html#keys">Keys</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html#values">Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#data">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html#metadata">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html#connecting-and-disconnecting">Connecting and Disconnecting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html#querying">Querying</a></li>
@@ -137,6 +142,7 @@ that we develop.</p>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#querying">Querying</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#writing">Writing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#transactions">Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#the-multi-methods">The &#8220;Multi&#8221; Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#events">Events</a></li>
 </ul>
 </li>
@@ -179,6 +185,7 @@ that we develop.</p>
 <h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
 <p>This software is OSI Certified Open Source Software.
 OSI Certified is a certification mark of the Open Source Initiative.</p>
+<p>Unless otherwise noted:</p>
 <p>Copyright (c) 2011, Enthought, Inc.
 All rights reserved.</p>
 <p>Redistribution and use in source and binary forms, with or without
@@ -206,6 +213,20 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 </div>
+<div class="section" id="util-human-date-module">
+<h2>util.human_date module<a class="headerlink" href="#util-human-date-module" title="Permalink to this headline">¶</a></h2>
+<p>Copyright 2009 Jai Vikram Singh Verma (jaivikram[dot]verma[at]gmail[dot]com)
+Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+&#8220;AS IS&#8221; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied.
+See the License for the specific language governing permissions
+and limitations under the License.</p>
+</div>
 </div>
 
 
@@ -229,13 +250,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
         <li class="right" >
           <a href="../events/progress_events.html" title="Progress Events"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li> 
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Enthought, Inc..
-      Last updated on Jan 18, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Last updated on May 16, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

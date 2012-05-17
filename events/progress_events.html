@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Progress Events &mdash; Encore v0.1 documentation</title>
+    <title>Progress Events &mdash; Encore 0.1 documentation</title>
+    
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -23,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore v0.1 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.1 documentation" href="../index.html" />
     <link rel="up" title="Events" href="index.html" />
     <link rel="next" title="Storage" href="../storage/index.html" />
     <link rel="prev" title="Event Manager Implementation" href="event_manager.html" /> 
@@ -44,7 +47,7 @@
         <li class="right" >
           <a href="event_manager.html" title="Event Manager Implementation"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Events</a> &raquo;</li> 
       </ul>
     </div>
@@ -67,7 +70,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -90,7 +93,7 @@
 <p>Events and helpers for managing progress indicators</p>
 <dl class="class">
 <dt id="encore.events.progress_events.ProgressManager">
-<em class="property">class </em><tt class="descclassname">encore.events.progress_events.</tt><tt class="descname">ProgressManager</tt><big>(</big><em>event_manager</em>, <em>source</em>, <em>operation_id</em>, <em>message</em>, <em>steps</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">encore.events.progress_events.</tt><tt class="descname">ProgressManager</tt><big>(</big><em>event_manager=None</em>, <em>source=None</em>, <em>operation_id=None</em>, <em>message='Performing operation'</em>, <em>steps=-1</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility class for managing progress events</p>
 <p>This class provides a context manager that will probably be sufficient in
 most use cases.  The standard method of invoking it will be something like:</p>
@@ -144,17 +147,17 @@ The actual event class to use when emitting an end event.  The default     is <a
 
 <dl class="method">
 <dt id="encore.events.progress_events.ProgressManager.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>event_manager</em>, <em>source</em>, <em>operation_id</em>, <em>message</em>, <em>steps</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>event_manager=None</em>, <em>source=None</em>, <em>operation_id=None</em>, <em>message='Performing operation'</em>, <em>steps=-1</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.events.progress_events.ProgressManager.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a progress manager instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>event_manager</strong> (<em>EventManager instance</em>) &#8211; The event manager to use when emitting events.</li>
 <li><strong>source</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#any" title="(in Python v2.7)"><em>any</em></a>) &#8211; The object that is the source of the events.</li>
 <li><strong>operation_id</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#any" title="(in Python v2.7)"><em>any</em></a>) &#8211; The unique identifier for the operation.</li>
-<li><strong>message</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The default message to use for events which are emitted.</li>
+<li><strong>message</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The default message to use for events which are emitted.</li>
 <li><strong>steps</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The number of steps.  If this is not known, use -1.</li>
 </ul>
 </td>
@@ -173,7 +176,7 @@ appropriate attributes.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>extra_kwargs</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Additional arguments to be passed through to the event&#8217;s constructor.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>extra_kwargs</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Additional arguments to be passed through to the event&#8217;s constructor.</td>
 </tr>
 </tbody>
 </table>
@@ -189,7 +192,7 @@ appropriate attributes.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>message</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The message to be passed to the event&#8217;s constructor.  By default will
 use <tt class="docutils literal"><span class="pre">self.message</span></tt>.</li>
 <li><strong>step</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The step number.  By default keeps an internal step count, incremented
@@ -212,7 +215,7 @@ appropriate attributes.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>message</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The message to be passed to the event&#8217;s constructor.  By default will
 use <tt class="docutils literal"><span class="pre">self.message</span></tt>.</li>
 <li><strong>exit_state</strong> (one of <tt class="docutils literal"><span class="pre">normal</span></tt>, <tt class="docutils literal"><span class="pre">warning</span></tt>, <tt class="docutils literal"><span class="pre">error</span></tt> or <tt class="docutils literal"><span class="pre">exception</span></tt>) &#8211; The exit_state of the event.</li>
@@ -348,14 +351,14 @@ A constant describing the end state of the operation.  One of <tt class="docutil
         <li class="right" >
           <a href="event_manager.html" title="Event Manager Implementation"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore v0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.1 documentation</a> &raquo;</li>
           <li><a href="index.html" >Events</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, Enthought, Inc..
-      Last updated on Jan 18, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Last updated on May 16, 2012.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

@@ -31,26 +31,29 @@ cleanly release any resources it may be using, such as database connections.
 Reading
 -------
 
-To read from a store, you use one of the :py:meth:`~.AbstractReadOnlyStore.get` methods::
+To read from a store, you use one of the :py:meth:`~.AbstractReadOnlyStore.get`
+methods::
 
-    document, metadata = store.get('my_document')
+    value = store.get('my_document')
+    datastream = value.data
+    metadata = value.metadata
     
-In this case document is a file-like object that streams bytes::
+In this case datastream is a file-like object that streams bytes::
 
-    data = document.read()
+    data = datastream.read()
     print data
 
 More likely you will have used some sort of serialization format like XML, JSON
 or YAML to store your data in the document, so instead you can do::
 
     import json
-    data = json.load(document)
+    data = json.load(datastream)
 
 If the data is raw bytes to store into a numpy array, you can do something like
 this::
 
     import numpy
-    data = document.read()
+    data = datastream.read()
     dtype = numpy.int32
     size = len(data)/dtype().nbytes
     arr = numpy.empty(shape=size, dtype=dtype)
@@ -149,6 +152,11 @@ utility methods :py:meth:`~.AbstractStore.from_bytes` and :py:meth:`~.AbstractSt
 the data of a key from either a byte string or a binary file.  The latter two
 methods do not set any metadata: that must be done manually if needed.
 
+If you want to add to the metadata without overwriting it, there is a convenience
+method :py:meth:`~.AbstractStore.update_metadata` method that will update the
+metadata dictionary in mych the same way that the standard Python dictionary's
+``update`` method works.
+
 You can delete a key with the :py:meth:`~.AbstractStore.delete` method::
 
     store.delete('hello')
@@ -183,6 +191,16 @@ Transactions are re-entrant, so it is safe to do the following::
 
 The transaction in the function is effectively ignored, with only the outermost
 transaction applying.
+
+
+The "Multi" Methods
+-------------------
+
+For convenience there are a collection of methods prefixed by "multi", such as
+:py:meth:`~.AbstractReadOnlyStore.multiget` and :py:meth:`~.AbstractStore.multiset_data`,
+which perform the specified operations on a collection of keys at once.  If
+transactions are available, then these will be done as a single transaction.
+
 
 Events
 ------
