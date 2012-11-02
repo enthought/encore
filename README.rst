@@ -18,6 +18,10 @@ distributed resources.
 The API is intended to be general purpose enough to support a variety of local and remote storage
 systems.
 
+*Concurrent:* A package of tools for handling concurrency within applications.
+
+*Terminal:* Some utilities for working with text-based terminal displays.
+
 Prerequisites
 -------------
 * Python >= 2.6 (not Python 3)
