@@ -6,4 +6,4 @@
 # LICENSE.txt
 #
 
-from encore.concurrent.futures.synchonous import SynchronousExecutor
+from encore.concurrent.futures.synchronous import SynchronousExecutor
