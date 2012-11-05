@@ -6,4 +6,4 @@
 # LICENSE.txt
 #
 
-from .synchonous import SynchronousExecutor
+from .synchronous import SynchronousExecutor
