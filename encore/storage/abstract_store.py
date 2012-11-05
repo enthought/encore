@@ -31,6 +31,12 @@ from encore.events.api import get_event_manager
 
 from .utils import StoreProgressManager, buffer_iterator
 
+class StoreError(RuntimeError):
+    pass
+
+class AuthorizationError(StoreError):
+    pass
+
 class Value(object):
     """ Abstract base class for file-like objects used by Key-Value stores
     
@@ -54,14 +60,25 @@ class Value(object):
         """ The byte stream of data contained in the value
         
         """
-        raise NotImplemented
+        raise NotImplementedError
     
     @abstractproperty
     def metadata(self):
         """ The metadata dictionary of the value
         
         """
-        raise NotImplemented
+        raise NotImplementedError
+    
+    @abstractproperty
+    def permissions(self):
+        """ The permissions dictionary of the value
+        
+        This is only available if the user has ownership privileges for the key.
+        Because different stores have different permission conventions, this
+        will not be used when setting a value.
+        
+        """
+        raise AuthorizationError("key not owned by user")
     
     def __enter__(self):
         """ Context manager to ensure data stream is closed when done
@@ -140,6 +157,11 @@ class AbstractReadOnlyStore(object):
             the use of any required resources.  The exact form of the credentials
             is implementation-specific, but may be as simple as a
             ``(username, password)`` tuple.
+        
+        Raises
+        ------
+        AuthorizationError :
+            If the credentials are not valid, this error will be raised.
             
         """
         self._connected = True
@@ -178,7 +200,8 @@ class AbstractReadOnlyStore(object):
             A dictionary of metadata giving information about the key-value store.
         """
         return {
-            'readonly': True
+            'readonly': True,
+            'authorizing': False,
         }
 
         
@@ -198,11 +221,9 @@ class AbstractReadOnlyStore(object):
         
         Returns
         -------
-        data : file-like
-            A readable file-like object that provides stream of data from the
-            key-value store
-        metadata : dictionary
-            A dictionary of metadata for the key.
+        value : instance of Value
+            An instance of a Value subclass which holds references to the data,
+            metadata and other information about the key.
         
         Raises
         ------
@@ -569,7 +590,8 @@ class AbstractStore(AbstractReadOnlyStore):
             A dictionary of metadata giving information about the key-value store.
         """
         return {
-            'readonly': False
+            'readonly': False,
+            'authorizing': False,
         }
         
     ##########################################################################
@@ -588,10 +610,8 @@ class AbstractStore(AbstractReadOnlyStore):
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        value : tuple of file-like, dict
-            A pair of objects, the first being a readable file-like object that
-            provides stream of data from the key-value store.  The second is a
-            dictionary of metadata for the key.
+        value : instance of Value
+            An instance of a Value subclass.
         buffer_size : int
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
@@ -613,7 +633,11 @@ class AbstractStore(AbstractReadOnlyStore):
             emitted with the key & metadata
         
         """
-        data, metadata = value
+        if isinstance(value, tuple):
+            data, metadata = value
+        else:
+            data = value.data
+            metadata = value.metadata
         with self.transaction('Setting key "%s"' % key):
             self.set_metadata(key, metadata)
             self.set_data(key, data)
@@ -996,3 +1020,136 @@ class AbstractStore(AbstractReadOnlyStore):
                 
         """
         self.set_data(key, StringIO(data), buffer_size)
+
+class AbstractAuthorizingStore(AbstractStore):
+    """ Abstract base class for Key-Value Store API with permissioning
+    
+    This class implements some of the API so that it can be used with super()
+    where appropriate.
+    
+    Permission information is available only to authenticated users who are
+    designated as owners of a particular key.  Permissions are simply strings
+    representing some right that the store allows, the only required permission
+    being 'owned'.
+    
+    Each permission has a set of tags which are granted that permission.  A tag
+    represents a user, group or role that will be granted that permission.  The
+    meaning of tags is also store dependent: a filesystem-based store may have
+    tags for 'user', 'group' and 'other'; while a web-based store may derive its
+    tags from a role-based authentication system.
+    
+    Attributes
+    ----------
+    event_manager :
+        Every store is assumed to have an event_manager attribute which
+        implements the :py:class:`~.abstract_event_manager.BaseEventManager` API.
+        
+    """
+    __metaclass__ = ABCMeta
+    
+    @abstractmethod
+    def info(self):
+        """ Get information about the key-value store
+        
+        Returns
+        -------
+        metadata : dict
+            A dictionary of metadata giving information about the key-value store.
+        """
+        return {
+            'readonly': False,
+            'authorizing': True,
+        }
+
+    @abstractproperty
+    def user_tag(self):
+        """ A tag that represents the user
+        
+        """
+        return 'user'
+
+    @abstractmethod
+    def get_permissions(self, key):
+        """ Return the set of permissions the user has
+        
+        Parameters
+        ----------
+        key : str
+            The key for the resource which you want to know the permissions.
+        
+        Returns
+        -------
+        permissions : dict of str: set of str
+            A dictionary whose keys are the permissions and values are sets of
+            tags which have that permission.
+        
+        Raises
+        ------
+        KeyError :
+            This error will be raised if the key does not exist or the user is
+            not authorized to see it.
+        
+        AuthorizationError :
+            This error will be raised if user is authorized to see the key, but
+            is not an owner.
+        
+        """
+        return self.get(key).permissions
+        
+    @abstractmethod
+    def set_permissions(self, key, permissions):
+        """ Set the permissions on a key the user owns
+        
+        Parameters
+        ----------
+        key : str
+            The key for the resource which you want to know the permissions.
+        
+        permissions : dict of str: set of str
+            A dictionary whose keys are the permissions and values are sets of
+            tags which have that permission.  There must be an 'owned'
+            permission with at least one tag.
+                
+        Raises
+        ------
+        KeyError :
+            This error will be raised if the key does not exist or the user is
+            not authorized to see it.
+
+        AuthorizationError :
+            This error will be raised if user is authorized to see the key, but
+            is not an owner.
+        
+        """
+        raise NotImplementedError
+                
+    @abstractmethod
+    def update_permissions(self, key, permissions):
+        """ Add permissions on a key the user owns
+        
+        The tags provided in the permissions dictionary will be added to the
+        existing set of tags for each permission.
+        
+        Parameters
+        ----------
+        key : str
+            The key for the resource which you want to know the permissions.
+        
+        permissions : dict of str: set of str
+            A dictionary whose keys are the permissions and values are sets of
+            tags which have that permission.
+        
+        
+        Raises
+        ------
+        KeyError :
+            This error will be raised if the key does not exist or the user is
+            not authorized to see it.
+
+        AuthorizationError :
+            This error will be raised if user is authorized to see the key, but
+            is not an owner.
+        
+        """
+        raise NotImplementedError
+        

@@ -8,7 +8,7 @@
 from cStringIO import StringIO
 import time
 
-from .abstract_store import Value
+from .abstract_store import Value, AuthorizationError
 
 class StringValue(Value):
     
@@ -31,4 +31,8 @@ class StringValue(Value):
     @property
     def metadata(self):
         return self._metadata.copy()
+
+    @property
+    def permissions(self):
+        raise AuthorizationError("key not owned by user")
         
