@@ -105,6 +105,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
         super(AbstractAuthorizingStore, self).__init__()
         self.base_url = base_url
         self.query_url = query_url
+        self._user_tag = None
         self.url_format = url_format
         self.parts = parts if parts is not None else {'data': 'data',
             'metadata': 'metadata', 'permissions': 'auth'}
@@ -119,8 +120,20 @@ class DynamicURLStore(AbstractAuthorizingStore):
             authentication already set up.
         
         """
-        self._session = credentials
+        self._user_tag, self._session = credentials
         super(DynamicURLStore, self).connect()
+
+    def disconnect(self):
+        super(DynamicURLStore, self).disconnect()
+
+    def is_connected(self):
+        super(DynamicURLStore, self).is_connected()
+
+    def info(self):
+        super(DynamicURLStore, self).info()
+
+    def user_tag(self):
+        return self._user_tag
 
     def _url(self, key, part):
         key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
@@ -168,6 +181,16 @@ class DynamicURLStore(AbstractAuthorizingStore):
             raise AuthorizationError(self._key)
         response.raise_for_status()
     update_metadata.__doc__ = AbstractAuthorizingStore.update_metadata.__doc__
+
+    def get_permissions(self, key, permissions):
+        response = self._session.get(self._url(key, 'permissions'),
+            json.dumps(permissions))
+        if response.status_code == 404:
+            raise KeyError(self._key)
+        elif response.status_code == 403:
+            raise AuthorizationError(self._key)
+        response.raise_for_status()
+    set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
 
     def set_permissions(self, key, permissions):
         response = self._session.put(self._url(key, 'permissions'),
