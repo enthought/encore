@@ -286,7 +286,7 @@ class AbstractReadOnlyStore(object):
         """
         metadata = self.get(key).metadata
         if select is not None:
-            return dict((key, metadata[key]) for key in select)
+            return dict((key, metadata[key]) for key in select if key in metadata)
         else:
             return metadata
 

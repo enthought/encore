@@ -66,13 +66,13 @@ class RequestsURLValue(Value):
         
     @property
     def size(self):
-        if self._data_stream is not None:
+        if self._data_response is not None:
             self.open()
         return self._size
         
     @property
     def modified(self):
-        if self._data_stream is not None:
+        if self._data_response is not None:
             self.open()
         return self._modified
        
@@ -137,12 +137,14 @@ class DynamicURLStore(AbstractAuthorizingStore):
 
     def _url(self, key, part):
         key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
-        return self._url_format.format(base=self._base_url, key=key, part=part)
+        return self.url_format.format(base=self.base_url, key=key, part=part)
 
     def get(self, key):
         safe_key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
-        return RequestsURLValue(self._session, self.base_url, safe_key, self.url_format,
+        result = RequestsURLValue(self._session, self.base_url, safe_key, self.url_format,
             self.parts)
+        
+        return result
     get.__doc__ = AbstractAuthorizingStore.get.__doc__
     
     def set(self, key, value, buffer_size=1048576):
@@ -222,13 +224,16 @@ class DynamicURLStore(AbstractAuthorizingStore):
 
     def query(self, select=None, **kwargs):
         for key in self.query_keys(**kwargs):
-            yield self.get_metadata(key, select=select)
+            yield (key, self.get_metadata(key, select=select))
     query.__doc__ = AbstractAuthorizingStore.query.__doc__
 
     def query_keys(self, **kwargs):
-        response = self._session.get(self.query_url, params=kwargs)
+        response = self._session.get(self.query_url,
+            params={key: json.dumps(value) for key, value in kwargs.items()})
         if response.status_code == 403:
             raise AuthorizationError(self._key)
+        elif response.status_code == 500:
+            print response.text
         response.raise_for_status()
         for line in response.iter_lines():
             yield line
