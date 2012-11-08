@@ -10,6 +10,8 @@ import json
 import urllib
 import rfc822
 
+import requests
+
 from .abstract_store import AbstractAuthorizingStore, Value, AuthorizationError
 from .utils import DummyTransactionContext
 
@@ -24,9 +26,28 @@ class RequestsURLValue(Value):
         self._parts = parts if parts is not None else {'data': 'data',
             'metadata': 'metadata', 'permissions': 'auth'}
         self._data_response = None
-        self._size = None
-        self._created = None
-        self._modified = None
+        self._get_info()
+    
+    def _get_info(self):
+        response = self._session.head(self._url('data'))
+        if response.status_code == 404:
+            raise KeyError(self._key)
+        elif response.status_code == 403:
+            raise AuthorizationError(self._key)
+        response.raise_for_status()
+            
+        size = response.headers['Content-Length']
+        if size is not None:
+            size = int(size)
+        self._size = size
+        
+        modified = response.headers['Last-Modified']
+        if modified is not None:
+            modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
+        self._modified = modified
+        
+        mimetype = response.headers['Content-Type']
+        self._mimetype = mimetype
     
     def _url(self, part):
         return self._url_format.format(base=self._base_url, key=self._key,
@@ -75,6 +96,12 @@ class RequestsURLValue(Value):
         if self._data_response is not None:
             self.open()
         return self._modified
+        
+    @property
+    def mimetype(self):
+        if self._data_response is not None:
+            self.open()
+        return self._mimetype
        
     def open(self):
         self._data_response = self._session.get(self._url('data'),
@@ -94,6 +121,9 @@ class RequestsURLValue(Value):
         if modified is not None:
             modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
         self._modified = modified
+        
+        mimetype = self._data_response.headers['Content-Type']
+        self._mimetype = mimetype
     
         return self._data_response.raw
         
@@ -148,7 +178,14 @@ class DynamicURLStore(AbstractAuthorizingStore):
     get.__doc__ = AbstractAuthorizingStore.get.__doc__
     
     def set(self, key, value, buffer_size=1048576):
-        super(DynamicURLStore, self).set(key, value, buffer_size)
+        if isinstance(value, tuple):
+            data, metadata = value
+        else:
+            data = value.data
+            metadata = value.metadata
+        with self.transaction('Setting key "%s"' % key):
+            self.set_data(key, data, buffer_size)
+            self.set_metadata(key, metadata)
     set.__doc__ = AbstractAuthorizingStore.set.__doc__
  
     def delete(self, key):
@@ -156,11 +193,15 @@ class DynamicURLStore(AbstractAuthorizingStore):
     delete.__doc__ = AbstractAuthorizingStore.delete.__doc__
    
     def set_data(self, key, data, buffer_size=1048576):
-        response = self._session.put(self._url(key, 'data'), data)
+        #request = self._session.put(self._url(key, 'data'), return_response=False)
+        #request.data = data.read()
+        #request.send()
+        #response = request.response
+        response = self._session.put(self._url(key, 'data'), data=data.read())
         if response.status_code == 404:
             raise KeyError(self._key)
         elif response.status_code == 403:
-            raise AuthorizationError(self._key)
+            raise AuthorizationError(key)
         response.raise_for_status()
     set_data.__doc__ = AbstractAuthorizingStore.set_data.__doc__
     
@@ -168,9 +209,9 @@ class DynamicURLStore(AbstractAuthorizingStore):
         response = self._session.put(self._url(key, 'metadata'),
             json.dumps(metadata))
         if response.status_code == 404:
-            raise KeyError(self._key)
+            raise KeyError(key)
         elif response.status_code == 403:
-            raise AuthorizationError(self._key)
+            raise AuthorizationError(key)
         response.raise_for_status()
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
     
@@ -178,9 +219,9 @@ class DynamicURLStore(AbstractAuthorizingStore):
         response = self._session.post(self._url(key, 'metadata'),
             json.dumps(metadata))
         if response.status_code == 404:
-            raise KeyError(self._key)
+            raise KeyError(key)
         elif response.status_code == 403:
-            raise AuthorizationError(self._key)
+            raise AuthorizationError(key)
         response.raise_for_status()
     update_metadata.__doc__ = AbstractAuthorizingStore.update_metadata.__doc__
 
@@ -188,9 +229,9 @@ class DynamicURLStore(AbstractAuthorizingStore):
         response = self._session.get(self._url(key, 'permissions'),
             json.dumps(permissions))
         if response.status_code == 404:
-            raise KeyError(self._key)
+            raise KeyError(key)
         elif response.status_code == 403:
-            raise AuthorizationError(self._key)
+            raise AuthorizationError(key)
         response.raise_for_status()
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
 
@@ -198,9 +239,9 @@ class DynamicURLStore(AbstractAuthorizingStore):
         response = self._session.put(self._url(key, 'permissions'),
             json.dumps(permissions))
         if response.status_code == 404:
-            raise KeyError(self._key)
+            raise KeyError(key)
         elif response.status_code == 403:
-            raise AuthorizationError(self._key)
+            raise AuthorizationError(key)
         response.raise_for_status()
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
     
@@ -208,9 +249,9 @@ class DynamicURLStore(AbstractAuthorizingStore):
         response = self._session.post(self._url(key, 'permissions'),
             json.dumps(permissions))
         if response.status_code == 404:
-            raise KeyError(self._key)
+            raise KeyError(key)
         elif response.status_code == 403:
-            raise AuthorizationError(self._key)
+            raise AuthorizationError(key)
         response.raise_for_status()
     update_metadata.__doc__ = AbstractAuthorizingStore.update_metadata.__doc__
 

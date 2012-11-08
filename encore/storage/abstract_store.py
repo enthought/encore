@@ -640,7 +640,7 @@ class AbstractStore(AbstractReadOnlyStore):
             metadata = value.metadata
         with self.transaction('Setting key "%s"' % key):
             self.set_metadata(key, metadata)
-            self.set_data(key, data)
+            self.set_data(key, data, buffer_size)
 
 
     @abstractmethod
