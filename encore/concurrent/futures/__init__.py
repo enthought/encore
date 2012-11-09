@@ -6,4 +6,5 @@
 # LICENSE.txt
 #
 
+from encore.concurrent.futures.lazy import LazyExecutor
 from encore.concurrent.futures.synchronous import SynchronousExecutor
