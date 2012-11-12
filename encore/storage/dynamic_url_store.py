@@ -20,6 +20,7 @@ class RequestsURLValue(Value):
     def __init__(self, session, base_url, key, url_format='{base}/{key}/{part}',
             parts=None):
         self._session = session
+        self._session.config['keep_alive'] = False
         self._base_url = base_url
         self._key = key
         self._url_format = url_format
