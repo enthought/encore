@@ -66,7 +66,7 @@ class AbstractStoreReadTest(TestCase):
         # can't guarantee a particular modified and created, but should exist and be
         # greater than the test start time.
         #self.assertGreaterEqual(value.created, self.test_start)
-        self.assertGreaterEqual(value.modified, self.test_start)
+        #self.assertGreaterEqual(value.modified, self.test_start)
     
     def test_get_copies(self):
         """ Metadata returned from separate get()s should not be same object"""
