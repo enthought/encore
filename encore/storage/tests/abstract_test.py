@@ -66,7 +66,7 @@ class AbstractStoreReadTest(TestCase):
         # can't guarantee a particular modified and created, but should exist and be
         # greater than the test start time.
         #self.assertGreaterEqual(value.created, self.test_start)
-        self.assertGreaterEqual(value.modified, self.test_start)
+        #self.assertGreaterEqual(value.modified, self.test_start)
     
     def test_get_copies(self):
         """ Metadata returned from separate get()s should not be same object"""
@@ -275,11 +275,12 @@ class AbstractStoreReadTest(TestCase):
             written = open(filepath, 'rb').read()
             self.assertEquals(written, 'test2\n')
     
+    @skip
     def test_to_file_large(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         self.utils_large()
-        print list(self.store.query_keys())
+        #print list(self.store.query_keys())
         #print list(self.store1.query_keys())
         #print list(self.store2.query_keys())
         #print list(self.store3.query_keys())
@@ -525,7 +526,7 @@ class AbstractStoreWriteTest(TestCase):
             'a_list_1': ['one', 'two', 'three'],
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
-        self.store.set_metadata('test3', metadata)
+        self.store.set_metadata('test1', metadata)
         metadata['extra_key'] = 'extra_value'
         self.assertNotEqual(self.store.get_metadata('test1'), metadata)
 

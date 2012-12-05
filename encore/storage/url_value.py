@@ -8,7 +8,7 @@
 import urllib2
 import rfc822
 
-from .abstract_store import Value
+from .abstract_store import Value, AuthorizationError
 
 class URLValue(Value):
     
@@ -30,6 +30,10 @@ class URLValue(Value):
     @property
     def metadata(self):
         return self._metadata.copy()
+
+    @property
+    def permissions(self):
+        raise AuthorizationError("key not owned by user")
         
     @property
     def size(self):
