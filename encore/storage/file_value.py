@@ -7,7 +7,7 @@
 
 import os
 
-from .abstract_store import Value
+from .abstract_store import Value, AuthorizationError
 
 class FileValue(Value):
     
@@ -26,6 +26,10 @@ class FileValue(Value):
     @property
     def metadata(self):
         return self._metadata.copy()
+
+    @property
+    def permissions(self):
+        raise AuthorizationError("key not owned by user")
         
     def _stat(self):
         stat = os.stat(self._path)
