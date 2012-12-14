@@ -76,7 +76,8 @@ class RequestsURLValue(Value):
     @property
     def permissions(self):
         headers = {'Accept': 'application/json'}
-        response = self._session.get(self._url('permissions'), headers=headers)
+        response = self._session.get(self._url(self._parts['permissions']),
+                                     headers=headers)
         if response.status_code == 404:
             raise KeyError(self._key)
         elif response.status_code == 403:
