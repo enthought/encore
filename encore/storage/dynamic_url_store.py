@@ -235,6 +235,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
         elif response.status_code == 403:
             raise AuthorizationError(key)
         response.raise_for_status()
+        return response.json
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
 
     def set_permissions(self, key, permissions):
