@@ -82,6 +82,14 @@ class FileLockTest(unittest.TestCase):
         self.assertTrue(self.lock.locked())
         lock2.release()
         self.assertFalse(self.lock.locked())
+        
+    def test_data(self):
+        self.lock = FileLock(self.path, data="%s\n"%os.getpid())
+        self.lock.acquire()
+        self.assertTrue(self.lock.acquired())
+        self.assertTrue(self.lock.locked())
+        self.assertTrue(os.path.exists(self.lock.full_path))
+        self.assertEqual(self.lock.get_data(), "%s\n"%os.getpid())
 
 
 class SharedFileLockTest(unittest.TestCase):
