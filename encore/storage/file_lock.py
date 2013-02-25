@@ -215,12 +215,14 @@ class FileLock(object):
                 
     def get_data(self):
         """Return the data stored in the lock file.
+        
+        If None is returned the lock has not been acquired.
         """
         try:
             with open(self.full_path, 'rb') as f:
                 text = f.read()
         except IOError:
-            text = ''
+            text = None
         return text
 
     def __enter__(self):
