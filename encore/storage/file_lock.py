@@ -44,7 +44,7 @@ class LockError(Exception):
 class FileLock(object):
     """ A simple file-based discretionary (advisory) exclusive lock. """
     def __init__(self, name, dir=None, poll_interval=1e-2, timeout=0,
-                 force_timeout=0, uid=None):
+                 force_timeout=0, uid=None, data=None):
         """ Constructor.
 
         Parameters
@@ -66,6 +66,12 @@ class FileLock(object):
             behave same within the store but any other store instance will
             have a different lock. If the uid is None, then the id of the
             lock instance is used, which means every lock instance is unique.
+        data - str or None
+            The data to add to the lock file that can be used to obtain 
+            details about the locking process.  If set to None, this adds
+            a default set of values as the hostname, pid, username and given
+            uid to the lock file.  This data is also used to check if 
+            a different process is releasing the lock.
 
         Notes
         -----
@@ -88,9 +94,13 @@ class FileLock(object):
         self._open_mode = os.O_CREAT | os.O_EXCL | os.O_RDWR
         if hasattr(os, 'O_BINARY'):
             self._open_mode |= os.O_BINARY
-        self._check_text = '%s\n%s\n%s\n%s\n%s'%(socket.gethostname(),
-                                 os.getpid(), getpass.getuser(), self.uid,
-                                 'LOCK')
+            
+        if data is None:
+            self._data = '%s\n%s\n%s\n%s\n%s'%(socket.gethostname(),
+                                    os.getpid(), getpass.getuser(), self.uid,
+                                    'LOCK')
+        else:
+            self._data = data
 
     def acquire(self):
         """ Acquire the lock.
@@ -112,7 +122,7 @@ class FileLock(object):
                 else:
                     raise
             else:
-                os.write(fd, self._check_text)
+                os.write(fd, self._data)
                 os.close(fd)
                 return True
             if 0 < self.timeout < time.time()-start_time:
@@ -131,23 +141,22 @@ class FileLock(object):
         """
         try:
             with open(self.full_path, 'rb') as f:
-                text = f.read()
-                f.close()
-                if text != self._check_text:
-                    raise LockError('Releasing an unacquired lock')
-                else:
-                    while True:
-                        # While loop is needed here because delete may be
-                        # denied on windows in case file is open by some other
-                        # lock for checking by reading the file contents.
-                        try:
-                            os.remove(self.full_path)
-                            break
-                        except OSError as e:
-                            if e.errno == errno.EACCES:
-                                time.sleep(0.01)
-                            else:
-                                raise
+                data = f.read()
+            if data != self._data:
+                raise LockError('Releasing an unacquired lock')
+            else:
+                while True:
+                    # While loop is needed here because delete may be
+                    # denied on windows in case file is open by some other
+                    # lock for checking by reading the file contents.
+                    try:
+                        os.remove(self.full_path)
+                        break
+                    except OSError as e:
+                        if e.errno == errno.EACCES:
+                            time.sleep(0.01)
+                        else:
+                            raise
         except IOError:
             raise LockError('Releasing an unlocked lock')
 
@@ -163,14 +172,10 @@ class FileLock(object):
 
     def acquired(self):
         """ Whether the lock is acquired by self. """
-        try:
-            with open(self.full_path, 'rb') as f:
-                text = f.read()
-                if text == self._check_text:
-                    return True
-                else:
-                    return False
-        except IOError:
+        text = self.get_data()
+        if text == self._data:
+            return True
+        else:
             return False
 
     def force_break(self):
@@ -207,6 +212,18 @@ class FileLock(object):
                 time.sleep(self.poll_interval)
             else:
                 return True
+                
+    def get_data(self):
+        """Return the data stored in the lock file.
+        
+        If None is returned the lock has not been acquired.
+        """
+        try:
+            with open(self.full_path, 'rb') as f:
+                text = f.read()
+        except IOError:
+            text = None
+        return text
 
     def __enter__(self):
         self.acquire()
