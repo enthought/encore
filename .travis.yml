@@ -2,7 +2,7 @@ language: python
 python:
   - 2.7
 install:
-  - pip install coverage requests futures
+  - pip install coverage requests futures sphinx
 script:
   - nosetests --with-coverage --cover-package=encore
   - make --directory docs html
