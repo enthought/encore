@@ -5,7 +5,7 @@ python:
 install:
   - pip install nose coverage requests futures
 script:
-  - nosetests --with-coverage --cover-package=encore --tests=encore.events.tests.test_event_manager
+  - nosetests --with-coverage --cover-package=encore
 notifications:
   email:
     - cwebster@enthought.com
