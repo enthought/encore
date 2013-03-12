@@ -94,6 +94,9 @@ class JoinedStore(AbstractAuthorizingStore):
         return {
             'readonly': False,
         }
+    
+    def user_tag(self):
+        return self.stores[0].user_tag()
 
         
     ##########################################################################
