@@ -643,7 +643,7 @@ class JoinedStore(AbstractStore):
         """
         for i, store in enumerate(self.stores):
             for key in store.query_keys(**kwargs):
-                if all(not s.exists(key) for s in self.stores[:i]):
+                if not any(s.exists(key) for s in self.stores[:i]):
                     yield key
 
     
