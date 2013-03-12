@@ -12,10 +12,10 @@ Joined Store
 
 """
 
-from .abstract_store import AbstractStore
+from .abstract_store import AbstractAuthorizingStore
 from .utils import DummyTransactionContext
 
-class JoinedStore(AbstractStore):
+class JoinedStore(AbstractAuthorizingStore):
     """ A key-value store that joins together several other Key-Value Stores
     
     A joined store is a composite store which takes a list of stores and
@@ -94,6 +94,9 @@ class JoinedStore(AbstractStore):
         return {
             'readonly': False,
         }
+    
+    def user_tag(self):
+        return self.stores[0].user_tag()
 
         
     ##########################################################################
@@ -263,6 +266,37 @@ class JoinedStore(AbstractStore):
             raise KeyError(key)
             
 
+    def get_permissions(self, key):
+        """ Return the set of permissions the user has
+        
+        Parameters
+        ----------
+        key : str
+            The key for the resource which you want to know the permissions.
+        
+        Returns
+        -------
+        permissions : dict of str: set of str
+            A dictionary whose keys are the permissions and values are sets of
+            tags which have that permission.
+        
+        Raises
+        ------
+        KeyError :
+            This error will be raised if the key does not exist or the user is
+            not authorized to see it.
+        
+        AuthorizationError :
+            This error will be raised if user is authorized to see the key, but
+            is not an owner.
+        
+        """
+        for store in self.stores:
+            if store.exists(key):
+                return self.get(key).permissions
+        else:
+            raise KeyError(key)
+        
     
     def set_data(self, key, data, buffer_size=1048576):
         """ Replace the data for a given key in the key-value store.
@@ -298,6 +332,8 @@ class JoinedStore(AbstractStore):
         """
         if self.stores:
             self.stores[0].set_data(key, data, buffer_size)
+        else:
+            raise KeyError(key)
 
     
     def set_metadata(self, key, metadata):
@@ -324,8 +360,40 @@ class JoinedStore(AbstractStore):
         """
         if self.stores:
             self.stores[0].set_metadata(key, metadata)
+        else:
+            raise KeyError(key)
 
-    
+
+    def set_permissions(self, key, permissions):
+        """ Set the permissions on a key the user owns
+        
+        Parameters
+        ----------
+        key : str
+            The key for the resource which you want to know the permissions.
+        
+        permissions : dict of str: set of str
+            A dictionary whose keys are the permissions and values are sets of
+            tags which have that permission.  There must be an 'owned'
+            permission with at least one tag.
+                
+        Raises
+        ------
+        KeyError :
+            This error will be raised if the key does not exist or the user is
+            not authorized to see it.
+
+        AuthorizationError :
+            This error will be raised if user is authorized to see the key, but
+            is not an owner.
+        
+        """
+        if self.stores:
+            self.stores[0].set_permissions(key, permissions)
+        else:
+            raise KeyError(key)
+            
+            
     def update_metadata(self, key, metadata):
         """ Update the metadata for a given key in the key-value store.
         
@@ -352,7 +420,42 @@ class JoinedStore(AbstractStore):
             current_metadata = self.get_metadata(key)
             current_metadata.update(metadata)
             self.stores[0].set_metadata(key, current_metadata)
+        else:
+            raise KeyError(key)
             
+    
+    def update_permissions(self, key, permissions):
+        """ Add permissions on a key the user owns
+        
+        The tags provided in the permissions dictionary will be added to the
+        existing set of tags for each permission.
+        
+        Parameters
+        ----------
+        key : str
+            The key for the resource which you want to know the permissions.
+        
+        permissions : dict of str: set of str
+            A dictionary whose keys are the permissions and values are sets of
+            tags which have that permission.
+        
+        
+        Raises
+        ------
+        KeyError :
+            This error will be raised if the key does not exist or the user is
+            not authorized to see it.
+
+        AuthorizationError :
+            This error will be raised if user is authorized to see the key, but
+            is not an owner.
+        
+        """
+        if self.stores:
+            self.stores[0].update_metadata(key, permissions)
+        else:
+            raise KeyError(key)
+
     
     def exists(self, key):
         """ Test whether or not a key exists in the key-value store
@@ -643,7 +746,7 @@ class JoinedStore(AbstractStore):
         """
         for i, store in enumerate(self.stores):
             for key in store.query_keys(**kwargs):
-                if all(not s.exists(key) for s in self.stores[:i]):
+                if not any(s.exists(key) for s in self.stores[:i]):
                     yield key
 
     
