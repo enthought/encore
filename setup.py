@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2012 by Enthought, Inc.
+# Copyright (c) 2011-2013 by Enthought, Inc.
 # All rights reserved.
 
 from setuptools import setup, find_packages
@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='encore',
-    version='0.2.1',
+    version='0.3',
     author='Enthought, Inc',
     author_email='info@enthought.com',
     url='https://github.com/enthought/encore',
