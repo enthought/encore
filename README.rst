@@ -27,3 +27,9 @@ Prerequisites
 * Python >= 2.6 (not Python 3)
 
 * Sphinx, graphviz, pydot (documentation build)
+
+* Some optional modules have dependencies on:
+
+    - Requests (http://docs.python-requests.org/en/latest/)
+
+    - Futures (https://code.google.com/p/pythonfutures/)
