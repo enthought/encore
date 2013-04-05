@@ -30,6 +30,6 @@ Prerequisites
 
 * Some optional modules have dependencies on:
 
-    - Requests (http://docs.python-requests.org/en/latest/)
+  - Requests (http://docs.python-requests.org/en/latest/)
 
-    - Futures (https://code.google.com/p/pythonfutures/)
+  - Futures (https://code.google.com/p/pythonfutures/)
