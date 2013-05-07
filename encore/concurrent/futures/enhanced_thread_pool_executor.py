@@ -1,11 +1,24 @@
+# Copyright 2009 Brian Quinlan. All Rights Reserved.
+# Licensed to PSF under a Contributor Agreement.
+#
+# Changes:
+# May 2013
+#   CLF: Ported to encore
+#   CLF: Renamed ThreadPoolExecutor to EnhancedThreadPoolExecutor
+#   CLF: Patched from upstream issue16284
+#   CLF: Patched from upstream issue11777
+#   CLF: Added 'initializer' and 'uninitializer' arguments to
+#        EnhancedThreadPoolExecutor
+#   CLF: Added 'name' argument to EnhancedThreadPoolExecutor
+
 """Implements EnhancedThreadPoolExecutor.
 
 This builds off of concurrent.futures.thread and implements the following
 changes:
     * Each worker can be initialized and unitialized with specified functions.
-    * 'map' works without iterating (issue11777).
+    * 'map' works without iterating (bugs.python.org/issue11777).
     * Workers do not unnecessarily retain references to work items
-      (issue16284).
+      (bugs.python.org/issue16284).
 
 The implementation is largely copied to avoid reliance on undocumented, private
 parts of the code. For example, '_thread_references' is needed to properly
