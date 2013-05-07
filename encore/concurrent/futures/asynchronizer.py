@@ -18,7 +18,13 @@ class Asynchronizer(object):
     Allows 'forgetful' submission of operations, giving a convenient
     pattern for some asynchronous use-cases.
 
-    The last operation submitted is guaranteed to eventually be executed.
+    The Asynchronizer executes at most a single operation at a time.  Requests
+    to `submit` a new operation while an operation is executed are stored for
+    future execution, with each new submission overwriting the prior.  When a
+    running operation completes, the most recent submission (if one exists) is
+    then executed. Therefore, operations submitted between the previous and
+    current execution are forgotten.  The last operation submitted is
+    guaranteed to eventually be executed.
 
     """
     def __init__(self, executor=None, name=None):
