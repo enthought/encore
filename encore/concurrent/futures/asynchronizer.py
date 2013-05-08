@@ -23,7 +23,7 @@ class Asynchronizer(object):
     future execution, with each new submission overwriting the prior.  When a
     running operation completes, the most recent submission (if one exists) is
     then executed. Therefore, operations submitted between the previous and
-    current execution are forgotten.  The last operation submitted is
+    current execution are discarded.  The last operation submitted is
     guaranteed to eventually be executed.
 
     """
