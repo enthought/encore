@@ -1,3 +1,6 @@
+# Portions of this code are taken from the Python source distribution, which is
+# subject to the PSF license. See http://docs.python.org/2/license.html.
+
 import threading
 import time
 import unittest
