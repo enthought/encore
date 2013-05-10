@@ -19,7 +19,6 @@ from ..enhanced_thread_pool_executor import EnhancedThreadPoolExecutor
 def _worker(queue, value):
     time.sleep(0.25)
     queue.put(value)
-    return value
 
 
 class TestHandler(logging.Handler):
@@ -171,8 +170,9 @@ class TestAsynchronizer(unittest.TestCase):
 
     def test_submit_bad_job_with_callback(self):
         """
-        Submission of a job with a raising callback should detect the
-        exception in the callback.
+        Submission of a job that causes an exception should succeed,
+        even with a (good) callback, but we should get a logged
+        exception as a result.
 
         """
 
@@ -200,8 +200,8 @@ class TestAsynchronizer(unittest.TestCase):
 
     def test_submit_job_with_raising_callback(self):
         """
-        Submission of a job with a raising callback should detect the exception
-        in the callback.
+        Submission of a job with a raising callback should detect
+        the exception in the callback.
 
         """
 
