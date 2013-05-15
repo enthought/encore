@@ -99,20 +99,15 @@ class _WorkItem(object):
             self.future.set_result(result)
 
 
-def _worker(executor_reference, work_queue, initialize_reference=None,
-        uninitialize_reference=None):
+def _worker(executor_reference, work_queue, initialize=None,
+        uninitialize=None):
 
-    if initialize_reference is not None:
-        initialize = initialize_reference()
-        if initialize is None:
-            _base.LOGGER.critical('Initializer reference is empty',
+    if initialize is not None:
+        try:
+            initialize()
+        except BaseException:
+            _base.LOGGER.critical('Initialize exception in worker',
                     exc_info=True)
-        else:
-            try:
-                initialize()
-            except BaseException:
-                _base.LOGGER.critical('Initialize exception in worker',
-                        exc_info=True)
 
     try:
         while True:
@@ -134,17 +129,12 @@ def _worker(executor_reference, work_queue, initialize_reference=None,
     except BaseException:
         _base.LOGGER.critical('Exception in worker', exc_info=True)
     finally:
-        if uninitialize_reference is not None:
-            uninitialize = uninitialize_reference()
-            if uninitialize is None:
-                _base.LOGGER.critical('Uninitializer reference is empty',
+        if uninitialize is not None:
+            try:
+                uninitialize()
+            except BaseException:
+                _base.LOGGER.critical('Uninitialize exception in worker',
                         exc_info=True)
-            else:
-                try:
-                    uninitialize()
-                except BaseException:
-                    _base.LOGGER.critical('Uninitialize exception in worker',
-                            exc_info=True)
 
 
 class EnhancedThreadPoolExecutor(_base.Executor):
@@ -196,16 +186,12 @@ class EnhancedThreadPoolExecutor(_base.Executor):
 
     def _adjust_thread_count(self):
         if len(self._threads) < self._max_workers:
-            initializer_reference = (None if self._initializer is None
-                                     else weakref.ref(self._initializer))
-            uninitializer_reference = (None if self._uninitializer is None
-                                     else weakref.ref(self._uninitializer))
             thread_name = "{0}Worker-{1}".format(self.name,
                                                  next(self._thread_counter))
             t = threading.Thread(target=_worker, name=thread_name,
                                  args=(weakref.ref(self), self._work_queue,
-                                       initializer_reference,
-                                       uninitializer_reference))
+                                       self._initializer,
+                                       self._uninitializer))
             t.daemon = True
             t.start()
             self._threads.add(t)
