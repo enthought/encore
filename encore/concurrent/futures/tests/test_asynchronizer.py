@@ -45,9 +45,11 @@ def loghandler(logger_name):
     old_propagate_value = logger.propagate
     logger.propagate = False
     logger.addHandler(handler)
-    yield handler
-    logger.removeHandler(handler)
-    logger.propagate = old_propagate_value
+    try:
+        yield handler
+    finally:
+        logger.removeHandler(handler)
+        logger.propagate = old_propagate_value
 
 
 class _TestException(Exception):
