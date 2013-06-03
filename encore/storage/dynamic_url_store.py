@@ -54,7 +54,7 @@ class RequestsURLValue(Value):
         if response.status_code == 404:
             raise KeyError(self._key)
         elif response.status_code == 403:
-            raise AuthorizationError(self._key)
+            raise AuthorizationError(key)
         response.raise_for_status()
     
     @property
@@ -123,7 +123,6 @@ class RequestsURLValue(Value):
     
         return self._data_response.raw
         
-
 class DynamicURLStore(AbstractAuthorizingStore):
     
     def __init__(self, base_url, query_url, url_format='{base}/{key}/{part}',
@@ -207,6 +206,16 @@ class DynamicURLStore(AbstractAuthorizingStore):
         self._validate_response(response, key)
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
     
+    def get_metadata(self, key):
+        response = self._session.get(self._url(key, 'metadata'))
+        self._validate_response(response, key)
+        if _requests_version=='0':
+            return response.json
+        else:
+            return response.json()
+    get_metadata.__doc__ = AbstractAuthorizingStore.get_metadata.__doc__    
+    
+    
     def update_metadata(self, key, metadata):
         response = self._session.post(self._url(key, 'metadata'),
             json.dumps(metadata))
@@ -216,25 +225,25 @@ class DynamicURLStore(AbstractAuthorizingStore):
     def get_permissions(self, key):
         response = self._session.get(self._url(key, 'permissions'))
         self._validate_response(response, key)
-        if requests.__version__.split('.')[0] == '0':
+        if _requests_version=='0':
             return response.json
         else:
             return response.json()
-    set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
+    get_permissions.__doc__ = AbstractAuthorizingStore.get_permissions.__doc__
 
     def set_permissions(self, key, permissions):
         response = self._session.put(self._url(key, 'permissions'),
             json.dumps(permissions))
         self._validate_response(response, key)
         response.raise_for_status()
-    set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
+    set_permissions.__doc__ = AbstractAuthorizingStore.set_permissions.__doc__
     
     def update_permissions(self, key, permissions):
         response = self._session.post(self._url(key, 'permissions'),
             json.dumps(permissions))
         self._validate_response(response, key)
         response.raise_for_status()
-    update_metadata.__doc__ = AbstractAuthorizingStore.update_metadata.__doc__
+    update_permissions.__doc__ = AbstractAuthorizingStore.update_permissions.__doc__
 
     def transaction(self, notes):
         """ Provide a transaction context manager
@@ -256,4 +265,3 @@ class DynamicURLStore(AbstractAuthorizingStore):
         for line in response.iter_lines():
             yield line
     query_keys.__doc__ = AbstractAuthorizingStore.query_keys.__doc__
-            

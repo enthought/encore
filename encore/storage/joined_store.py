@@ -128,7 +128,7 @@ class JoinedStore(AbstractAuthorizingStore):
 
         """
         for store in self.stores:
-            if store.exists(key):
+            if store.exists(key):  #equivalent to if key in store
                 return store.get(key)
         else:
             raise KeyError(key)
@@ -173,8 +173,8 @@ class JoinedStore(AbstractAuthorizingStore):
         """
         data, metadata = value
         with self.transaction('Setting key "%s"' % key):
-            self.set_metadata(key, metadata)
             self.set_data(key, data, buffer_size)
+            self.set_metadata(key, metadata)
 
 
     
@@ -261,7 +261,7 @@ class JoinedStore(AbstractAuthorizingStore):
         """
         for store in self.stores:
             if store.exists(key):
-                return store.get_metadata(key, select)
+                return store.get_metadata(key)
         else:
             raise KeyError(key)
             
@@ -293,7 +293,7 @@ class JoinedStore(AbstractAuthorizingStore):
         """
         for store in self.stores:
             if store.exists(key):
-                return self.get(key).permissions
+                return store.get_permissions(key)
         else:
             raise KeyError(key)
         
@@ -330,10 +330,16 @@ class JoinedStore(AbstractAuthorizingStore):
             emitted with the key & metadata
 
         """
-        if self.stores:
-            self.stores[0].set_data(key, data, buffer_size)
-        else:
-            raise KeyError(key)
+     
+        # Tries to set data on first store that will allow for it (eg spaces).
+        for store in self.stores:
+            try:
+                store.set_data(key, data, buffer_size)
+            except KeyError:
+                pass 
+            else:
+                return 
+        raise KeyError(key)
 
     
     def set_metadata(self, key, metadata):
@@ -358,10 +364,11 @@ class JoinedStore(AbstractAuthorizingStore):
             emitted with the key & metadata
 
         """
-        if self.stores:
-            self.stores[0].set_metadata(key, metadata)
-        else:
-            raise KeyError(key)
+        for store in self.stores:
+            if store.exists(key):                
+                store.set_metadata(key, metadata)
+                return
+        raise KeyError(key)
 
 
     def set_permissions(self, key, permissions):
@@ -388,10 +395,11 @@ class JoinedStore(AbstractAuthorizingStore):
             is not an owner.
         
         """
-        if self.stores:
-            self.stores[0].set_permissions(key, permissions)
-        else:
-            raise KeyError(key)
+        for store in self.stores:
+            if store.exists(key):                
+                store.set_permissions(key, permissions)
+                return 
+        raise KeyError(key)
             
             
     def update_metadata(self, key, metadata):
@@ -419,7 +427,7 @@ class JoinedStore(AbstractAuthorizingStore):
         if self.stores:
             current_metadata = self.get_metadata(key)
             current_metadata.update(metadata)
-            self.stores[0].set_metadata(key, current_metadata)
+            self.set_metadata(key, current_metadata)
         else:
             raise KeyError(key)
             
@@ -451,10 +459,12 @@ class JoinedStore(AbstractAuthorizingStore):
             is not an owner.
         
         """
-        if self.stores:
-            self.stores[0].update_metadata(key, permissions)
-        else:
-            raise KeyError(key)
+
+        for store in self.stores:
+            if store.exists(key):                       
+                store.update_permissions(key, permissions)
+                return
+        raise KeyError(key)
 
     
     def exists(self, key):
