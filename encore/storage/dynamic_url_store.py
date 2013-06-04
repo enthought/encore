@@ -265,3 +265,4 @@ class DynamicURLStore(AbstractAuthorizingStore):
         for line in response.iter_lines():
             yield line
     query_keys.__doc__ = AbstractAuthorizingStore.query_keys.__doc__
+    

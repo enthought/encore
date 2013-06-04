@@ -128,7 +128,7 @@ class JoinedStore(AbstractAuthorizingStore):
 
         """
         for store in self.stores:
-            if store.exists(key):  #equivalent to if key in store
+            if store.exists(key): 
                 return store.get(key)
         else:
             raise KeyError(key)
