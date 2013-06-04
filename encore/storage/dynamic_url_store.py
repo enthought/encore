@@ -54,7 +54,7 @@ class RequestsURLValue(Value):
         if response.status_code == 404:
             raise KeyError(self._key)
         elif response.status_code == 403:
-            raise AuthorizationError(key)
+            raise AuthorizationError(self._key)
         response.raise_for_status()
     
     @property
