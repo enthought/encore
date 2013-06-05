@@ -140,7 +140,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
 
     def _url(self, key, part):
         safe_key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
-        url = self.url_format.format(base=self.base_url, key=safe_key, part=part)
+        url = self.url_format.format(base=self.base_url, key=safe_key, part=self.parts[part])
         return url
     
     def _validate_response(self, response, key):
@@ -223,7 +223,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
     update_metadata.__doc__ = AbstractAuthorizingStore.update_metadata.__doc__
 
     def get_permissions(self, key):
-        response = self._session.get(self._url(key, 'auth'))
+        response = self._session.get(self._url(key, 'permissions'))
         self._validate_response(response, key)
         if _requests_version=='0':
             return response.json
@@ -232,14 +232,14 @@ class DynamicURLStore(AbstractAuthorizingStore):
     get_permissions.__doc__ = AbstractAuthorizingStore.get_permissions.__doc__
 
     def set_permissions(self, key, permissions):
-        response = self._session.put(self._url(key, 'auth'),
+        response = self._session.put(self._url(key, 'permissions'),
             json.dumps(permissions))
         self._validate_response(response, key)
         response.raise_for_status()
     set_permissions.__doc__ = AbstractAuthorizingStore.set_permissions.__doc__
     
     def update_permissions(self, key, permissions):
-        response = self._session.post(self._url(key, 'auth'),
+        response = self._session.post(self._url(key, 'permissions'),
             json.dumps(permissions))
         self._validate_response(response, key)
         response.raise_for_status()
