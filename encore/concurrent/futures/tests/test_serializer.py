@@ -11,13 +11,13 @@ import operator
 import time
 import unittest
 
-from encore.concurrent.futures.asynchronizer import Asynchronizer
+from encore.concurrent.futures.serializer import Serializer
 from encore.concurrent.futures.enhanced_thread_pool_executor import (
     EnhancedThreadPoolExecutor)
 
 
 def _worker(data, value):
-    time.sleep(0.25)
+    time.sleep(0.1)
     data.append(value)
     return value
 
@@ -58,33 +58,32 @@ class _TestException(Exception):
     pass
 
 
-class TestAsynchronizer(unittest.TestCase):
+class TestSerializer(unittest.TestCase):
 
     def setUp(self):
         self.executor = EnhancedThreadPoolExecutor(
-            name='TestAsynchronizerExecutor',
+            name='TestSerializerExecutor',
             max_workers=1)
-        self.asynchronizer = Asynchronizer(
-            name='TestAsynchronizer',
+        self.serializer = Serializer(
+            name='TestSerializer',
             executor=self.executor,
         )
 
-    def test_events_collapsed(self):
+    def test_events_serialized(self):
         numbers = []
-        self.asynchronizer.submit(_worker, numbers, 1)
-        self.asynchronizer.submit(_worker, numbers, 2)
-        self.asynchronizer.submit(_worker, numbers, 3)
-        self.asynchronizer.submit(_worker, numbers, 4)
-        self.asynchronizer.submit(_worker, numbers, 5)
-        self.asynchronizer.submit(_worker, numbers, 6)
-        self.asynchronizer.submit(_worker, numbers, 7)
-        self.asynchronizer.submit(_worker, numbers, 8)
-        self.asynchronizer.submit(_worker, numbers, 9)
-        self.asynchronizer.submit(_worker, numbers, 10)
-        self.asynchronizer.wait()
-        self.assertEqual(len(numbers), 2)
-        self.assertEqual(numbers[0], 1)
-        self.assertEqual(numbers[1], 10)
+        self.serializer.submit(_worker, numbers, 1)
+        self.serializer.submit(_worker, numbers, 2)
+        self.serializer.submit(_worker, numbers, 3)
+        self.serializer.submit(_worker, numbers, 4)
+        self.serializer.submit(_worker, numbers, 5)
+        self.serializer.submit(_worker, numbers, 6)
+        self.serializer.submit(_worker, numbers, 7)
+        self.serializer.submit(_worker, numbers, 8)
+        self.serializer.submit(_worker, numbers, 9)
+        self.serializer.submit(_worker, numbers, 10)
+        self.serializer.wait()
+        self.assertEqual(len(numbers), 10)
+        self.assertEqual(numbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
     def test_callback(self):
         # Make a callback that repeats the insertion into another queue.
@@ -94,43 +93,41 @@ class TestAsynchronizer(unittest.TestCase):
             value = future.result()
             callback_numbers.append(value)
 
-        asynchronizer = Asynchronizer(
-            name='TestCallbackAsynchronizer',
+        serializer = Serializer(
+            name='TestCallbackSerializer',
             executor=self.executor,
             callback=_callback
         )
 
         numbers = []
-        asynchronizer.submit(_worker, numbers, 1)
-        asynchronizer.submit(_worker, numbers, 2)
-        asynchronizer.submit(_worker, numbers, 3)
-        asynchronizer.submit(_worker, numbers, 4)
-        asynchronizer.submit(_worker, numbers, 5)
-        asynchronizer.submit(_worker, numbers, 6)
-        asynchronizer.submit(_worker, numbers, 7)
-        asynchronizer.submit(_worker, numbers, 8)
-        asynchronizer.submit(_worker, numbers, 9)
-        asynchronizer.submit(_worker, numbers, 10)
-        asynchronizer.wait()
-        self.assertEqual(len(numbers), 2)
-        self.assertEqual(numbers[0], 1)
-        self.assertEqual(numbers[1], 10)
-        self.assertEqual(len(callback_numbers), 2)
-        self.assertEqual(callback_numbers[0], 1)
-        self.assertEqual(callback_numbers[1], 10)
-        asynchronizer.shutdown()
+        serializer.submit(_worker, numbers, 1)
+        serializer.submit(_worker, numbers, 2)
+        serializer.submit(_worker, numbers, 3)
+        serializer.submit(_worker, numbers, 4)
+        serializer.submit(_worker, numbers, 5)
+        serializer.submit(_worker, numbers, 6)
+        serializer.submit(_worker, numbers, 7)
+        serializer.submit(_worker, numbers, 8)
+        serializer.submit(_worker, numbers, 9)
+        serializer.submit(_worker, numbers, 10)
+        serializer.wait()
+        self.assertEqual(len(numbers), 10)
+        self.assertEqual(numbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        self.assertEqual(len(callback_numbers), 10)
+        self.assertEqual(callback_numbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        serializer.shutdown()
 
-    def test_asynchronizer_name(self):
-        asynchronizer = Asynchronizer(executor=self.executor, name="Will")
-        self.assertEqual(asynchronizer.name, "Will")
+    def test_serializer_name(self):
+        serializer = Serializer(executor=self.executor, name="Will")
+        self.assertEqual(serializer.name, "Will")
         self.assertEqual(
-            asynchronizer._executor.name,
-            'TestAsynchronizerExecutor')
+            serializer._executor.name,
+            'TestSerializerExecutor')
 
     def test_submit_after_shutdown(self):
-        self.asynchronizer.shutdown()
+        self.serializer.shutdown()
         with self.assertRaises(RuntimeError):
-            self.asynchronizer.submit(lambda: None)
+            self.serializer.submit(lambda: None)
 
     def test_submit_bad_job(self):
         """
@@ -140,8 +137,8 @@ class TestAsynchronizer(unittest.TestCase):
         """
         logger_name = 'encore.concurrent.futures.abc_work_scheduler'
         with loghandler(logger_name) as handler:
-            self.asynchronizer.submit(operator.div, 1, 0)
-            self.asynchronizer.wait()
+            self.serializer.submit(operator.div, 1, 0)
+            self.serializer.wait()
 
         self.assertEqual(len(handler.records), 1)
         record = handler.records[0]
@@ -160,8 +157,8 @@ class TestAsynchronizer(unittest.TestCase):
         def _callback(future):
             future.result()
 
-        asynchronizer = Asynchronizer(
-            name='TestCallbackExceptionAsynchronizer',
+        serializer = Serializer(
+            name='TestCallbackExceptionSerializer',
             executor=self.executor,
             callback=_callback,
         )
@@ -169,8 +166,8 @@ class TestAsynchronizer(unittest.TestCase):
         # Submit a bad job
         logger_name = 'encore.concurrent.futures.abc_work_scheduler'
         with loghandler(logger_name) as handler:
-            asynchronizer.submit(operator.div, 1, 0)
-            asynchronizer.wait()
+            serializer.submit(operator.div, 1, 0)
+            serializer.wait()
 
         self.assertEqual(len(handler.records), 1)
         record = handler.records[0]
@@ -178,7 +175,7 @@ class TestAsynchronizer(unittest.TestCase):
         exc_type, exc_value, exc_tb = record.exc_info
         self.assertIs(exc_type, ZeroDivisionError)
 
-        asynchronizer.shutdown()
+        serializer.shutdown()
 
     def test_submit_job_with_raising_callback(self):
         """
@@ -190,8 +187,8 @@ class TestAsynchronizer(unittest.TestCase):
         def _callback(future):
             raise _TestException('Failing callback')
 
-        asynchronizer = Asynchronizer(
-            name='TestCallbackExceptionAsynchronizer',
+        serializer = Serializer(
+            name='TestCallbackExceptionSerializer',
             executor=self.executor,
             callback=_callback,
         )
@@ -199,8 +196,8 @@ class TestAsynchronizer(unittest.TestCase):
         # Submit a good job
         logger_name = 'encore.concurrent.futures.abc_work_scheduler'
         with loghandler(logger_name) as handler:
-            asynchronizer.submit(operator.add, 1, 0)
-            asynchronizer.wait()
+            serializer.submit(operator.add, 1, 0)
+            serializer.wait()
 
         self.assertEqual(len(handler.records), 1)
         record = handler.records[0]
@@ -210,8 +207,8 @@ class TestAsynchronizer(unittest.TestCase):
 
         # Submit a bad job
         with loghandler(logger_name) as handler:
-            asynchronizer.submit(operator.div, 1, 0)
-            asynchronizer.wait()
+            serializer.submit(operator.div, 1, 0)
+            serializer.wait()
 
         self.assertEqual(len(handler.records), 1)
         record = handler.records[0]
@@ -219,11 +216,11 @@ class TestAsynchronizer(unittest.TestCase):
         exc_type, exc_value, exc_tb = record.exc_info
         self.assertIs(exc_type, _TestException)
 
-        asynchronizer.shutdown()
+        serializer.shutdown()
 
     def tearDown(self):
-        self.asynchronizer.shutdown()
-        del self.asynchronizer
+        self.serializer.shutdown()
+        del self.serializer
         self.executor.shutdown()
         del self.executor
 
