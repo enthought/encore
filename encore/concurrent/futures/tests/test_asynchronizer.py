@@ -8,17 +8,18 @@
 import contextlib
 import logging
 import operator
-import Queue
 import time
 import unittest
 
-from ..asynchronizer import Asynchronizer
-from ..enhanced_thread_pool_executor import EnhancedThreadPoolExecutor
+from encore.concurrent.futures.asynchronizer import Asynchronizer
+from encore.concurrent.futures.enhanced_thread_pool_executor import (
+    EnhancedThreadPoolExecutor)
 
 
-def _worker(queue, value):
+def _worker(data, value):
     time.sleep(0.25)
-    queue.put(value)
+    data.append(value)
+    return value
 
 
 class TestHandler(logging.Handler):
@@ -42,6 +43,7 @@ def loghandler(logger_name):
     """
     handler = TestHandler()
     logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
     old_propagate_value = logger.propagate
     logger.propagate = False
     logger.addHandler(handler)
@@ -68,91 +70,67 @@ class TestAsynchronizer(unittest.TestCase):
         )
 
     def test_events_collapsed(self):
-        queue = Queue.Queue()
-        self.asynchronizer.submit(_worker, queue, 1)
-        self.asynchronizer.submit(_worker, queue, 2)
-        self.asynchronizer.submit(_worker, queue, 3)
-        self.asynchronizer.submit(_worker, queue, 4)
-        self.asynchronizer.submit(_worker, queue, 5)
-        self.asynchronizer.submit(_worker, queue, 6)
-        self.asynchronizer.submit(_worker, queue, 7)
-        self.asynchronizer.submit(_worker, queue, 8)
-        self.asynchronizer.submit(_worker, queue, 9)
-        self.asynchronizer.submit(_worker, queue, 10)
+        numbers = []
+        self.asynchronizer.submit(_worker, numbers, 1)
+        self.asynchronizer.submit(_worker, numbers, 2)
+        self.asynchronizer.submit(_worker, numbers, 3)
+        self.asynchronizer.submit(_worker, numbers, 4)
+        self.asynchronizer.submit(_worker, numbers, 5)
+        self.asynchronizer.submit(_worker, numbers, 6)
+        self.asynchronizer.submit(_worker, numbers, 7)
+        self.asynchronizer.submit(_worker, numbers, 8)
+        self.asynchronizer.submit(_worker, numbers, 9)
+        self.asynchronizer.submit(_worker, numbers, 10)
         self.asynchronizer.wait()
-        self.assertEqual(queue.qsize(), 2)
-        self.assertEqual(queue.get(), 1)
-        self.assertEqual(queue.get(), 10)
+        self.assertEqual(len(numbers), 2)
+        self.assertEqual(numbers[0], 1)
+        self.assertEqual(numbers[1], 10)
 
     def test_callback(self):
         # Make a callback that repeats the insertion into another queue.
-        callback_queue = Queue.Queue()
+        callback_numbers = []
 
         def _callback(future):
             value = future.result()
-            callback_queue.put(value)
+            callback_numbers.append(value)
 
         asynchronizer = Asynchronizer(
             name='TestCallbackAsynchronizer',
             executor=self.executor,
-            callback=_callback,
+            callback=_callback
         )
 
-        queue = Queue.Queue()
-        asynchronizer.submit(_worker, queue, 1)
-        asynchronizer.submit(_worker, queue, 2)
-        asynchronizer.submit(_worker, queue, 3)
-        asynchronizer.submit(_worker, queue, 4)
-        asynchronizer.submit(_worker, queue, 5)
-        asynchronizer.submit(_worker, queue, 6)
-        asynchronizer.submit(_worker, queue, 7)
-        asynchronizer.submit(_worker, queue, 8)
-        asynchronizer.submit(_worker, queue, 9)
-        asynchronizer.submit(_worker, queue, 10)
+        numbers = []
+        asynchronizer.submit(_worker, numbers, 1)
+        asynchronizer.submit(_worker, numbers, 2)
+        asynchronizer.submit(_worker, numbers, 3)
+        asynchronizer.submit(_worker, numbers, 4)
+        asynchronizer.submit(_worker, numbers, 5)
+        asynchronizer.submit(_worker, numbers, 6)
+        asynchronizer.submit(_worker, numbers, 7)
+        asynchronizer.submit(_worker, numbers, 8)
+        asynchronizer.submit(_worker, numbers, 9)
+        asynchronizer.submit(_worker, numbers, 10)
         asynchronizer.wait()
-
-        # Test that the queues contain the same contents.
-        self.assertEqual(queue.qsize(), 2)
-        self.assertEqual(queue.get(), 1)
-        self.assertEqual(queue.get(), 10)
-        self.assertEqual(callback_queue.qsize(), 2)
-        self.assertEqual(callback_queue.get(), 1)
-        self.assertEqual(callback_queue.get(), 10)
-
+        self.assertEqual(len(numbers), 2)
+        self.assertEqual(numbers[0], 1)
+        self.assertEqual(numbers[1], 10)
+        self.assertEqual(len(callback_numbers), 2)
+        self.assertEqual(callback_numbers[0], 1)
+        self.assertEqual(callback_numbers[1], 10)
         asynchronizer.shutdown()
-
-    def test_private_executor_shutdown(self):
-        asynchronizer = Asynchronizer()
-        asynchronizer.submit(lambda: None)
-        self.assertTrue(
-            all(t.isAlive() for t in asynchronizer._executor._threads))
-        asynchronizer.shutdown()
-        self.assertFalse(
-            all(t.isAlive() for t in asynchronizer._executor._threads))
-
-    def test_public_executor_shutdown(self):
-        self.asynchronizer.submit(lambda: None)
-        self.assertTrue(
-            all(t.isAlive() for t in self.asynchronizer._executor._threads))
-        self.asynchronizer.shutdown()
-        self.assertTrue(
-            all(t.isAlive() for t in self.asynchronizer._executor._threads))
 
     def test_asynchronizer_name(self):
-        asynchronizer = Asynchronizer(name="Will")
+        asynchronizer = Asynchronizer(executor=self.executor, name="Will")
         self.assertEqual(asynchronizer.name, "Will")
-        self.assertEqual(asynchronizer._executor.name, "WillExecutor")
+        self.assertEqual(
+            asynchronizer._executor.name,
+            'TestAsynchronizerExecutor')
 
     def test_submit_after_shutdown(self):
         self.asynchronizer.shutdown()
         with self.assertRaises(RuntimeError):
             self.asynchronizer.submit(lambda: None)
-
-    def test_submit_after_shutdown_private_executor(self):
-        asynchronizer = Asynchronizer()
-        asynchronizer.shutdown()
-        with self.assertRaises(RuntimeError):
-            asynchronizer.submit(lambda: None)
 
     def test_submit_bad_job(self):
         """
@@ -160,7 +138,8 @@ class TestAsynchronizer(unittest.TestCase):
         but we should get a logged exception as a result.
 
         """
-        with loghandler('encore.concurrent.futures.asynchronizer') as handler:
+        logger_name = 'encore.concurrent.futures.abc_work_scheduler'
+        with loghandler(logger_name) as handler:
             self.asynchronizer.submit(operator.div, 1, 0)
             self.asynchronizer.wait()
 
@@ -188,7 +167,8 @@ class TestAsynchronizer(unittest.TestCase):
         )
 
         # Submit a bad job
-        with loghandler('encore.concurrent.futures.asynchronizer') as handler:
+        logger_name = 'encore.concurrent.futures.abc_work_scheduler'
+        with loghandler(logger_name) as handler:
             asynchronizer.submit(operator.div, 1, 0)
             asynchronizer.wait()
 
@@ -217,7 +197,8 @@ class TestAsynchronizer(unittest.TestCase):
         )
 
         # Submit a good job
-        with loghandler('encore.concurrent.futures.asynchronizer') as handler:
+        logger_name = 'encore.concurrent.futures.abc_work_scheduler'
+        with loghandler(logger_name) as handler:
             asynchronizer.submit(operator.add, 1, 0)
             asynchronizer.wait()
 
@@ -228,7 +209,8 @@ class TestAsynchronizer(unittest.TestCase):
         self.assertIs(exc_type, _TestException)
 
         # Submit a bad job
-        with loghandler('encore.concurrent.futures.asynchronizer') as handler:
+        logger_name = 'encore.concurrent.futures.abc_work_scheduler'
+        with loghandler(logger_name) as handler:
             asynchronizer.submit(operator.div, 1, 0)
             asynchronizer.wait()
 
@@ -245,3 +227,7 @@ class TestAsynchronizer(unittest.TestCase):
         del self.asynchronizer
         self.executor.shutdown()
         del self.executor
+
+
+if __name__ == '__main__':
+    unittest.main()
