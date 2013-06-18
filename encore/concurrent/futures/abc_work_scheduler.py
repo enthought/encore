@@ -25,7 +25,7 @@ class ABCWorkScheduler(object):
 
         Parameters
         ----------
-        executor : features.Executor
+        executor : concurrent.features.Executor
             The executor to use for the jobs.
 
         name : string
