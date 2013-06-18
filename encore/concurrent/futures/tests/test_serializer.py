@@ -69,7 +69,7 @@ class TestSerializer(unittest.TestCase):
             executor=self.executor,
         )
 
-    def test_events_collapsed(self):
+    def test_events_serialized(self):
         numbers = []
         self.serializer.submit(_worker, numbers, 1)
         self.serializer.submit(_worker, numbers, 2)
