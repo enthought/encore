@@ -209,7 +209,6 @@ class TestAsynchronizer(unittest.TestCase):
         self.assertIs(exc_type, _TestException)
 
         # Submit a bad job
-        logger_name = 'encore.concurrent.futures.abc_work_scheduler'
         with loghandler(logger_name) as handler:
             asynchronizer.submit(operator.div, 1, 0)
             asynchronizer.wait()
