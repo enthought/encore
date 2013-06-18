@@ -83,7 +83,7 @@ class TestSerializer(unittest.TestCase):
         self.serializer.submit(_worker, numbers, 10)
         self.serializer.wait()
         self.assertEqual(len(numbers), 10)
-        self.assertEqual(numbers, [1, 2, 3, 4, 5, 6 ,7, 8, 9, 10])
+        self.assertEqual(numbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
     def test_callback(self):
         # Make a callback that repeats the insertion into another queue.
@@ -112,9 +112,9 @@ class TestSerializer(unittest.TestCase):
         serializer.submit(_worker, numbers, 10)
         serializer.wait()
         self.assertEqual(len(numbers), 10)
-        self.assertEqual(numbers, [1, 2, 3, 4, 5, 6 ,7, 8, 9, 10])
+        self.assertEqual(numbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
         self.assertEqual(len(callback_numbers), 10)
-        self.assertEqual(callback_numbers, [1, 2, 3, 4, 5, 6 ,7, 8, 9, 10])
+        self.assertEqual(callback_numbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
         serializer.shutdown()
 
     def test_serializer_name(self):
