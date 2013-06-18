@@ -11,7 +11,7 @@ from encore.concurrent.futures.abc_work_scheduler import ABCWorkScheduler
 
 
 class Serializer(ABCWorkScheduler):
-    """ Makes sure that all jobs submitted are executed in order.
+    """ Execute all submitted jobs in order.
 
     """
     def __init__(self, executor, name=None, callback=None):
@@ -19,20 +19,21 @@ class Serializer(ABCWorkScheduler):
 
         Parameters
         ----------
-        excutor : features.Executor
-            The executor to use for the jobs
+        executor : features.Executor
+            The executor to use for the jobs.
 
         name : string
             The name of the Serializer to be identified in the logs.
 
         callback : callable
             If a callable `callback` is provided, it will be called whenever an
-            execution completes.  The callback must accept as its only argument
+            execution completes. The callback must accept as its only argument
             the Future that encapsulates the job. (The Future objects used by
             the scheduler are otherwise private.) Exceptions raised within the
             callback will be logged and suppressed.  See the
             `concurrent.futures` documentation for more information about
             Future callbacks.
+
         """
         super(Serializer, self).__init__(executor, name)
         #: A deque to act as buffer for the pending operations
@@ -45,13 +46,13 @@ class Serializer(ABCWorkScheduler):
     ###########################################################################
 
     def _add_pending_operation(self, operation, args, kwargs):
-        """ Add a new pending operation for sceduling.
+        """ Add a new pending operation for scheduling.
 
         """
         self._pending_operations.append((operation, args, kwargs))
 
     def _get_next_operation(self):
-        """ Add a new pending operation for sceduling.
+        """ Get the next operation to scedule or return None.
 
         """
         if self._pending_operations:

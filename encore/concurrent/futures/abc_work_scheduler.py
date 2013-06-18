@@ -21,11 +21,11 @@ class ABCWorkScheduler(object):
 
     @abc.abstractmethod
     def __init__(self, executor, name=None, callback=None):
-        """ Initialize the Sceduler.
+        """ Initialize the Scheduler.
 
         Parameters
         ----------
-        excutor : features.Executor
+        executor : features.Executor
             The executor to use for the jobs.
 
         name : string
