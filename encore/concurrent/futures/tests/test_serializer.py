@@ -17,7 +17,7 @@ from encore.concurrent.futures.enhanced_thread_pool_executor import (
 
 
 def _worker(data, value):
-    time.sleep(0.25)
+    time.sleep(0.1)
     data.append(value)
     return value
 
