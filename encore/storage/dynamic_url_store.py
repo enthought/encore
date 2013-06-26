@@ -131,7 +131,7 @@ class RequestsURLValue(Value):
 class DynamicURLStore(AbstractAuthorizingStore):
 
     def __init__(self, base_url, query_url, url_format='{base}/{key}/{part}',
-            parts=DEFAULT_PARTS):
+                 parts=DEFAULT_PARTS):
         super(AbstractAuthorizingStore, self).__init__()
         self.base_url = base_url
         self.query_url = query_url
