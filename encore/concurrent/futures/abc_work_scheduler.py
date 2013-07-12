@@ -127,6 +127,7 @@ class ABCWorkScheduler(object):
                     self.name,
                 )
             )
+            logger.error('Actual error:\n{}'.format(future.traceback()))
 
         with self._state_lock:
             self._future = None
