@@ -143,7 +143,10 @@ class TestAsynchronizer(unittest.TestCase):
             self.asynchronizer.submit(operator.div, 1, 0)
             self.asynchronizer.wait()
 
-        self.assertEqual(len(handler.records), 1)
+        # We log two messages for each failure. The actual traceback
+        # from the worker, and the exception of where it occurred
+        # (i.e. where the result was accessed)
+        self.assertEqual(len(handler.records), 2)
         record = handler.records[0]
         self.assertIsNotNone(record.exc_info)
         exc_type, exc_value, exc_tb = record.exc_info
@@ -172,7 +175,10 @@ class TestAsynchronizer(unittest.TestCase):
             asynchronizer.submit(operator.div, 1, 0)
             asynchronizer.wait()
 
-        self.assertEqual(len(handler.records), 1)
+        # We log two messages for each failure. The actual traceback
+        # from the worker, and the exception of where it occurred
+        # (i.e. where the result was accessed)
+        self.assertEqual(len(handler.records), 2)
         record = handler.records[0]
         self.assertIsNotNone(record.exc_info)
         exc_type, exc_value, exc_tb = record.exc_info
@@ -202,7 +208,10 @@ class TestAsynchronizer(unittest.TestCase):
             asynchronizer.submit(operator.add, 1, 0)
             asynchronizer.wait()
 
-        self.assertEqual(len(handler.records), 1)
+        # We log two messages for each failure. The actual traceback
+        # from the worker, and the exception of where it occurred
+        # (i.e. where the result was accessed)
+        self.assertEqual(len(handler.records), 2)
         record = handler.records[0]
         self.assertIsNotNone(record.exc_info)
         exc_type, exc_value, exc_tb = record.exc_info
@@ -213,7 +222,10 @@ class TestAsynchronizer(unittest.TestCase):
             asynchronizer.submit(operator.div, 1, 0)
             asynchronizer.wait()
 
-        self.assertEqual(len(handler.records), 1)
+        # We log two messages for each failure. The actual traceback
+        # from the worker, and the exception of where it occurred
+        # (i.e. where the result was accessed)
+        self.assertEqual(len(handler.records), 2)
         record = handler.records[0]
         self.assertIsNotNone(record.exc_info)
         exc_type, exc_value, exc_tb = record.exc_info
