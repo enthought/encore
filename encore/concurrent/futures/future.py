@@ -10,6 +10,10 @@ class Future(_base.Future):
         self._traceback = None
 
     def traceback(self):
+        """Return the formatted traceback of the error that occured in the
+        Executor worker, or None if no error occurred.
+
+        """
         return self._traceback
 
     def set_exception(self, exception):
