@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EnCore - A collection of core-level utility modules &mdash; Encore 0.2 documentation</title>
+    <title>EnCore - A collection of core-level utility modules &mdash; Encore 0.4.0 documentation</title>
     
     <link rel="stylesheet" href="_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2',
+        VERSION:     '0.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/et.ico"/>
-    <link rel="top" title="Encore 0.2 documentation" href="#" />
+    <link rel="top" title="Encore 0.4.0 documentation" href="#" />
     <link rel="next" title="Events" href="events/index.html" /> 
   </head>
   <body>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="events/index.html" title="Events"
              accesskey="N">next</a> |</li>
-        <li><a href="#">Encore 0.2 documentation</a> &raquo;</li> 
+        <li><a href="#">Encore 0.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -55,6 +55,7 @@
 <li><a class="reference internal" href="#">EnCore - A collection of core-level utility modules</a><ul>
 <li><a class="reference internal" href="#packages">Packages</a></li>
 <li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#build-status">Build Status</a></li>
 <li><a class="reference internal" href="#contents">Contents</a><ul>
 </ul>
 </li>
@@ -109,13 +110,24 @@ distributed resources.</p>
 <p><em>Storage:</em> Abstract base classes and concrete implementations of a basic key-value storage API.
 The API is intended to be general purpose enough to support a variety of local and remote storage
 systems.</p>
+<p><em>Concurrent:</em> A package of tools for handling concurrency within applications.</p>
+<p><em>Terminal:</em> Some utilities for working with text-based terminal displays.</p>
 </div>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Python &gt;= 2.6 (not Python 3)</li>
 <li>Sphinx, graphviz, pydot (documentation build)</li>
+<li>Some optional modules have dependencies on:<ul>
+<li>Requests (<a class="reference external" href="http://docs.python-requests.org/en/latest/">http://docs.python-requests.org/en/latest/</a>)</li>
+<li>Futures (<a class="reference external" href="https://code.google.com/p/pythonfutures/">https://code.google.com/p/pythonfutures/</a>)</li>
 </ul>
+</li>
+</ul>
+</div>
+<div class="section" id="build-status">
+<h2>Build Status<a class="headerlink" href="#build-status" title="Permalink to this headline">¶</a></h2>
+<img alt="https://travis-ci.org/enthought/encore.png" src="https://travis-ci.org/enthought/encore.png" />
 </div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
@@ -212,12 +224,12 @@ and limitations under the License.</p>
         <li class="right" >
           <a href="events/index.html" title="Events"
              >next</a> |</li>
-        <li><a href="#">Encore 0.2 documentation</a> &raquo;</li> 
+        <li><a href="#">Encore 0.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Enthought, Inc..
-      Last updated on May 16, 2012.
+        &copy; Copyright 2011-2013, Enthought, Inc..
+      Last updated on Jul 24, 2013.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>

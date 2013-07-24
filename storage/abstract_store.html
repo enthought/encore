@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Key-Value Store API &mdash; Encore 0.2 documentation</title>
+    <title>Key-Value Store API &mdash; Encore 0.4.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2',
+        VERSION:     '0.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.2 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.4.0 documentation" href="../index.html" />
     <link rel="up" title="Storage" href="index.html" />
     <link rel="next" title="Events" href="events.html" />
     <link rel="prev" title="Usage" href="usage.html" /> 
@@ -47,7 +47,7 @@
         <li class="right" >
           <a href="usage.html" title="Usage"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
@@ -125,6 +125,8 @@ the use of any required resources.  The exact form of the credentials
 is implementation-specific, but may be as simple as a
 <tt class="docutils literal"><span class="pre">(username,</span> <span class="pre">password)</span></tt> tuple.</td>
 </tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><strong>AuthorizationError</strong> - If the credentials are not valid, this error will be raised.</td>
+</tr>
 </tbody>
 </table>
 </dd></dl>
@@ -162,11 +164,7 @@ store requires.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
-<li><strong>data</strong> (file-like) - A readable file-like object that provides stream of data from the key-value store</li>
-<li><strong>metadata</strong> (dictionary) - A dictionary of metadata for the key.</li>
-</ul>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>value</strong> (instance of Value) - An instance of a Value subclass which holds references to the data, metadata and other information about the key.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
 </tr>
@@ -460,9 +458,7 @@ key-value store.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
-<li><strong>value</strong> (<em>tuple of file-like, dict</em>) &#8211; A pair of objects, the first being a readable file-like object that
-provides stream of data from the key-value store.  The second is a
-dictionary of metadata for the key.</li>
+<li><strong>value</strong> (<em>instance of Value</em>) &#8211; An instance of a Value subclass.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
 default if they need to.  The default is 1048576 bytes (1 MiB).</li>
@@ -827,13 +823,13 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
         <li class="right" >
           <a href="usage.html" title="Usage"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.2 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, Enthought, Inc..
-      Last updated on May 16, 2012.
+        &copy; Copyright 2011-2013, Enthought, Inc..
+      Last updated on Jul 24, 2013.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
