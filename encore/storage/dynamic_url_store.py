@@ -212,16 +212,18 @@ class DynamicURLStore(AbstractAuthorizingStore):
         self._validate_response(response, key)
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
     
-    def get_metadata(self, key):
+    def get_metadata(self, key, select=None):
         response = self._session.get(self._url(key, 'metadata'))
         self._validate_response(response, key)
         if _requests_version=='0':
-            return response.json
+            metadata = response.json
         else:
-            return response.json()
-    get_metadata.__doc__ = AbstractAuthorizingStore.get_metadata.__doc__    
-    
-    
+            metadata = response.json()
+        if select is not None:
+            return dict((k, metadata[k]) for k in select if k in metadata)
+        else:
+            return metadata
+    get_metadata.__doc__ = AbstractAuthorizingStore.get_metadata.__doc__
 
     def update_metadata(self, key, metadata):
         response = self._session.post(self._url(key, 'metadata'),

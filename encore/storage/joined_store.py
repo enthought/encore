@@ -261,7 +261,7 @@ class JoinedStore(AbstractAuthorizingStore):
         """
         for store in self.stores:
             if store.exists(key):
-                return store.get_metadata(key)
+                return store.get_metadata(key, select)
         else:
             raise KeyError(key)
             
