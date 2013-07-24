@@ -344,7 +344,8 @@ class DictMemoryStore(AbstractStore):
             emitted with the key & metadata
 
         """
-        self.set(key, StringValue(metadata=metadata))
+        data = self._store.get(key, ('', {}))[0]
+        self.set(key, StringValue(data=data, metadata=metadata))
 
 
     def update_metadata(self, key, metadata):
