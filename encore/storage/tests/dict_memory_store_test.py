@@ -86,6 +86,19 @@ class DictMemoryStoreWriteTest(abstract_test.AbstractStoreWriteTest):
             metadata = {'meta': True, 'meta1': -i}
             t = time.time()
             self.store._store[key] = (data, metadata, t, t)
+            
+    def test_set_data(self):
+        super(DictMemoryStoreWriteTest, self).test_set_data()
+        # make an additional claim about behaviour of metadata
+        self.assertEqual(self.store.get_metadata('test1'), {
+            'a_str': 'test3',
+            'an_int': 1,
+            'a_float': 2.0,
+            'a_bool': True,
+            'a_list': ['one', 'two', 'three'],
+            'a_dict': {'one': 1, 'two': 2, 'three': 3}
+        })
+
 
     """
     def test_set(self):
