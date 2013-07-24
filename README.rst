@@ -33,3 +33,8 @@ Prerequisites
   - Requests (http://docs.python-requests.org/en/latest/)
 
   - Futures (https://code.google.com/p/pythonfutures/)
+
+Build Status
+------------
+
+.. image:: https://travis-ci.org/enthought/encore.png
