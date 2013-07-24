@@ -38,6 +38,8 @@ import Queue as queue
 
 from concurrent.futures import _base
 
+from .future import Future
+
 
 # Workers are created as daemon threads. This is done to allow the interpreter
 # to exit when there are still idle threads in a ThreadPoolExecutor's thread
@@ -164,7 +166,7 @@ class EnhancedThreadPoolExecutor(_base.Executor):
             if self._shutdown:
                 raise RuntimeError('cannot schedule new futures after shutdown')
 
-            f = _base.Future()
+            f = Future()
             w = _WorkItem(f, fn, args, kwargs)
 
             self._work_queue.put(w)
