@@ -393,6 +393,17 @@ class EnhancedThreadPoolExecutorTest(EnhancedThreadPoolMixin, unittest.TestCase)
                 msg="Threads don't have unique names: {0}.".format(
                     thread_names))
 
+    def test_retrieve_real_traceback(self):
+        future = self.executor.submit(divmod, 1, 0)
+        self.assertRaises(ZeroDivisionError, future.result)
+        traceback = future.traceback()
+        # We don't want to see a traceback of retrieving the result, but
+        # of where it occurred in the worker.
+        # This is concurrent\futures\_base.py", line 357
+        invalid = 'return self.__get_result()'
+        self.assertTrue(invalid not in traceback)
+        self.assertTrue('ZeroDivisionError' in traceback)
+
 
 class EnhancedThreadPoolExecutorInitUninit(unittest.TestCase):
 
