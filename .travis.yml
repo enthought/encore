@@ -9,4 +9,4 @@ script:
   - make --directory docs html
 notifications:
   email:
-    - cwebster@enthought.com
+    - travis-ci@enthought.com
