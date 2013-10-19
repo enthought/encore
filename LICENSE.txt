@@ -46,3 +46,9 @@ software distributed under the License is distributed on an
 either express or implied. 
 See the License for the specific language governing permissions 
 and limitations under the License. 
+
+concurrent.futures.enhanced_thread_pool_executor
+------------------------------------------------
+
+Copyright 2009 Brian Quinlan. All Rights Reserved.
+Licensed to PSF under a Contributor Agreement.
