@@ -58,8 +58,7 @@ class DelayedAsynchronizer(Asynchronizer):
             factory must accept two arguments: The interval in seconds
             and a callback to be executed on timeout.  The returned
             timer must have ``start()`` method to start the timer and a
-            ``cancel()`` method to cancell the current timer at
-            shutdown.
+            ``cancel()`` method to cancel the current timer at shutdown.
 
         Notes
         -----
