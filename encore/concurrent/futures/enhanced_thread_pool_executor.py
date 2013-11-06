@@ -130,6 +130,14 @@ def _worker(executor_reference, work_queue, initialize=None,
 
 
 class EnhancedThreadPoolExecutor(_base.Executor):
+
+    # Class-attribute for customizing the type of future used by the executor.
+    # This is provided to ease customization of this class without having to
+    # duplicate its internals. The factory must accept no arguments and the
+    # object returned by the factory must support the concurrent.futures.Future
+    # API.
+    _future_factory = Future
+
     def __init__(self, max_workers, initializer=None, uninitializer=None,
                  name=None):
         """Initializes a new EnhancedThreadPoolExecutor instance.
@@ -166,7 +174,7 @@ class EnhancedThreadPoolExecutor(_base.Executor):
             if self._shutdown:
                 raise RuntimeError('cannot schedule new futures after shutdown')
 
-            f = Future()
+            f = self._future_factory()
             w = _WorkItem(f, fn, args, kwargs)
 
             self._work_queue.put(w)

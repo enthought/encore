@@ -75,6 +75,14 @@ class EnhancedThreadPoolMixin(ExecutorMixin):
     executor_type = EnhancedThreadPoolExecutor
 
 
+class CustomFuture(Future):
+    pass
+
+
+class CustomThreadPoolExecutor(EnhancedThreadPoolExecutor):
+    _future_factory = CustomFuture
+
+
 class EnhancedThreadPoolShutdownTest(EnhancedThreadPoolMixin, unittest.TestCase):
     def _prime_executor(self):
         pass
@@ -436,6 +444,17 @@ class EnhancedThreadPoolExecutorInitUninit(unittest.TestCase):
         self.assertEqual([None] * num_workers, self.artifacts)
 
 
+class TestCustomFuture(unittest.TestCase):
+
+    def test_custom_future(self):
+        num_workers = 5
+        executor = CustomThreadPoolExecutor(num_workers)
+        futures_ = _start_all_threads(executor, num_workers)
+        self.assertTrue(
+            all(isinstance(future_, CustomFuture) for future_ in futures_)
+        )
+
+
 def _start_all_threads(executor, num_workers):
 
     counter = collections.Counter(count=0)
@@ -444,6 +463,7 @@ def _start_all_threads(executor, num_workers):
         future = executor.submit(_wait_for_counter, counter, num_workers)
         futures_.append(future)
     futures.wait(futures_)
+    return futures_
 
 
 def _wait_for_counter(counter, max_count):
