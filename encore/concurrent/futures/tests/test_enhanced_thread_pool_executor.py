@@ -1,11 +1,11 @@
 # Portions of this code are taken from the Python source distribution, which is
 # subject to the PSF license. See http://docs.python.org/2/license.html.
 
+import collections
 import threading
 import time
 import unittest
 import weakref
-import collections
 
 from concurrent import futures
 from concurrent.futures._base import (
@@ -458,18 +458,21 @@ class TestCustomFuture(unittest.TestCase):
 def _start_all_threads(executor, num_workers):
 
     counter = collections.Counter(count=0)
+    lock = threading.Lock()
     futures_ = []
     for i in range(num_workers):
-        future = executor.submit(_wait_for_counter, counter, num_workers)
+        future = executor.submit(
+            _wait_for_counter, counter, lock, num_workers)
         futures_.append(future)
     futures.wait(futures_)
     return futures_
 
 
-def _wait_for_counter(counter, max_count):
-    counter['count'] += 1
+def _wait_for_counter(counter, lock, max_count):
+    with lock:
+        counter['count'] += 1
     while counter['count'] < max_count:
-        time.sleep(0.1)
+        time.sleep(0.05)
 
 
 if __name__ == "__main__":
