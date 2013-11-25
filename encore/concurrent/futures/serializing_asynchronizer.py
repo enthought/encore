@@ -26,8 +26,9 @@ class SerializingAsynchronizer(ABCWorkScheduler):
     def __init__(self, executor, name=None, callback=None):
         super(SerializingAsynchronizer, self).__init__(
             executor, name, callback)
-        #: Either a tuple (operation, args, kwargs) representing a pending
-        #: call, or None.
+        # Ordered dictionary containing tuples (operation, args, kwargs)
+        # representing pending operations.  Operations are executed in
+        # the order they were entered in the dict.
         self._pending_operations = OrderedDict()
 
     ###########################################################################
