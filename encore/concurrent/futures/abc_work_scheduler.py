@@ -16,6 +16,10 @@ class ABCWorkScheduler(object):
     """ An abstract class to implement various job scheduling and execution
     models using executors.
 
+    .. warning::
+
+        This is an experimental API and is subject to change.
+
     """
     __metaclass__ = abc.ABCMeta
 

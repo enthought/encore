@@ -21,6 +21,10 @@ class SerializingAsynchronizer(ABCWorkScheduler):
     prior.  Different submitted callables are executed serially in the
     order in which they were submitted.
 
+    .. warning::
+
+        This is an experimental API and is subject to change.
+
     """
 
     def __init__(self, executor, name=None, callback=None):
