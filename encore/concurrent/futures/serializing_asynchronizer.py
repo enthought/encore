@@ -13,13 +13,18 @@ from encore.concurrent.futures.abc_work_scheduler import ABCWorkScheduler
 class SerializingAsynchronizer(ABCWorkScheduler):
     """Provides Asynchronizer functionality for multiple operations.
 
-    The SerializingAsynchronizer provides the same gauranteed as the
+    The SerializingAsynchronizer provides the same guarantees as the
     :class:`~encore.concurrent.futures.asynchronizer.Asynchronizer` for
     multiple different operations.  For any submitted callable, requests
     to submit a new operation while an operation of **the same**
     callable is underway, the new operation is stored overwriting the
     prior.  Different submitted callables are executed serially in the
-    order in which they were submitted.
+    order in which they were originally submitted.
+
+    For example if long-running callable ``C`` is submitted, then
+    callable ``A``, then callable ``B``, then callable ``A`` again (all
+    while ``C`` is running), then the order of execution will be ``C``,
+    ``A``, ``B``.
 
     .. warning::
 
