@@ -16,6 +16,10 @@ class Serializer(ABCWorkScheduler):
     All submitted operations are stored in a deque and are scheduled in
     sequence.
 
+    .. warning::
+
+        This is an experimental API and is subject to change.
+
     """
     def __init__(self, executor, name=None, callback=None):
         """ Initialize the Serializer.

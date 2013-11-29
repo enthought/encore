@@ -23,6 +23,10 @@ class Asynchronizer(ABCWorkScheduler):
     current execution are discarded.  The last operation submitted is
     guaranteed to eventually be executed.
 
+    .. warning::
+
+        This is an experimental API and is subject to change.
+
     """
 
     def __init__(self, executor, name=None, callback=None):
