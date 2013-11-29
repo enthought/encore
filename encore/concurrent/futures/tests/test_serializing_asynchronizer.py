@@ -49,6 +49,7 @@ def loghandler(logger_name):
     """
     handler = TestHandler()
     logger = logging.getLogger(logger_name)
+    old_level = logger.level
     logger.setLevel(logging.DEBUG)
     old_propagate_value = logger.propagate
     logger.propagate = False
@@ -58,9 +59,10 @@ def loghandler(logger_name):
     finally:
         logger.removeHandler(handler)
         logger.propagate = old_propagate_value
+        logger.setLevel(old_level)
 
 
-class _TestException(Exception):
+class TestException(Exception):
     pass
 
 
@@ -69,7 +71,8 @@ class TestSerializingAsynchronizer(unittest.TestCase):
     def setUp(self):
         self.executor = EnhancedThreadPoolExecutor(
             name='TestSerializingAsynchronizerExecutor',
-            max_workers=1)
+            max_workers=1,
+        )
         self.asynchronizer = SerializingAsynchronizer(
             name='TestSerializingAsynchronizer',
             executor=self.executor,
@@ -237,7 +240,7 @@ class TestSerializingAsynchronizer(unittest.TestCase):
         """
 
         def _callback(future):
-            raise _TestException('Failing callback')
+            raise TestException('Failing callback')
 
         asynchronizer = SerializingAsynchronizer(
             name='TestCallbackExceptionSerializingAsynchronizer',
@@ -258,7 +261,7 @@ class TestSerializingAsynchronizer(unittest.TestCase):
         record = handler.records[0]
         self.assertIsNotNone(record.exc_info)
         exc_type, exc_value, exc_tb = record.exc_info
-        self.assertIs(exc_type, _TestException)
+        self.assertIs(exc_type, TestException)
 
         # Submit a bad job
         with loghandler(logger_name) as handler:
@@ -272,7 +275,7 @@ class TestSerializingAsynchronizer(unittest.TestCase):
         record = handler.records[0]
         self.assertIsNotNone(record.exc_info)
         exc_type, exc_value, exc_tb = record.exc_info
-        self.assertIs(exc_type, _TestException)
+        self.assertIs(exc_type, TestException)
 
         asynchronizer.shutdown()
 
