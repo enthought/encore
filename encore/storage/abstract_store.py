@@ -27,7 +27,7 @@ import fnmatch
 from cStringIO import StringIO
 import warnings
 
-from encore.events.api import get_event_manager
+from ..events.api import get_event_manager
 
 from .utils import StoreProgressManager, buffer_iterator
 
