@@ -12,11 +12,11 @@ from functools import wraps
 def dispatch(dispatcher=None, call=None):
     """ Dispatch method calls using a dispatcher.
 
-    All calls made to the decorated method are sumbitted to a "dispatcher" (an
+    All calls made to the decorated method are submitted to a "dispatcher" (an
     executor, work scheduler, or anything else with a "submit" method), or via
     some other call. The decorated function does not await any feedback from
     the dispatcher. For example, futures returned by an executor are ignored.
-    The decorated method returns nothing.function
+    The decorated method returns nothing.
 
     Parameters
     ----------
