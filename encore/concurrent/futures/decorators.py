@@ -9,11 +9,6 @@
 from functools import wraps
 
 
-# Encapsulate re-dispatch of result. Allow on_result to be passed, which should
-# be called with self, result.
-# dispatch('dispatch', on_result=partial(ui_dispatch, setattr,
-# 'my_trait')
-# partial(ui_dispatch,
 def dispatch(dispatcher=None, call=None):
     """ Dispatch method calls using a dispatcher.
 

@@ -86,6 +86,10 @@ class TestDispatch(unittest.TestCase):
         self.assertEqual(self.calls, self.obj.dispatcher.calls)
         self.assertEqual(self.obj.calls, self.calls)
 
+    def test_wrong_args(self):
+        self.assertRaises(ValueError, dispatch)
+        self.assertRaises(ValueError, dispatch, 'foo', 'bar')
+
 
 if __name__ == '__main__':
     unittest.main()
