@@ -20,6 +20,9 @@ changes:
     * Workers do not unnecessarily retain references to work items
       (bugs.python.org/issue16284).
     * Workers do not use polling: http://bugs.python.org/issue11635
+    * Optional `name` argument to prefix executor threads' names.
+    * Optional `wait_on_exit` argument to let worker threads die
+      abruptly during jobs on interpreter exit instead of waiting to finish.
 
 The implementation is largely copied to avoid reliance on undocumented, private
 parts of the code. For example, '_threads_queues' is needed to properly
@@ -139,7 +142,7 @@ class EnhancedThreadPoolExecutor(_base.Executor):
     _future_factory = Future
 
     def __init__(self, max_workers, initializer=None, uninitializer=None,
-                 name=None):
+                 name=None, wait_at_exit=True):
         """Initializes a new EnhancedThreadPoolExecutor instance.
 
         Args:
@@ -155,6 +158,12 @@ class EnhancedThreadPoolExecutor(_base.Executor):
                 is used as a prefix for the names of the executor's
                 worker threads.  If no name is given then the executor
                 class name will be used.
+            wait_at_exit: whether to wait for running jobs to finish during
+                interpreter exit or to abruptly kill the worker thread.
+                Note: The killed job does not get a chance to do any cleanups,
+                its resources (such as open files, database transactions, etc.)
+                may not be released properly. See the threading module
+                documentation about daemon threads for more information.
 
         """
         self._max_workers = max_workers
@@ -164,6 +173,7 @@ class EnhancedThreadPoolExecutor(_base.Executor):
         self._shutdown_lock = threading.Lock()
         self._initializer = initializer
         self._uninitializer = uninitializer
+        self._wait_at_exit = wait_at_exit
         if name is None:
             name = type(self).__name__
         self.name = name
@@ -199,7 +209,8 @@ class EnhancedThreadPoolExecutor(_base.Executor):
             t.daemon = True
             t.start()
             self._threads.add(t)
-            _threads_queues[t] = self._work_queue
+            if self._wait_at_exit:
+                _threads_queues[t] = self._work_queue
 
     def shutdown(self, wait=True):
         with self._shutdown_lock:
