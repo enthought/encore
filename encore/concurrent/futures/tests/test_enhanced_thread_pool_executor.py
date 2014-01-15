@@ -2,6 +2,9 @@
 # subject to the PSF license. See http://docs.python.org/2/license.html.
 
 import collections
+from os.path import dirname, join
+import subprocess
+import sys
 import threading
 import time
 import unittest
@@ -442,6 +445,35 @@ class EnhancedThreadPoolExecutorInitUninit(unittest.TestCase):
 
         executor.shutdown(wait=True)
         self.assertEqual([None] * num_workers, self.artifacts)
+
+
+class EnhancedThreadPoolWaitAtExit(unittest.TestCase):
+    """ Test whether the `wait_at_exit` argument is honored. """
+
+    def _execute(self, wait=False):
+        code = """if 1: # For indentation
+            import os, sys, time
+            from encore.concurrent.futures.enhanced_thread_pool_executor \
+                    import EnhancedThreadPoolExecutor
+
+            def job():
+                time.sleep(1)
+                sys.stdout.write('FINISHED')
+                sys.stdout.flush()
+
+            executor = EnhancedThreadPoolExecutor(max_workers=4,
+                            wait_at_exit=int(os.environ['SHOULD_WAIT']))
+            executor.submit(job)
+        """
+        return assert_python_ok('-c', code, SHOULD_WAIT=str(int(wait)))
+
+    def test_no_wait_at_exit(self):
+        rc, out, err = self._execute(False)
+        self.assertEqual(out, '')
+
+    def test_wait_at_exit(self):
+        rc, out, err = self._execute(True)
+        self.assertEqual(out, 'FINISHED')
 
 
 class TestCustomFuture(unittest.TestCase):
