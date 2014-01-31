@@ -28,7 +28,7 @@ def dispatch(dispatcher=None, call=None):
     call : callable or str, optional
         A callable used to dispatch calls, or a string identifying
         a callable on the instance to which the method is bound. The callable
-        must support the Executor.call signature.
+        must support the Executor.submit call signature.
 
     Notes
     -----
