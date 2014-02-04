@@ -11,13 +11,15 @@ from tempfile import mkdtemp
 from shutil import rmtree
 import json
 import time
-import random
+import urllib
 import SocketServer
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 import encore.storage.tests.abstract_test as abstract_test
 from ..static_url_store import StaticURLStore
+
+count = 1
 
 class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
     resolution = 'second'
@@ -64,8 +66,6 @@ class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
         self._running = True
 
         self._set_up_server()
-        time.sleep(1)
-
 
         self.store = StaticURLStore(self._get_base_url(), 'data/', 'index.json')
         self.store.connect()
@@ -90,7 +90,7 @@ class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
         pass
 
     def _get_base_url(self):
-        return 'file://'+self.path+'/'
+        return 'file:' + urllib.pathname2url(os.path.abspath(self.path)) + '/'
 
     def _write_data(self, filename, data):
         with file(os.path.join(self.path, 'data', filename), 'wb') as fp:
@@ -109,7 +109,9 @@ class StaticURLStoreHTTPReadTest(StaticURLStoreReadTest):
         return 'http://localhost:%s/' % self.port
 
     def _set_up_server(self):
-        self.port = 8080
+        global count
+        count += 1
+        self.port = 8080+count
         self._oldwd = os.getcwd()
         os.chdir(self.path)
 
@@ -117,6 +119,7 @@ class StaticURLStoreHTTPReadTest(StaticURLStoreReadTest):
         self.server_thread = threading.Thread(target=self.server.serve_forever, args=(0.1,))
         self.server_thread.daemon = True
         self.server_thread.start()
+        time.sleep(1)
 
     def _tear_down_server(self):
         self.server.shutdown()
