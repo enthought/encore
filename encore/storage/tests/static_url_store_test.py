@@ -19,6 +19,8 @@ from SimpleHTTPServer import SimpleHTTPRequestHandler
 import encore.storage.tests.abstract_test as abstract_test
 from ..static_url_store import StaticURLStore
 
+count = 1
+
 class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
     resolution = 'second'
 
@@ -107,7 +109,9 @@ class StaticURLStoreHTTPReadTest(StaticURLStoreReadTest):
         return 'http://localhost:%s/' % self.port
 
     def _set_up_server(self):
-        self.port = 8080
+        global count
+        count += 1
+        self.port = 8080+count
         self._oldwd = os.getcwd()
         os.chdir(self.path)
 
