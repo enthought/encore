@@ -23,22 +23,22 @@ def temp_dir():
 
 class AbstractStoreReadTest(TestCase):
     resolution = 'arbitrary'
-    
+
     def setUp(self):
         """ Set up a data store for the test case
-        
+
         The store should have:
-            
+
             * a key 'test1' with a file-like data object containing the
               bytes 'test2\n' and metadata {'a_str': 'test3', 'an_int': 1,
               'a_float': 2.0, 'a_bool': True, 'a_list': ['one', 'two', 'three'],
               'a_dict': {'one': 1, 'two': 2, 'three': 3}}
-            
+
             * keys 'key0' through 'key9' with values 'value0' through 'value9'
-              in filelike objects, and metadata {'query_test1': 'value', 
+              in filelike objects, and metadata {'query_test1': 'value',
               'query_test2': 0 through 9, 'optional': True for even,
-              not present for odd} 
-        
+              not present for odd}
+
         and set into 'self.store'.
         """
         self.store = None
@@ -67,7 +67,7 @@ class AbstractStoreReadTest(TestCase):
         # greater than the test start time.
         #self.assertGreaterEqual(value.created, self.test_start)
         #self.assertGreaterEqual(value.modified, self.test_start)
-    
+
     def test_get_copies(self):
         """ Metadata returned from separate get()s should not be same object"""
         if self.store is None:
@@ -76,13 +76,13 @@ class AbstractStoreReadTest(TestCase):
         metadata1['extra_key'] = 'extra_value'
         data2, metadata2 = self.store.get('test1')
         self.assertNotEqual(metadata2, metadata1)
-    
+
     def test_get_data(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = self.store.get_data('test1')
         self.assertEqual(data.read(), 'test2\n')
-    
+
     def test_get_metadata(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -95,7 +95,7 @@ class AbstractStoreReadTest(TestCase):
             'a_list': ['one', 'two', 'three'],
             'a_dict': {'one': 1, 'two': 2, 'three': 3}
         })
-    
+
     def test_get_metadata_copies(self):
         """ Results of separate get_metadata()s should not be same object"""
         if self.store is None:
@@ -104,7 +104,7 @@ class AbstractStoreReadTest(TestCase):
         metadata1['extra_key'] = 'extra_value'
         metadata2 = self.store.get('test1')
         self.assertNotEqual(metadata2, metadata1)
-    
+
     def test_get_metadata_select(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -113,7 +113,7 @@ class AbstractStoreReadTest(TestCase):
             'a_str': 'test3',
             'an_int': 1,
         })
-    
+
     def test_get_metadata_select_missing(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -128,7 +128,7 @@ class AbstractStoreReadTest(TestCase):
             self.skipTest('Abstract test case')
         self.assertEqual(self.store.exists('test1'), True)
         self.assertEqual(self.store.exists('test2'), False)
-    
+
     def test_multiget(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -139,15 +139,15 @@ class AbstractStoreReadTest(TestCase):
             expected = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
                 expected['optional'] = True
-            self.assertEqual(expected, value.metadata)        
-    
+            self.assertEqual(expected, value.metadata)
+
     def test_multiget_data(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         result = self.store.multiget_data('key'+str(i) for i in range(10))
         for i, data in enumerate(result):
             self.assertEqual(data.read(), 'value'+str(i))
-    
+
     def test_multiget_metadata(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -156,8 +156,8 @@ class AbstractStoreReadTest(TestCase):
             expected = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
                 expected['optional'] = True
-            self.assertEqual(expected, metadata)        
-    
+            self.assertEqual(expected, metadata)
+
     def test_multiget_metadata_select(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -167,8 +167,8 @@ class AbstractStoreReadTest(TestCase):
             expected = {'query_test1': 'value'}
             if i % 2 == 0:
                 expected['optional'] = True
-            self.assertEqual(expected, metadata)        
-    
+            self.assertEqual(expected, metadata)
+
     def test_query(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -176,7 +176,7 @@ class AbstractStoreReadTest(TestCase):
         self.assertEqual(result, [('test1', {'a_str': 'test3', 'an_int': 1,
             'a_float': 2.0, 'a_bool': True, 'a_list': ['one', 'two', 'three'],
             'a_dict': {'one': 1, 'two': 2, 'three': 3}})])
-    
+
     def test_query_copy(self):
         """ Metadata returned from separate query()s should not be same object"""
         if self.store is None:
@@ -185,7 +185,7 @@ class AbstractStoreReadTest(TestCase):
         result1[0][1]['extra_key'] = 'extra_value'
         result2 = sorted(self.store.query(a_str='test3'))
         self.assertNotEqual(result1, result2)
-    
+
     def test_query1(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -196,7 +196,7 @@ class AbstractStoreReadTest(TestCase):
             if i % 2 == 0:
                 metadata['optional'] = True
         self.assertEqual(result, expected)
-    
+
     def test_query2(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -206,19 +206,19 @@ class AbstractStoreReadTest(TestCase):
             if i % 2 == 0:
                 expected['optional'] = True
             self.assertEqual(result, [('key%d' % i, expected)])
-    
+
     def test_query_empty(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         result = list(self.store.query(a_str='test1'))
         self.assertEqual(result, [])
-    
+
     def test_query_select(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         result = sorted(self.store.query(['a_str', 'an_int'], a_str='test3'))
         self.assertEqual(result, [('test1', {'a_str': 'test3', 'an_int': 1})])
-    
+
     def test_query_select_missing(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -234,20 +234,20 @@ class AbstractStoreReadTest(TestCase):
             self.skipTest('Abstract test case')
         result = sorted(self.store.query_keys(a_str='test3'))
         self.assertEqual(result, ['test1'])
-    
+
     def test_query1_keys(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         result = sorted(self.store.query_keys(query_test1='value'))
         self.assertEqual(result, sorted('key%d' % i for i in range(10)))
-    
+
     def test_query2_keys(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         for i in range(10):
             result = sorted(self.store.query_keys(query_test2=i))
             self.assertEqual(result, ['key%d' % i])
-    
+
     def test_query_keys_empty(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -264,8 +264,8 @@ class AbstractStoreReadTest(TestCase):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = self.store.to_bytes('test1')
-        self.assertEqual(data, 'test2\n')        
-    
+        self.assertEqual(data, 'test2\n')
+
     def test_to_file(self):
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -274,7 +274,7 @@ class AbstractStoreReadTest(TestCase):
             self.store.to_file('test1', filepath)
             written = open(filepath, 'rb').read()
             self.assertEquals(written, 'test2\n')
-    
+
     @skip
     def test_to_file_large(self):
         if self.store is None:
@@ -289,36 +289,36 @@ class AbstractStoreReadTest(TestCase):
             self.store.to_file('test3', filepath)
             written = open(filepath).read()
             self.assertEquals(written, 'test4'*10000000)
-            
+
 
 class AbstractStoreWriteTest(TestCase):
     resolution = 'arbitrary'
-    
+
     def setUp(self):
         """ Set up a data store for the test case
-        
+
         The store should have:
-            
+
             * a key 'test1' with a file-like data object containing the
               bytes 'test2\n' and metadata {'a_str': 'test3', 'an_int': 1,
               'a_float': 2.0, 'a_bool': True, 'a_list': ['one', 'two', 'three'],
               'a_dict': {'one': 1, 'two': 2, 'three': 3}} with creation and
               modification times of 12:00 am 1st January, 2012 localtime
-            
+
             * a series of keys 'existing_key0' through 'existing_key9' with
               data containing 'existing_value0' throigh 'existing_value9' and
               metadata {'meta': True, 'meta1': 0} through {'meta': True, 'meta1': -9}
-        
+
         and set into 'self.store'.
         """
         self.store = None
-    
+
     def test_set(self):
         """ Test that set works
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
-        
+
         """
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -336,6 +336,8 @@ class AbstractStoreWriteTest(TestCase):
             test_start = int(test_start)
         self.store.set('test3', (data, metadata))
         test_end = time.time()
+        if self.resolution == 'second':
+            test_end = int(test_end)+1
         self.assertEqual(self.store.to_bytes('test3'), 'test4')
         self.assertEqual(self.store.get_metadata('test3'), metadata)
 
@@ -348,10 +350,10 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_set_copies(self):
         """ Test that set copies the provided metadata
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
-        
+
         """
         if self.store is None:
             self.skipTest('Abstract test case')
@@ -367,10 +369,10 @@ class AbstractStoreWriteTest(TestCase):
         self.store.set('test3', (data, metadata))
         metadata['extra_key'] = 'extra_value'
         self.assertNotEqual(self.store.get_metadata('test3'), metadata)
-        
+
     def test_set_large(self):
         """ Test that set works with large (~50 MB) data
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -388,10 +390,10 @@ class AbstractStoreWriteTest(TestCase):
         self.store.set('test3', (data, metadata))
         self.assertEqual(self.store.to_bytes('test3'), 'test4'*10000000)
         self.assertEqual(self.store.get_metadata('test3'), metadata)
-        
+
     def test_set_buffer(self):
         """ Test that set works with a different size buffer
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -419,6 +421,8 @@ class AbstractStoreWriteTest(TestCase):
             test_start = int(test_start)
         self.store.set_data('test1', data)
         test_end = time.time()
+        if self.resolution == 'second':
+            test_end = int(test_end)+1
         self.assertEqual(self.store.to_bytes('test1'), 'test4')
         value = self.store.get('test1')
         self.assertGreaterEqual(value.modified, test_start)
@@ -445,6 +449,8 @@ class AbstractStoreWriteTest(TestCase):
             test_start = int(test_start)
         self.store.set_data('test3', data)
         test_end = time.time()
+        if self.resolution == 'second':
+            test_end = int(test_end)+1
         self.assertEqual(self.store.to_bytes('test3'), 'test4')
         value = self.store.get('test3')
         self.assertGreaterEqual(value.modified, test_start)
@@ -457,7 +463,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_set_data_large(self):
         """ Test that set works with large (~50 MB) data
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -469,7 +475,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_set_data_buffer(self):
         """ Test that set works with a different-sized buffer
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -481,7 +487,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_set_metadata(self):
         """ Test that set_metadata works
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -500,6 +506,8 @@ class AbstractStoreWriteTest(TestCase):
             test_start = int(test_start)
         self.store.set_metadata('test1', metadata)
         test_end = time.time()
+        if self.resolution == 'second':
+            test_end = int(test_end)+1
         self.assertEqual(self.store.get_metadata('test1'), metadata)
         value = self.store.get('test1')
         self.assertGreaterEqual(value.modified, test_start)
@@ -512,7 +520,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_set_metadata_copies(self):
         """ Test that set_metadata copies the provided metadata
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -532,7 +540,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_update_metadata(self):
         """ Test that update_metadata works
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -550,7 +558,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_delete(self):
         """ Test that delete works
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -628,7 +636,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_from_file(self):
         """ Test that from_file works
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -643,7 +651,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_from_file_large(self):
         """ Test that from_file works for large files (~50 MB)
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -658,7 +666,7 @@ class AbstractStoreWriteTest(TestCase):
 
     def test_from_bytes(self):
         """ Test that from bytes works
-        
+
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
@@ -666,4 +674,3 @@ class AbstractStoreWriteTest(TestCase):
             self.skipTest('Abstract test case')
         self.store.from_bytes('test3', 'test4')
         self.assertEqual(self.store.to_bytes('test3'), 'test4')
-        
