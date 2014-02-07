@@ -85,14 +85,17 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
         lock = threading.Lock()
         def callback(event):
             events.append(event)
-            lock.release()
+            if lock.locked():
+                # Prevent double-release on some filesystems where multiple
+                # events get emitted occasionally
+                lock.release()
         self.store.event_manager.connect(StoreSetEvent, callback)
         lock.acquire()
         store2.set_metadata('key', {'name':'key'})
 
         # Wait until the event is emitted.
         with lock:
-            self.assertEqual(len(events), 1)
+            self.assertTrue(len(events) >= 1)
 
         thread = self.store._remote_poll_thread
         self.store._remote_poll_thread = None
