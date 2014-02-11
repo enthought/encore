@@ -112,17 +112,17 @@ class RequestsURLValue(Value):
                 stream=True)
         self._validate_response(self._data_response)
 
-        size = self._data_response.headers['Content-Length']
+        size = self._data_response.headers.get('Content-Length', None)
         if size is not None:
             size = int(size)
         self._size = size
 
-        modified = self._data_response.headers('Last-Modified', None)
+        modified = self._data_response.headers.get('Last-Modified', None)
         if modified is not None:
             modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
         self._modified = modified
 
-        mimetype = self._data_response.headers('Content-Type', 'application/octet-stream')
+        mimetype = self._data_response.headers.get('Content-Type', 'application/octet-stream')
         self._mimetype = mimetype
 
         return self._data_response.raw
