@@ -46,7 +46,7 @@ class RequestsURLValue(Value):
             modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
         self._modified = modified
 
-        mimetype = response.headers.get('Content-Type', None)
+        mimetype = response.headers.get('Content-Type', 'application/octet-stream')
         self._mimetype = mimetype
 
     def _url(self, part):
@@ -122,7 +122,7 @@ class RequestsURLValue(Value):
             modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
         self._modified = modified
 
-        mimetype = self._data_response.headers('Content-Type', None)
+        mimetype = self._data_response.headers('Content-Type', 'application/octet-stream')
         self._mimetype = mimetype
 
         return self._data_response.raw
