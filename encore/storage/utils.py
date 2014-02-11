@@ -16,7 +16,7 @@ Utilities for key-value stores.
 import sys
 import itertools
 
-from encore.events.api import ProgressManager
+from ..events.api import ProgressManager
 from .events import (StoreTransactionStartEvent, StoreTransactionEndEvent,
     StoreProgressStartEvent, StoreProgressStepEvent, StoreProgressEndEvent,
     StoreModificationEvent)

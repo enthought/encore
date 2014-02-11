@@ -10,12 +10,8 @@ import json
 import urllib
 import rfc822
 
-import requests
-
 from .abstract_store import AbstractAuthorizingStore, Value, AuthorizationError
 from .utils import DummyTransactionContext
-
-_requests_version = requests.__version__.split('.')[0]
 
 DEFAULT_PARTS = {'data': 'data',
                  'metadata': 'metadata',
@@ -104,12 +100,8 @@ class RequestsURLValue(Value):
         return self._mimetype
 
     def open(self):
-        if _requests_version == '0':
-            self._data_response = self._session.get(self._url('data'),
-                prefetch=False)
-        else:
-            self._data_response = self._session.get(self._url('data'),
-                stream=True)
+        self._data_response = self._session.get(self._url('data'),
+            stream=True)
         self._validate_response(self._data_response)
 
         size = self._data_response.headers.get('Content-Length', None)
@@ -211,14 +203,11 @@ class DynamicURLStore(AbstractAuthorizingStore):
             json.dumps(metadata))
         self._validate_response(response, key)
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
-    
+
     def get_metadata(self, key, select=None):
         response = self._session.get(self._url(key, 'metadata'))
         self._validate_response(response, key)
-        if _requests_version=='0':
-            metadata = response.json
-        else:
-            metadata = response.json()
+        metadata = response.json()
         if select is not None:
             return dict((k, metadata[k]) for k in select if k in metadata)
         else:
@@ -234,10 +223,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
     def get_permissions(self, key):
         response = self._session.get(self._url(key, 'permissions'))
         self._validate_response(response, key)
-        if _requests_version=='0':
-            return response.json
-        else:
-            return response.json()
+        return response.json()
     get_permissions.__doc__ = AbstractAuthorizingStore.get_permissions.__doc__
 
     def set_permissions(self, key, permissions):

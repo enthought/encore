@@ -13,7 +13,7 @@ This module contains asbtract and concrete Event subclasses that support the
 Storage API.
 """
 
-from encore.events.api import (BaseEvent, ProgressEvent, ProgressStartEvent,
+from ..events.api import (BaseEvent, ProgressEvent, ProgressStartEvent,
     ProgressStepEvent, ProgressEndEvent)
 
 
