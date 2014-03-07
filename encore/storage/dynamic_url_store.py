@@ -13,7 +13,7 @@ import rfc822
 import requests
 
 from .abstract_store import AbstractAuthorizingStore, Value, AuthorizationError
-from .utils import DummyTransactionContext
+from .utils import DummyTransactionContext, BufferIteratorIO, buffer_iterator
 
 _requests_version = requests.__version__.split('.')[0]
 
@@ -102,6 +102,33 @@ class RequestsURLValue(Value):
         if self._data_response is not None:
             self.open()
         return self._mimetype
+
+    def range(self, start=None, end=None):
+        # need to build a reqquest with a range header
+        start_string = str(start) if start is not None else ''
+        end_string = str(end) if end is not None else ''
+        headers = {'Range': '{0}-{1}/*'.format(start_string, end_string)}
+        if _requests_version == '0':
+            data = self._session.get(self._url('data'),
+                headers=headers, prefetch=False)
+        else:
+            data = self._session.get(self._url('data'),
+                headers=headers, stream=True)
+        if data.status_code == 206:
+            # it worked!
+            return data.raw
+        else:
+            self._validate_response(data)
+            if start is not None:
+                data.raw.read(start)
+            else:
+                start = 0
+            if end is not None:
+                max_bytes = end-start
+                return BufferIteratorIO(buffer_iterator(data.raw,
+                                                        max_bytes=max_bytes))
+            else:
+                return stream
 
     def open(self):
         if _requests_version == '0':
@@ -211,7 +238,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
             json.dumps(metadata))
         self._validate_response(response, key)
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
-    
+
     def get_metadata(self, key, select=None):
         response = self._session.get(self._url(key, 'metadata'))
         self._validate_response(response, key)
