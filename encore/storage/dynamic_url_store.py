@@ -107,7 +107,9 @@ class RequestsURLValue(Value):
         # need to build a reqquest with a range header
         start_string = str(start) if start is not None else ''
         end_string = str(end) if end is not None else ''
-        headers = {'Range': '{0}-{1}/*'.format(start_string, end_string)}
+        headers = {
+            'range': 'bytes={0}-{1}'.format(start_string, end_string)
+        }
         if _requests_version == '0':
             data = self._session.get(self._url('data'),
                 headers=headers, prefetch=False)
@@ -118,6 +120,7 @@ class RequestsURLValue(Value):
             # it worked!
             return data.raw
         else:
+            # we don't support range requests...
             self._validate_response(data)
             if start is not None:
                 data.raw.read(start)
@@ -128,7 +131,7 @@ class RequestsURLValue(Value):
                 return BufferIteratorIO(buffer_iterator(data.raw,
                                                         max_bytes=max_bytes))
             else:
-                return stream
+                return data.raw
 
     def open(self):
         if _requests_version == '0':

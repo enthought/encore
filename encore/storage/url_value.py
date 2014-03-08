@@ -59,7 +59,7 @@ class URLValue(Value):
         start_string = str(start) if start is not None else ''
         end_string = str(end) if end is not None else ''
         request = urllib2.Request(self._url, headers={
-            'Range': '{0}-{1}/*'.format(start_string, end_string),
+            'Range': 'bytes={0}-{1}'.format(start_string, end_string),
         })
         stream = self._opener.open(request)
         if stream.getcode() == 206:
