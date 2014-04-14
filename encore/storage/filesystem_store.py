@@ -508,10 +508,12 @@ class FileSystemStore(AbstractStore):
     # Private methods
     ##########################################################################
     def _get_metadata_path(self, key):
-        return os.path.join(self._root, key + '.metadata')
+        path = os.path.join(self._root, key + '.metadata')
+        return os.path.normpath(path)
 
     def _get_data_path(self, key):
-        return os.path.join(self._root, key + '.data')
+        path = os.path.join(self._root, key + '.data')
+        return os.path.normpath(path)
         
     def _get_metadata(self, path):
         md = json.load(open(path, 'rb'))
