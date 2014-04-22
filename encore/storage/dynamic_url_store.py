@@ -9,7 +9,6 @@
 import json
 import urllib
 import rfc822
-import gzip
 
 import requests
 
