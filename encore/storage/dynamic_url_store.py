@@ -104,12 +104,14 @@ class RequestsURLValue(Value):
         return self._mimetype
 
     def open(self):
+        # XXX in future add support for compression
+        headers = {'Accept-Encoding': ''}
         if _requests_version == '0':
             self._data_response = self._session.get(self._url('data'),
-                prefetch=False)
+                prefetch=False, headers=headers)
         else:
             self._data_response = self._session.get(self._url('data'),
-                stream=True)
+                stream=True, headers=headers)
         self._validate_response(self._data_response)
 
         size = self._data_response.headers.get('Content-Length', None)
@@ -211,7 +213,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
             json.dumps(metadata))
         self._validate_response(response, key)
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
-    
+
     def get_metadata(self, key, select=None):
         response = self._session.get(self._url(key, 'metadata'))
         self._validate_response(response, key)
