@@ -525,4 +525,3 @@ class FileSystemStore(AbstractStore):
             os.utime(path, None)
         else:
             open(path, 'a').close()
-   
