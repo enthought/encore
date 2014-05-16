@@ -132,24 +132,30 @@ class RequestsURLValue(Value):
 class DynamicURLStore(AbstractAuthorizingStore):
 
     def __init__(self, base_url, query_url, url_format='{base}/{key}/{part}',
-                 parts=DEFAULT_PARTS):
+                 url_format_no_part='{base}/{key}', parts=DEFAULT_PARTS):
         super(AbstractAuthorizingStore, self).__init__()
         self.base_url = base_url
         self.query_url = query_url
         self._user_tag = None
         self.url_format = url_format
+        self.url_format_no_part = url_format_no_part
         self.parts = parts
 
     def user_tag(self):
         return self._user_tag
 
-    def _url(self, key, part):
+    def _url(self, key, part=""):
         safe_key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
 
-        url = self.url_format.format(base=self.base_url,
-                                     key=safe_key,
-                                     part=self.parts[part])
-        return url
+        if part:
+            url = self.url_format.format(base=self.base_url,
+                                         key=safe_key,
+                                         part=self.parts[part])
+            return url
+        else:
+            url = self.url_format_no_part.format(base=self.base_url,
+                                                 key=safe_key)
+            return url
 
     def _validate_response(self, response, key):
         if response.status_code == 404:
@@ -200,7 +206,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
     set.__doc__ = AbstractAuthorizingStore.set.__doc__
 
     def delete(self, key):
-        pass
+        self._session.delete(self._url(key))
     delete.__doc__ = AbstractAuthorizingStore.delete.__doc__
 
     def set_data(self, key, data, buffer_size=1048576):
