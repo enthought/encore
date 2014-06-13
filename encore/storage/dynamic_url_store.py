@@ -154,7 +154,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
     def _validate_response(self, response, key):
         if response.status_code == 404:
             raise KeyError(key)
-        elif response.status_code == 403:
+        elif response.status_code == 403 or response.status_code == 401:
             raise AuthorizationError(key)
         response.raise_for_status()
 
