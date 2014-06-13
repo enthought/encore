@@ -57,7 +57,7 @@ class RequestsURLValue(Value):
     def _validate_response(self, response):
         if response.status_code == 404:
             raise KeyError(self._key)
-        elif response.status_code == 403:
+        elif response.status_code == 403 or response.status_code == 401:
             raise AuthorizationError(self._key)
         response.raise_for_status()
 
