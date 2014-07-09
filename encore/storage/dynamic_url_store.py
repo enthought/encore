@@ -204,7 +204,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
     delete.__doc__ = AbstractAuthorizingStore.delete.__doc__
 
     def set_data(self, key, data, buffer_size=1048576):
-        response = self._session.put(self._url(key, 'data'), data=data.read())
+        response = self._session.put(self._url(key, 'data'), data=data)
         self._validate_response(response, key)
     set_data.__doc__ = AbstractAuthorizingStore.set_data.__doc__
 
