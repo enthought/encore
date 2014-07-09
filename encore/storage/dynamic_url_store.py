@@ -57,7 +57,7 @@ class RequestsURLValue(Value):
     def _validate_response(self, response):
         if response.status_code == 404:
             raise KeyError(self._key)
-        elif response.status_code == 403:
+        elif response.status_code == 403 or response.status_code == 401:
             raise AuthorizationError(self._key)
         response.raise_for_status()
 
@@ -130,6 +130,47 @@ class RequestsURLValue(Value):
         return self._data_response.raw
 
 class DynamicURLStore(AbstractAuthorizingStore):
+    """ Store implementation which gets and sets from a web server
+
+    This store expects a server which exposes URLs for each key.  By default
+    these URLs are of the form::
+
+        <base>/<key>/<part>
+
+    Where <base> is a common prefix, <key> is the key of interest, and
+    <part> is one of "data", "metadata" or "auth".  If the store does not
+    follow this format, you can provide a differnt `url_format` argument
+    and a different mapping of `part`s to aspects of the key.
+
+    The server is expected to respond to queries against these URLS in the
+    following ways:
+
+        GET <base>/<key>/data - return the bytes in the body of the response
+
+        PUT <base>/<key>/data - accept the data bytes from the body of the
+            request
+
+        GET <base>/<key>/metadata - return metadata as JSON
+
+        PUT <base>/<key>/metadata - set the metadata based on JSON contained in
+            the body of the request
+
+        POST <base>/<key>/metadata - update the metadata based on JSON
+            contained in the body of the request (as `dict.update()`)
+
+        GET <base>/<key>/auth - return permissions information as JSON
+
+        PUT <base>/<key>/auth - set the permissions based on JSON contained in
+            the body of the request
+
+        POST <base>/<key>/metadata - update the permissions based on JSON
+            contained in the body of the request
+
+    In addition, the server should have a query URL which accepts GET reuqests
+    containing a JSON data structure of metadata key, value pairs to filter
+    with, and should return a list of macthing keys, one per line.
+
+    """
 
     def __init__(self, base_url, query_url, url_format='{base}/{key}/{part}',
                  url_format_no_part='{base}/{key}', parts=DEFAULT_PARTS):
@@ -160,7 +201,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
     def _validate_response(self, response, key):
         if response.status_code == 404:
             raise KeyError(key)
-        elif response.status_code == 403:
+        elif response.status_code == 403 or response.status_code == 401:
             raise AuthorizationError(key)
         response.raise_for_status()
 
@@ -210,7 +251,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
     delete.__doc__ = AbstractAuthorizingStore.delete.__doc__
 
     def set_data(self, key, data, buffer_size=1048576):
-        response = self._session.put(self._url(key, 'data'), data=data.read())
+        response = self._session.put(self._url(key, 'data'), data=data)
         self._validate_response(response, key)
     set_data.__doc__ = AbstractAuthorizingStore.set_data.__doc__
 
