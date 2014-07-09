@@ -166,6 +166,10 @@ class DynamicURLStore(AbstractAuthorizingStore):
         POST <base>/<key>/metadata - update the permissions based on JSON
             contained in the body of the request
 
+    In addition, a DELETE request to a URL of the form <base>/<key> should
+    remove the key from the remote store.  This pattern is configurable via
+    the url_format_no_part argument to the constructor.
+
     In addition, the server should have a query URL which accepts GET reuqests
     containing a JSON data structure of metadata key, value pairs to filter
     with, and should return a list of macthing keys, one per line.
