@@ -206,12 +206,12 @@ class DynamicURLStore(AbstractAuthorizingStore):
     def get_data(self, key):
         headers = {'Accept-Encoding': ''}
         if _requests_version == '0':
-            response = self._session.get(self._url('data'),
+            response = self._session.get(self._url(key, 'data'),
                 prefetch=False, headers=headers)
         else:
-            response = self._session.get(self._url('data'),
+            response = self._session.get(self._url(key, 'data'),
                 stream=True, headers=headers)
-        self._validate_response(response)
+        self._validate_response(response, key)
         return response.raw
     get_data.__doc__ = AbstractAuthorizingStore.get_data.__doc__
 
