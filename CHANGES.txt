@@ -1,0 +1,7 @@
+Encore Change Log
+=================
+
+New Features
+~~~~~~~~~~~~
+
+* Added `concurrent.threadtools` module and `synchronized` decorator (PR #91)
