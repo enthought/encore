@@ -13,7 +13,7 @@ import rfc822
 import requests
 
 from .abstract_store import AbstractAuthorizingStore, Value, AuthorizationError
-from .utils import DummyTransactionContext
+from .utils import DummyTransactionContext, BufferIteratorIO, buffer_iterator
 
 _requests_version = requests.__version__.split('.')[0]
 
@@ -103,6 +103,36 @@ class RequestsURLValue(Value):
             self.open()
         return self._mimetype
 
+    def range(self, start=None, end=None):
+        # need to build a reqquest with a range header
+        start_string = str(start) if start is not None else ''
+        end_string = str(end) if end is not None else ''
+        headers = {
+            'range': 'bytes={0}-{1}'.format(start_string, end_string)
+        }
+        if _requests_version == '0':
+            data = self._session.get(self._url('data'),
+                headers=headers, prefetch=False)
+        else:
+            data = self._session.get(self._url('data'),
+                headers=headers, stream=True)
+        if data.status_code == 206:
+            # it worked!
+            return data.raw
+        else:
+            # we don't support range requests...
+            self._validate_response(data)
+            if start is not None:
+                data.raw.read(start)
+            else:
+                start = 0
+            if end is not None:
+                max_bytes = end-start
+                return BufferIteratorIO(buffer_iterator(data.raw,
+                                                        max_bytes=max_bytes))
+            else:
+                return data.raw
+
     def open(self):
         # XXX in future add support for compression
         headers = {'Accept-Encoding': ''}
@@ -166,6 +196,10 @@ class DynamicURLStore(AbstractAuthorizingStore):
         POST <base>/<key>/metadata - update the permissions based on JSON
             contained in the body of the request
 
+    In addition, a DELETE request to a URL of the form <base>/<key> should
+    remove the key from the remote store.  This pattern is configurable via
+    the url_format_no_part argument to the constructor.
+
     In addition, the server should have a query URL which accepts GET reuqests
     containing a JSON data structure of metadata key, value pairs to filter
     with, and should return a list of macthing keys, one per line.
@@ -173,24 +207,30 @@ class DynamicURLStore(AbstractAuthorizingStore):
     """
 
     def __init__(self, base_url, query_url, url_format='{base}/{key}/{part}',
-                 parts=DEFAULT_PARTS):
+                 url_format_no_part='{base}/{key}', parts=DEFAULT_PARTS):
         super(AbstractAuthorizingStore, self).__init__()
         self.base_url = base_url
         self.query_url = query_url
         self._user_tag = None
         self.url_format = url_format
+        self.url_format_no_part = url_format_no_part
         self.parts = parts
 
     def user_tag(self):
         return self._user_tag
 
-    def _url(self, key, part):
+    def _url(self, key, part=""):
         safe_key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
 
-        url = self.url_format.format(base=self.base_url,
-                                     key=safe_key,
-                                     part=self.parts[part])
-        return url
+        if part:
+            url = self.url_format.format(base=self.base_url,
+                                         key=safe_key,
+                                         part=self.parts[part])
+            return url
+        else:
+            url = self.url_format_no_part.format(base=self.base_url,
+                                                 key=safe_key)
+            return url
 
     def _validate_response(self, response, key):
         if response.status_code == 404:
@@ -241,8 +281,20 @@ class DynamicURLStore(AbstractAuthorizingStore):
     set.__doc__ = AbstractAuthorizingStore.set.__doc__
 
     def delete(self, key):
-        pass
+        self._session.delete(self._url(key))
     delete.__doc__ = AbstractAuthorizingStore.delete.__doc__
+
+    def get_data(self, key):
+        headers = {'Accept-Encoding': ''}
+        if _requests_version == '0':
+            response = self._session.get(self._url(key, 'data'),
+                prefetch=False, headers=headers)
+        else:
+            response = self._session.get(self._url(key, 'data'),
+                stream=True, headers=headers)
+        self._validate_response(response, key)
+        return response.raw
+    get_data.__doc__ = AbstractAuthorizingStore.get_data.__doc__
 
     def set_data(self, key, data, buffer_size=1048576):
         response = self._session.put(self._url(key, 'data'), data=data)
