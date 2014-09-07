@@ -83,6 +83,12 @@ class AbstractStoreReadTest(TestCase):
         data = self.store.get_data('test1')
         self.assertEqual(data.read(), 'test2\n')
 
+    def test_get_data_range(self):
+        if self.store is None:
+            self.skipTest('Abstract test case')
+        data = self.store.get_data_range('test1', 1, 3)
+        self.assertEqual(data.read(), 'es')
+
     def test_get_metadata(self):
         if self.store is None:
             self.skipTest('Abstract test case')

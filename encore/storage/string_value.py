@@ -11,7 +11,7 @@ import time
 from .abstract_store import Value, AuthorizationError
 
 class StringValue(Value):
-    
+
     def __init__(self, data='', metadata=None, created=None, modified=None):
         if not isinstance(data, basestring):
             raise ValueError(data)
@@ -21,7 +21,7 @@ class StringValue(Value):
         self.size = len(self._data)
         self.created = created if created is not None else time.time()
         self.modified = modified if modified is not None else time.time()
-    
+
     @property
     def data(self):
         if self._data_stream is None:
@@ -35,4 +35,6 @@ class StringValue(Value):
     @property
     def permissions(self):
         raise AuthorizationError("key not owned by user")
-        
+
+    def range(self, start=None, end=None):
+        return StringIO(self._data[slice(start, end)])
