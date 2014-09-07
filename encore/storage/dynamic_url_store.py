@@ -21,10 +21,11 @@ DEFAULT_PARTS = {'data': 'data',
                  'metadata': 'metadata',
                  'permissions': 'auth'}
 
+
 class RequestsURLValue(Value):
 
-    def __init__(self, session, base_url, key, url_format='{base}/{key}/{part}',
-            parts=DEFAULT_PARTS):
+    def __init__(self, session, base_url, key,
+                 url_format='{base}/{key}/{part}', parts=DEFAULT_PARTS):
         self._session = session
         self._base_url = base_url
         self._key = key
@@ -46,7 +47,8 @@ class RequestsURLValue(Value):
             modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
         self._modified = modified
 
-        mimetype = response.headers.get('Content-Type', 'application/octet-stream')
+        mimetype = response.headers.get('Content-Type',
+                                        'application/octet-stream')
         self._mimetype = mimetype
 
     def _url(self, part):
@@ -112,10 +114,10 @@ class RequestsURLValue(Value):
         }
         if _requests_version == '0':
             data = self._session.get(self._url('data'),
-                headers=headers, prefetch=False)
+                                     headers=headers, prefetch=False)
         else:
             data = self._session.get(self._url('data'),
-                headers=headers, stream=True)
+                                     headers=headers, stream=True)
         if data.status_code == 206:
             # it worked!
             return data.raw
@@ -127,7 +129,7 @@ class RequestsURLValue(Value):
             else:
                 start = 0
             if end is not None:
-                max_bytes = end-start
+                max_bytes = end - start
                 return BufferIteratorIO(buffer_iterator(data.raw,
                                                         max_bytes=max_bytes))
             else:
@@ -138,10 +140,12 @@ class RequestsURLValue(Value):
         headers = {'Accept-Encoding': ''}
         if _requests_version == '0':
             self._data_response = self._session.get(self._url('data'),
-                prefetch=False, headers=headers)
+                                                    prefetch=False,
+                                                    headers=headers)
         else:
             self._data_response = self._session.get(self._url('data'),
-                stream=True, headers=headers)
+                                                    stream=True,
+                                                    headers=headers)
         self._validate_response(self._data_response)
 
         size = self._data_response.headers.get('Content-Length', None)
@@ -154,10 +158,12 @@ class RequestsURLValue(Value):
             modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
         self._modified = modified
 
-        mimetype = self._data_response.headers.get('Content-Type', 'application/octet-stream')
+        mimetype = self._data_response.headers.get('Content-Type',
+                                                   'application/octet-stream')
         self._mimetype = mimetype
 
         return self._data_response.raw
+
 
 class DynamicURLStore(AbstractAuthorizingStore):
     """ Store implementation which gets and sets from a web server
@@ -241,8 +247,8 @@ class DynamicURLStore(AbstractAuthorizingStore):
 
     def get(self, key):
         safe_key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
-        result = RequestsURLValue(self._session, self.base_url, safe_key, self.url_format,
-            self.parts)
+        result = RequestsURLValue(self._session, self.base_url, safe_key,
+                                  self.url_format, self.parts)
 
         return result
     get.__doc__ = AbstractAuthorizingStore.get.__doc__
@@ -264,10 +270,10 @@ class DynamicURLStore(AbstractAuthorizingStore):
         super(DynamicURLStore, self).disconnect()
 
     def is_connected(self):
-        super(DynamicURLStore, self).is_connected()
+        return super(DynamicURLStore, self).is_connected()
 
     def info(self):
-        super(DynamicURLStore, self).info()
+        return super(DynamicURLStore, self).info()
 
     def set(self, key, value, buffer_size=1048576):
         if isinstance(value, tuple):
@@ -288,10 +294,10 @@ class DynamicURLStore(AbstractAuthorizingStore):
         headers = {'Accept-Encoding': ''}
         if _requests_version == '0':
             response = self._session.get(self._url(key, 'data'),
-                prefetch=False, headers=headers)
+                                         prefetch=False, headers=headers)
         else:
             response = self._session.get(self._url(key, 'data'),
-                stream=True, headers=headers)
+                                         stream=True, headers=headers)
         self._validate_response(response, key)
         return response.raw
     get_data.__doc__ = AbstractAuthorizingStore.get_data.__doc__
@@ -303,14 +309,14 @@ class DynamicURLStore(AbstractAuthorizingStore):
 
     def set_metadata(self, key, metadata):
         response = self._session.put(self._url(key, 'metadata'),
-            json.dumps(metadata))
+                                     json.dumps(metadata))
         self._validate_response(response, key)
     set_metadata.__doc__ = AbstractAuthorizingStore.set_metadata.__doc__
 
     def get_metadata(self, key, select=None):
         response = self._session.get(self._url(key, 'metadata'))
         self._validate_response(response, key)
-        if _requests_version=='0':
+        if _requests_version == '0':
             metadata = response.json
         else:
             metadata = response.json()
@@ -322,14 +328,14 @@ class DynamicURLStore(AbstractAuthorizingStore):
 
     def update_metadata(self, key, metadata):
         response = self._session.post(self._url(key, 'metadata'),
-            json.dumps(metadata))
+                                      json.dumps(metadata))
         self._validate_response(response, key)
     update_metadata.__doc__ = AbstractAuthorizingStore.update_metadata.__doc__
 
     def get_permissions(self, key):
         response = self._session.get(self._url(key, 'permissions'))
         self._validate_response(response, key)
-        if _requests_version=='0':
+        if _requests_version == '0':
             return response.json
         else:
             return response.json()
@@ -337,17 +343,17 @@ class DynamicURLStore(AbstractAuthorizingStore):
 
     def set_permissions(self, key, permissions):
         response = self._session.put(self._url(key, 'permissions'),
-            json.dumps(permissions))
+                                     json.dumps(permissions))
         self._validate_response(response, key)
         response.raise_for_status()
     set_permissions.__doc__ = AbstractAuthorizingStore.set_permissions.__doc__
 
     def update_permissions(self, key, permissions):
         response = self._session.post(self._url(key, 'permissions'),
-            json.dumps(permissions))
+                                      json.dumps(permissions))
         self._validate_response(response, key)
         response.raise_for_status()
-    update_permissions.__doc__ = AbstractAuthorizingStore.update_permissions.__doc__
+    update_permissions.__doc__ = AbstractAuthorizingStore.update_permissions.__doc__  # noqa
 
     def transaction(self, notes):
         """ Provide a transaction context manager
