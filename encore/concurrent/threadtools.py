@@ -11,7 +11,7 @@ from functools import wraps
 from threading import RLock
 
 
-def syncronized(func):
+def synchronized(func):
     """ Decorator that prevents simultaneous execution of a function
 
     This decorator that ensures that only one thread at a time can be executing
