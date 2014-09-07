@@ -244,6 +244,18 @@ class DynamicURLStore(AbstractAuthorizingStore):
         pass
     delete.__doc__ = AbstractAuthorizingStore.delete.__doc__
 
+    def get_data(self, key):
+        headers = {'Accept-Encoding': ''}
+        if _requests_version == '0':
+            response = self._session.get(self._url(key, 'data'),
+                prefetch=False, headers=headers)
+        else:
+            response = self._session.get(self._url(key, 'data'),
+                stream=True, headers=headers)
+        self._validate_response(response, key)
+        return response.raw
+    get_data.__doc__ = AbstractAuthorizingStore.get_data.__doc__
+
     def set_data(self, key, data, buffer_size=1048576):
         response = self._session.put(self._url(key, 'data'), data=data)
         self._validate_response(response, key)
