@@ -14,6 +14,7 @@ import unittest
 # local imports
 from encore.concurrent.threadtools import synchronized
 
+
 class SynchronizedTest(unittest.TestCase):
 
     def test_synchronized(self):
