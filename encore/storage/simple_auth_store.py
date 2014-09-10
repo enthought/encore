@@ -538,10 +538,8 @@ class SimpleAuthStore(AbstractStore):
         """
         if self._username:
             user_key = self.user_key_path + self._username
-            print user_key
             try:
                 token = self.user_key_store.get_data(user_key).read()
-                print 'token', token
             except KeyError:
                 return set()
             if self._token == token:
