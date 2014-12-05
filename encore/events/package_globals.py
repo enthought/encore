@@ -1,10 +1,9 @@
 #
-# Canopy product code
-#
-# (C) Copyright 2011 Enthought, Inc., Austin, TX
+# (C) Copyright 2014 Enthought, Inc., Austin, TX
 # All right reserved.
 #
-# This file is confidential and NOT open source.  Do not distribute.
+# This file is open source software distributed according to the terms in
+# LICENSE.txt
 #
 """ Module to hold global state, such as a global event manager.
 
@@ -35,6 +34,3 @@ def set_event_manager(event_manager):
     if _event_manager is not None:
         raise ValueError('Event manager has already been set.')
     _event_manager = event_manager
-
-
-
