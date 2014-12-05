@@ -9,7 +9,7 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    events/index.rst
    storage/index.rst

@@ -81,18 +81,16 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
         store2 = LockingFileSystemStore(self.path)
         store2._remote_event_poll_interval = self.store._remote_event_poll_interval = 0.1
 
-        events = []
-        lock = threading.Lock()
+        got_file_system_event = threading.Event()
         def callback(event):
-            events.append(event)
-            lock.release()
+            got_file_system_event.set()
         self.store.event_manager.connect(StoreSetEvent, callback)
-        lock.acquire()
         store2.set_metadata('key', {'name':'key'})
 
-        # Wait until the event is emitted.
-        with lock:
-            self.assertEqual(len(events), 1)
+        # Wait until the event is emitted; fail if not emitted
+        # within 10 seconds.
+        event_occurred = got_file_system_event.wait(timeout=10.0)
+        self.assertTrue(event_occurred)
 
         thread = self.store._remote_poll_thread
         self.store._remote_poll_thread = None
