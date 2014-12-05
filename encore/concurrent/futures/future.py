@@ -7,14 +7,16 @@ class Future(_base.Future):
 
     def __init__(self):
         super(Future, self).__init__()
-        self._traceback = None
+        self._traceback_formatted = None
 
     def traceback(self):
         """Return the formatted traceback of the error that occured in the
         Executor worker, or None if no error occurred.
 
         """
-        return self._traceback
+        if self._traceback is not None:
+            return traceback.format_tb(self._traceback)
+        return self._traceback_formatted
 
     def set_exception(self, exception):
         """Sets the result of the future as being the given exception.
@@ -23,7 +25,7 @@ class Future(_base.Future):
         """
         with self._condition:
             self._exception = exception
-            self._traceback = traceback.format_exc()
+            self._traceback_formatted = traceback.format_exc()
             self._state = _base.FINISHED
             for waiter in self._waiters:
                 waiter.add_exception(self)
