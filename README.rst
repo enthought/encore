@@ -2,7 +2,13 @@
 EnCore - A collection of core-level utility modules
 ====================================================
 
-`|build_status| <https://travis-ci.org/enthought/encore>`_
+.. image:: https://api.travis-ci.org/enthought/encore.png?branch=master
+   :target: https://travis-ci.org/enthought/encore
+   :alt: Build status
+
+.. image:: https://coveralls.io/repos/enthought/encore/badge.png
+   :target: https://coveralls.io/r/enthought/encore
+   :alt: Coverage status
 
 This package consists of a collection of core utility packages useful for
 building Python applications.  This package is intended to be at the
