@@ -6,7 +6,7 @@ EnCore - A collection of core-level utility modules
    :target: https://travis-ci.org/enthought/encore
    :alt: Build status
 
-.. image:: https://coveralls.io/repos/enthought/encore/badge.png
+.. image:: https://coveralls.io/repos/enthought/encore/badge.png?branch=master
    :target: https://coveralls.io/r/enthought/encore
    :alt: Coverage status
 
