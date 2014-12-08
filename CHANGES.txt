@@ -1,6 +1,18 @@
 Encore Change Log
 =================
 
+0.6.1.dev
+---------
+
+New Features
+~~~~~~~~~~~~
+
+Improvements
+~~~~~~~~~~~~
+
+Fixes
+~~~~~
+
 0.6.0
 -----
 
