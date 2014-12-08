@@ -26,7 +26,7 @@ Contents
 
 .. toctree::
    :maxdepth: 2
-   
+
    concepts.rst
    usage.rst
    abstract_store.rst
@@ -43,7 +43,9 @@ Implementations
    sqlite_store.rst
    filesystem_store.rst
    static_url_store.rst
+   dynamic_url_store.rst
    joined_store.rst
+   mounted_store.rst
    simple_auth_store.rst
 
 

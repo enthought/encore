@@ -4,6 +4,16 @@
 #
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
+"""
+MountedStore
+============
+
+A store which combines two stores by mounting one of the stores at a particular
+point in the other store's key space, prefixing all references to keys with
+the mount point.  This is similar in concept to mounting filesystems.
+
+"""
+
 
 from .abstract_store import AbstractStore
 

@@ -63,7 +63,7 @@ The :py:meth:`~.Filelike.read` method supports buffered reads if your data is
 larger than would comfortably fit into memory.
 
 If you need to support random-access streaming, the value API also supports
-a :py:meth:`~.AbstractValue.range(start, end)` method that return the requested
+a :py:meth:`~.Value.range(start, end)` method that return the requested
 bytes as a readable stream.
 
 The metadata stores auxilliary information about the data that is stored in the
