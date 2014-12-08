@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Key-Value Store Concepts &mdash; Encore 0.4.0 documentation</title>
+    <title>Key-Value Store Concepts &mdash; Encore 0.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.4.0 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
     <link rel="up" title="Storage" href="index.html" />
     <link rel="next" title="Usage" href="usage.html" />
     <link rel="prev" title="Storage" href="index.html" /> 
@@ -47,7 +45,7 @@
         <li class="right" >
           <a href="index.html" title="Storage"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
@@ -134,12 +132,12 @@ trade-offs, and the trade-offs may end up being inappropriate for particular use
 cases (eg. &#8220;Now I need to have an in-memory code-block store for efficiency, and
 my store&#8217;s optimized for remote access...&#8221;).</p>
 <p class="graphviz">
-<img src="../_images/graphviz-d72272f4ddade45ab7c700db34c9bb7f02e2cb45.png" alt="digraph diagram1 {
+digraph diagram1 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store&quot; -&gt; &quot;General Implementation&quot;;
 &quot;Code Block Store&quot; -&gt; &quot;General Implementation&quot;;
 &quot;Configuration Store&quot; -&gt; &quot;General Implementation&quot;
-}" />
+}
 </p>
 <p>Alternatively, it is tempting to start from the task that is being attempted
 (eg. &#8220;I need to store eggs, so I build an egg store&#8221;) and then generalize the
@@ -149,14 +147,14 @@ of the implementation may make it inappropriate for particular use cases (eg.
 &#8220;Now I need a code-block store, so I&#8217;ll wrap up my code-blocks as eggs and use
 an egg store... but now they&#8217;re 100 times bigger than they need to be...&#8221;)</p>
 <p class="graphviz">
-<img src="../_images/graphviz-cd912d97e026ade897130acc415509ff561b34c1.png" alt="digraph diagram2 {
+digraph diagram2 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store API&quot; -&gt; &quot;Memory Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;Disk Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;HTTP Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;Cached Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;SQL Store&quot;
-}" />
+}
 </p>
 <p>This storage API instead to simply provides an API through which data providers
 and data consumers can talk.  The API deliberately makes no assumptions about
@@ -170,7 +168,7 @@ implements the API, and join them together&#8221;).  Not every combination may m
 sense (an in-memory egg store is probably a bad idea, for example), but the
 ability to pick and choose allows a great deal of flexibility.</p>
 <p class="graphviz">
-<img src="../_images/graphviz-0a67c9692c62bcbcb0fc6152e9585f22a3b392cf.png" alt="digraph diagram2 {
+digraph diagram2 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store&quot; -&gt; &quot;Key-Value Store API&quot;
 &quot;Code Block Store&quot; -&gt; &quot;Key-Value Store API&quot;
@@ -180,7 +178,7 @@ node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Key-Value Store API&quot; -&gt; &quot;HTTP Store&quot;
 &quot;Key-Value Store API&quot; -&gt; &quot;Cached Store&quot;
 &quot;Key-Value Store API&quot; -&gt; &quot;SQL Store&quot;
-}" />
+}
 </p>
 <p>This also reflects the reality that developers frequently do not have complete
 freedom to choose the best possible data store solution due to external
@@ -377,14 +375,14 @@ will put the store into the correct state.</dd>
         <li class="right" >
           <a href="index.html" title="Storage"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Jul 24, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

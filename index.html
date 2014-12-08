@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EnCore - A collection of core-level utility modules &mdash; Encore 0.4.0 documentation</title>
+    <title>EnCore - A collection of core-level utility modules &mdash; Encore 0.6.0 documentation</title>
     
     <link rel="stylesheet" href="_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '0.4.0',
+        URL_ROOT:    './',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/et.ico"/>
-    <link rel="top" title="Encore 0.4.0 documentation" href="#" />
+    <link rel="top" title="Encore 0.6.0 documentation" href="#" />
     <link rel="next" title="Events" href="events/index.html" /> 
   </head>
   <body>
@@ -42,7 +40,7 @@
         <li class="right" >
           <a href="events/index.html" title="Events"
              accesskey="N">next</a> |</li>
-        <li><a href="#">Encore 0.4.0 documentation</a> &raquo;</li> 
+        <li><a href="#">Encore 0.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -55,13 +53,11 @@
 <li><a class="reference internal" href="#">EnCore - A collection of core-level utility modules</a><ul>
 <li><a class="reference internal" href="#packages">Packages</a></li>
 <li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li><a class="reference internal" href="#build-status">Build Status</a></li>
-<li><a class="reference internal" href="#contents">Contents</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
 <li><a class="reference internal" href="#util-human-date-module">util.human_date module</a></li>
+<li><a class="reference internal" href="#concurrent-futures-enhanced-thread-pool-executor">concurrent.futures.enhanced_thread_pool_executor</a></li>
 </ul>
 </li>
 </ul>
@@ -97,6 +93,8 @@
             
   <div class="section" id="encore-a-collection-of-core-level-utility-modules">
 <h1>EnCore - A collection of core-level utility modules<a class="headerlink" href="#encore-a-collection-of-core-level-utility-modules" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://travis-ci.org/enthought/encore"><img alt="Build status" src="https://api.travis-ci.org/enthought/encore.png?branch=master" /></a>
+<a class="reference external image-reference" href="https://coveralls.io/r/enthought/encore"><img alt="Coverage status" src="https://coveralls.io/repos/enthought/encore/badge.png?branch=master" /></a>
 <p>This package consists of a collection of core utility packages useful for
 building Python applications.  This package is intended to be at the
 bottom of the software stack and have zero required external dependencies
@@ -125,28 +123,13 @@ systems.</p>
 </li>
 </ul>
 </div>
-<div class="section" id="build-status">
-<h2>Build Status<a class="headerlink" href="#build-status" title="Permalink to this headline">¶</a></h2>
-<img alt="https://travis-ci.org/enthought/encore.png" src="https://travis-ci.org/enthought/encore.png" />
-</div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="events/index.html">Events</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="events/index.html#contents">Contents</a></li>
-<li class="toctree-l2"><a class="reference internal" href="events/index.html#indices-and-tables">Indices and tables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="events/index.html#license">License</a></li>
-<li class="toctree-l2"><a class="reference internal" href="events/index.html#util-human-date-module">util.human_date module</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="storage/index.html">Storage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="storage/index.html#contents">Contents</a></li>
-<li class="toctree-l2"><a class="reference internal" href="storage/index.html#indices-and-tables">Indices and tables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="storage/index.html#license">License</a></li>
-<li class="toctree-l2"><a class="reference internal" href="storage/index.html#util-human-date-module">util.human_date module</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="events/index.html">Events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="storage/index.html">Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concurrent/index.html">Concurrent Package</a></li>
 </ul>
 </div>
 </div>
@@ -204,6 +187,11 @@ either express or implied.
 See the License for the specific language governing permissions
 and limitations under the License.</p>
 </div>
+<div class="section" id="concurrent-futures-enhanced-thread-pool-executor">
+<h2>concurrent.futures.enhanced_thread_pool_executor<a class="headerlink" href="#concurrent-futures-enhanced-thread-pool-executor" title="Permalink to this headline">¶</a></h2>
+<p>Copyright 2009 Brian Quinlan. All Rights Reserved.
+Licensed to PSF under a Contributor Agreement.</p>
+</div>
 </div>
 
 
@@ -224,13 +212,13 @@ and limitations under the License.</p>
         <li class="right" >
           <a href="events/index.html" title="Events"
              >next</a> |</li>
-        <li><a href="#">Encore 0.4.0 documentation</a> &raquo;</li> 
+        <li><a href="#">Encore 0.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Jul 24, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

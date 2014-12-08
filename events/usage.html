@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Usage &mdash; Encore 0.4.0 documentation</title>
+    <title>Usage &mdash; Encore 0.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.4.0 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
     <link rel="up" title="Events" href="index.html" />
     <link rel="next" title="Abstract Event Manager API" href="abstract_event_manager.html" />
     <link rel="prev" title="Events" href="index.html" /> 
@@ -47,7 +45,7 @@
         <li class="right" >
           <a href="index.html" title="Events"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Events</a> &raquo;</li> 
       </ul>
     </div>
@@ -181,7 +179,7 @@ event manager is straightforward:</p>
 <p>More typically you will have some sort of global application state object that
 is responsible for managing things like event managers, and then you might use
 it as follows:</p>
-<div class="highlight-python"><pre>import os
+<div class="highlight-python"><div class="highlight"><pre>import os
 from uuid import uuid4
 from encore.events.api import EventManager, ProgressManager
 from .app_events import SaveEvent
@@ -191,7 +189,7 @@ class App(object):
         self.event_manager = EventManager()
 
 class File(object):
-    def __init__(self, app, directory, filename, data=''):
+    def __init__(self, app, directory, filename, data=&#39;&#39;):
         self.app = app
         self.directory = directory
         self.filename = filename
@@ -202,17 +200,18 @@ class File(object):
         path = os.path.join(self.directory, self.filename)
         op_id = uuid4()
         try:
-            with open(path, 'wb') as fp:
+            with open(path, &#39;wb&#39;) as fp:
                 steps = range(0, len(data), 2**20)
                 with ProgressManager(event_manager, self, op_id,
-                        'Saving "%s"' % path, len(steps)) as progress:
+                        &#39;Saving &quot;%s&quot;&#39; % path, len(steps)) as progress:
                     for i, pos in enumerate(step):
                         fp.write(self.data[i:i+2**20])
-                        progress('Saving "%s" (%d of %d bytes)' % (path, pos, len(data)),
+                        progress(&#39;Saving &quot;%s&quot; (%d of %d bytes)&#39; % (path, pos, len(data)),
                             step=i+1)
         else:
             event_manager.emit(SaveEvent(source=self, directory=self.directory,
-                filename=self.filename))</pre>
+                filename=self.filename))
+</pre></div>
 </div>
 <p>Notice the use of the standard <tt class="xref py py-class docutils literal"><span class="pre">ProgressManager</span></tt> subclasses to generate
 progress update events while writing out the data.</p>
@@ -316,8 +315,9 @@ directory specified by its <tt class="xref py py-attr docutils literal"><span cl
 <p>As an example which ties together the concepts which have been shown so far,
 we will write some code which displays progress indications to standard out
 that look something like the following:</p>
-<div class="highlight-python"><pre>Saving "foo/bar/baz.txt":
-[*************************************</pre>
+<div class="highlight-python"><div class="highlight"><pre>Saving &quot;foo/bar/baz.txt&quot;:
+[*************************************
+</pre></div>
 </div>
 <p>We start with a class which is responsible for listening for the start of a
 progress event.  For simplicty we will assume that there will only be one
@@ -448,14 +448,14 @@ call.</p>
         <li class="right" >
           <a href="index.html" title="Events"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Events</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Jul 24, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Event Manager Implementation &mdash; Encore 0.4.0 documentation</title>
+    <title>Event Manager Implementation &mdash; Encore 0.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.4.0 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
     <link rel="up" title="Events" href="index.html" />
     <link rel="next" title="Progress Events" href="progress_events.html" />
     <link rel="prev" title="Abstract Event Manager API" href="abstract_event_manager.html" /> 
@@ -47,7 +45,7 @@
         <li class="right" >
           <a href="abstract_event_manager.html" title="Abstract Event Manager API"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Events</a> &raquo;</li> 
       </ul>
     </div>
@@ -97,31 +95,6 @@
 <em class="property">class </em><tt class="descclassname">encore.events.event_manager.</tt><tt class="descname">EventManager</tt><a class="headerlink" href="#encore.events.event_manager.EventManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>A single registry point for all application events.</p>
 <dl class="method">
-<dt id="encore.events.event_manager.EventManager.emit">
-<tt class="descname">emit</tt><big>(</big><em>event</em>, <em>block=True</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.emit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Notifies all listeners about the event with the specified arguments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>event</strong> (instance of <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt>) &#8211; The <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt> instance to emit.</li>
-<li><strong>block</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether to block the call until the event handling is finished.
-If block is False, the event will be emitted in a separate thread
-and the thread will be returned, so you can later query its status
-or do <tt class="docutils literal"><span class="pre">wait()</span></tt> on the thread.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Note</p>
-<p>Listeners of superclasses of the event are also called.
-Eg. a <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt> listener will also be notified about any
-derived class events.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="encore.events.event_manager.EventManager.connect">
 <tt class="descname">connect</tt><big>(</big><em>cls</em>, <em>func</em>, <em>filter=None</em>, <em>priority=0</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a listener for the event.</p>
@@ -163,6 +136,20 @@ than iterating through all listeners.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="encore.events.event_manager.EventManager.disable">
+<tt class="descname">disable</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable the event from generating notifications.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<em>class</em>) &#8211; The class of events which we want to disable.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="encore.events.event_manager.EventManager.disconnect">
 <tt class="descname">disconnect</tt><big>(</big><em>cls</em>, <em>func</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnects a listener from being notified about the event&#8217;</p>
@@ -176,7 +163,7 @@ than iterating through all listeners.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - if <cite>func</cite> is not already connected.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - if <cite>func</cite> is not already connected.</p>
 </td>
 </tr>
 </tbody>
@@ -184,17 +171,28 @@ than iterating through all listeners.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.events.event_manager.EventManager.disable">
-<tt class="descname">disable</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.disable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disable the event from generating notifications.</p>
+<dt id="encore.events.event_manager.EventManager.emit">
+<tt class="descname">emit</tt><big>(</big><em>event</em>, <em>block=True</em><big>)</big><a class="headerlink" href="#encore.events.event_manager.EventManager.emit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notifies all listeners about the event with the specified arguments.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<em>class</em>) &#8211; The class of events which we want to disable.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event</strong> (instance of <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt>) &#8211; The <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt> instance to emit.</li>
+<li><strong>block</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether to block the call until the event handling is finished.
+If block is False, the event will be emitted in a separate thread
+and the thread will be returned, so you can later query its status
+or do <tt class="docutils literal"><span class="pre">wait()</span></tt> on the thread.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Note</p>
+<p>Listeners of superclasses of the event are also called.
+Eg. a <tt class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></tt> listener will also be notified about any
+derived class events.</p>
 </dd></dl>
 
 <dl class="method">
@@ -250,14 +248,14 @@ than iterating through all listeners.</p>
         <li class="right" >
           <a href="abstract_event_manager.html" title="Abstract Event Manager API"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Events</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Jul 24, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Static URL Store &mdash; Encore 0.4.0 documentation</title>
+    <title>Static URL Store &mdash; Encore 0.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,9 +24,9 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.4.0 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
     <link rel="up" title="Storage" href="index.html" />
-    <link rel="next" title="Joined Store" href="joined_store.html" />
+    <link rel="next" title="Dynamic URL Store" href="dynamic_url_store.html" />
     <link rel="prev" title="File System Store" href="filesystem_store.html" /> 
   </head>
   <body>
@@ -42,12 +40,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="joined_store.html" title="Joined Store"
+          <a href="dynamic_url_store.html" title="Dynamic URL Store"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="filesystem_store.html" title="File System Store"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
@@ -60,8 +58,8 @@
   <p class="topless"><a href="filesystem_store.html"
                         title="previous chapter">File System Store</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="joined_store.html"
-                        title="next chapter">Joined Store</a></p>
+  <p class="topless"><a href="dynamic_url_store.html"
+                        title="next chapter">Dynamic URL Store</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/storage/static_url_store.txt"
@@ -96,12 +94,13 @@ simple read-only store that can be run against a static HTTP server which
 provides a json file with all metadata and then serves data from URLs from
 another path.  The metadata URL is polled periodically for updates.</p>
 <p>A typical static server might be layed out as:</p>
-<div class="highlight-python"><pre>base_directory/
+<div class="highlight-python"><div class="highlight"><pre>base_directory/
     index.json
     data/
         key1
         key2
-        ...</pre>
+        ...
+</pre></div>
 </div>
 </div>
 <dl class="class">
@@ -114,10 +113,12 @@ partial URL to which the keys will be appended when requesting data, and a
 query URL which is a single URL which provides all metadata as a json
 encoded file.</p>
 <p>For example, an HTTP server may store data at URLs of the form:</p>
-<div class="highlight-python"><pre>http://www.example.com/data/&lt;key&gt;</pre>
+<div class="highlight-python"><div class="highlight"><pre>http://www.example.com/data/&lt;key&gt;
+</pre></div>
 </div>
 <p>and may store the metadata at:</p>
-<div class="highlight-python"><pre>http://www.example.com/index.json</pre>
+<div class="highlight-python"><div class="highlight"><pre>http://www.example.com/index.json
+</pre></div>
 </div>
 <p>These would have a root url of &#8220;<a class="reference external" href="http://www.example.com/">http://www.example.com/</a>&#8221;, a data path
 of &#8220;data/&#8221; and a query path of &#8220;index.json&#8221;.</p>
@@ -187,6 +188,107 @@ store requires.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="encore.storage.static_url_store.StaticURLStore.exists">
+<tt class="descname">exists</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether or not a key exists in the key-value store</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>exists</strong> (bool) - Whether or not the key exists in the key-value store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.static_url_store.StaticURLStore.get">
+<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>data</strong> (file-like) - A readable file-like object that provides stream of data from the key-value store.  This is the same type of filelike object returned by urllib2&#8217;s urlopen function.</li>
+<li><strong>metadata</strong> (dictionary) - A dictionary of metadata for the key.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.static_url_store.StaticURLStore.get_data">
+<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream from a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.  This is the same type of filelike object returned by urllib2&#8217;s urlopen function.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.static_url_store.StaticURLStore.get_metadata">
+<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the metadata for a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the result.  If unspecified, then
+return the entire metadata dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadata</strong> (dict) - A dictionary of metadata associated with the key.  The dictionary has keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.static_url_store.StaticURLStore.glob">
+<tt class="descname">glob</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.glob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return keys which match glob-style patterns</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Glob-style pattern to match keys with.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - A iterable of keys which match the glob pattern.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.is_connected">
 <tt class="descname">is_connected</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether or not the store is currently connected</p>
@@ -201,53 +303,64 @@ store requires.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.update_index">
-<tt class="descname">update_index</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.update_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Request the most recent version of the metadata</p>
-<p>This downloads the json file at the query_path location, and updates
-the local metadata cache with this information.  It then emits events
-that represent the difference between the old metadata and the new
-metadata.</p>
-<p>This method is normally called from the polling thread, but can be called
-by other code when needed.  It locks the metadata index whilst performing
-the update.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.get">
-<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
+<dt id="encore.storage.static_url_store.StaticURLStore.multiget">
+<tt class="descname">multiget</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the data and metadata for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
-<li><strong>data</strong> (file-like) - A readable file-like object that provides stream of data from the key-value store.  This is the same type of filelike object returned by urllib2&#8217;s urlopen function.</li>
-<li><strong>metadata</strong> (dictionary) - A dictionary of metadata for the key.</li>
-</ul>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of (file-like, dict) tuples) - An iterator of (data, metadata) pairs.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.exists">
-<tt class="descname">exists</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.exists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test whether or not a key exists in the key-value store</p>
+<dt id="encore.storage.static_url_store.StaticURLStore.multiget_data">
+<tt class="descname">multiget_data</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the data for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>exists</strong> (bool) - Whether or not the key exists in the key-value store.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of file-like) - An iterator of file-like data objects corresponding to the keys.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.static_url_store.StaticURLStore.multiget_metadata">
+<tt class="descname">multiget_metadata</tt><big>(</big><em>keys</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the results.  If unspecified, then
+return the entire metadata dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadatas</strong> (iterator of dicts) - An iterator of dictionaries of metadata associated with the key. The dictionaries have keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -303,124 +416,34 @@ possible values for that metadata item.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.glob">
-<tt class="descname">glob</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.glob" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return keys which match glob-style patterns</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Glob-style pattern to match keys with.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - A iterable of keys which match the glob pattern.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.get_data">
-<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve a stream from a given key in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.  This is the same type of filelike object returned by urllib2&#8217;s urlopen function.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.get_metadata">
-<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the metadata for a given key in the key-value store.</p>
+<dt id="encore.storage.static_url_store.StaticURLStore.to_bytes">
+<tt class="descname">to_bytes</tt><big>(</big><em>key</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently store the data associated with a key into a bytes object.</p>
+<p>This method can be optionally overriden by subclasses to proved a more
+efficient way of copy the data from the underlying data store to a bytes
+object.  The default implementation uses the get() method
+together with chunked reads from the returned data stream and join.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
-<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the result.  If unspecified, then
-return the entire metadata dictionary.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadata</strong> (dict) - A dictionary of metadata associated with the key.  The dictionary has keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>bytes</strong>  - The contents of the file-like object as bytes.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.multiget">
-<tt class="descname">multiget</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the data and metadata for a collection of keys.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of (file-like, dict) tuples) - An iterator of (data, metadata) pairs.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.multiget_data">
-<tt class="descname">multiget_data</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the data for a collection of keys.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of file-like) - An iterator of file-like data objects corresponding to the keys.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.multiget_metadata">
-<tt class="descname">multiget_metadata</tt><big>(</big><em>keys</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the results.  If unspecified, then
-return the entire metadata dictionary.</li>
+<tr class="field-odd field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to extracting the data.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is extracted.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after extracting the data.</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadatas</strong> (iterator of dicts) - An iterator of dictionaries of metadata associated with the key. The dictionaries have keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
 </td>
 </tr>
 </tbody>
@@ -440,16 +463,16 @@ together with chunked reads from the returned data stream to the disk.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
-<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to store the data to.</li>
+<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to store the data to.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
 default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to disk.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to disk.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to disk.</li>
@@ -461,38 +484,16 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.static_url_store.StaticURLStore.to_bytes">
-<tt class="descname">to_bytes</tt><big>(</big><em>key</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.to_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Efficiently store the data associated with a key into a bytes object.</p>
-<p>This method can be optionally overriden by subclasses to proved a more
-efficient way of copy the data from the underlying data store to a bytes
-object.  The default implementation uses the get() method
-together with chunked reads from the returned data stream and join.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
-Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>bytes</strong>  - The contents of the file-like object as bytes.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to extracting the data.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is extracted.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after extracting the data.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+<dt id="encore.storage.static_url_store.StaticURLStore.update_index">
+<tt class="descname">update_index</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.update_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request the most recent version of the metadata</p>
+<p>This downloads the json file at the query_path location, and updates
+the local metadata cache with this information.  It then emits events
+that represent the difference between the old metadata and the new
+metadata.</p>
+<p>This method is normally called from the polling thread, but can be called
+by other code when needed.  It locks the metadata index whilst performing
+the update.</p>
 </dd></dl>
 
 </dd></dl>
@@ -514,19 +515,19 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="joined_store.html" title="Joined Store"
+          <a href="dynamic_url_store.html" title="Dynamic URL Store"
              >next</a> |</li>
         <li class="right" >
           <a href="filesystem_store.html" title="File System Store"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Jul 24, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

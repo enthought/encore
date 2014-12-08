@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Joined Store &mdash; Encore 0.4.0 documentation</title>
+    <title>Joined Store &mdash; Encore 0.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,10 +24,10 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.4.0 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
     <link rel="up" title="Storage" href="index.html" />
-    <link rel="next" title="Simple Authenticating Store" href="simple_auth_store.html" />
-    <link rel="prev" title="Static URL Store" href="static_url_store.html" /> 
+    <link rel="next" title="MountedStore" href="mounted_store.html" />
+    <link rel="prev" title="Dynamic URL Store" href="dynamic_url_store.html" /> 
   </head>
   <body>
     <div class="related">
@@ -42,12 +40,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="simple_auth_store.html" title="Simple Authenticating Store"
+          <a href="mounted_store.html" title="MountedStore"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="static_url_store.html" title="Static URL Store"
+          <a href="dynamic_url_store.html" title="Dynamic URL Store"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
@@ -57,11 +55,11 @@
               <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
             </a></p>
   <h4>Previous topic</h4>
-  <p class="topless"><a href="static_url_store.html"
-                        title="previous chapter">Static URL Store</a></p>
+  <p class="topless"><a href="dynamic_url_store.html"
+                        title="previous chapter">Dynamic URL Store</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="simple_auth_store.html"
-                        title="next chapter">Simple Authenticating Store</a></p>
+  <p class="topless"><a href="mounted_store.html"
+                        title="next chapter">MountedStore</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/storage/joined_store.txt"
@@ -133,11 +131,185 @@ is implementation-specific, but may be as simple as a
 </dd></dl>
 
 <dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.delete">
+<tt class="descname">delete</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a key from the repsository.</p>
+<p>This may be left unimplemented by subclasses that represent a read-only
+key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="encore.storage.joined_store.JoinedStore.disconnect">
 <tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect from the key-value store</p>
 <p>This method disposes or disconnects to any long-lived resources that the
 store requires.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.exists">
+<tt class="descname">exists</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether or not a key exists in the key-value store</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>exists</strong> (bool) - Whether or not the key exists in the key-value store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.from_bytes">
+<tt class="descname">from_bytes</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.from_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently store a bytes object as the data associated with a key.</p>
+<p>This method can be optionally overriden by subclasses to proved a more
+efficient way of copy the data from a bytes object to the underlying
+data store.  The default implementation uses the set() method
+together with a cStringIO.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>data</strong> (<em>bytes</em>) &#8211; The data as a bytes object.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.from_file">
+<tt class="descname">from_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently read data from a file into a key in the key-value store.</p>
+<p>This method can be optionally overriden by subclasses to proved a more
+efficient way of copy the data from a path in the filesystem to the
+underlying data store.   The default implementation uses the set() method
+together with chunked reads from the disk which are fed into the data
+stream.</p>
+<p>This makes no attempt to set metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to read the data from.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.get">
+<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>data</strong> (file-like) - A readable file-like object that provides stream of data from the key-value store</li>
+<li><strong>metadata</strong> (dictionary) - A dictionary of metadata for the key.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.get_data">
+<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream from a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.get_metadata">
+<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the metadata for a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the result.  If unspecified, then
+return the entire metadata dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadata</strong> (dict) - A dictionary of metadata associated with the key.  The dictionary has keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.glob">
+<tt class="descname">glob</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.glob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return keys which match glob-style patterns</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Glob-style pattern to match keys with.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - A iterable of keys which match the glob pattern.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -155,55 +327,97 @@ store requires.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.get">
-<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
+<dt id="encore.storage.joined_store.JoinedStore.multiget">
+<tt class="descname">multiget</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the data and metadata for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
-<li><strong>data</strong> (file-like) - A readable file-like object that provides stream of data from the key-value store</li>
-<li><strong>metadata</strong> (dictionary) - A dictionary of metadata for the key.</li>
-</ul>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of (file-like, dict) tuples) - An iterator of (data, metadata) pairs.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.set">
-<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store a stream of data into a given key in the key-value store.</p>
-<p>This may be left unimplemented by subclasses that represent a read-only
-key-value store.</p>
+<dt id="encore.storage.joined_store.JoinedStore.multiget_data">
+<tt class="descname">multiget_data</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiget_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the data for a collection of keys.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of file-like) - An iterator of file-like data objects corresponding to the keys.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.multiget_metadata">
+<tt class="descname">multiget_metadata</tt><big>(</big><em>keys</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>value</strong> (<em>tuple of file-like, dict</em>) &#8211; A pair of objects, the first being a readable file-like object that
-provides stream of data from the key-value store.  The second is a
-dictionary of metadata for the key.</li>
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the results.  If unspecified, then
+return the entire metadata dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadatas</strong> (iterator of dicts) - An iterator of dictionaries of metadata associated with the key. The dictionaries have keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.multiset">
+<tt class="descname">multiset</tt><big>(</big><em>keys</em>, <em>values</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the data and metadata for a collection of keys.</p>
+<p>Where supported by an implementation, this should perform the whole
+collection of sets as a single transaction.</p>
+<p>Like zip() if keys and values have different lengths, then any excess
+values in the longer list should be silently ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>values</strong> (<em>iterable of (file-like, dict) tuples</em>) &#8211; An iterator that provides the (data, metadata) pairs for the
+corresponding keys.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
 default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</li>
 </ul>
 </td>
 </tr>
@@ -212,78 +426,88 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.delete">
-<tt class="descname">delete</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.delete" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete a key from the repsository.</p>
-<p>This may be left unimplemented by subclasses that represent a read-only
-key-value store.</p>
+<dt id="encore.storage.joined_store.JoinedStore.multiset_data">
+<tt class="descname">multiset_data</tt><big>(</big><em>keys</em>, <em>datas</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiset_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the data for a collection of keys.</p>
+<p>Where supported by an implementation, this should perform the whole
+collection of sets as a single transaction.</p>
+<p>Like zip() if keys and datas have different lengths, then any excess
+values in the longer list should be silently ignored.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.exists">
-<tt class="descname">exists</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.exists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test whether or not a key exists in the key-value store</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>exists</strong> (bool) - Whether or not the key exists in the key-value store.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.transaction">
-<tt class="descname">transaction</tt><big>(</big><em>notes</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.transaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Provide a transaction context manager</p>
-<p>Implementations which have no native notion of transactions may choose
-not to implement this.</p>
-<p>This method provides a context manager which creates a data store
-transaction in its __enter__() method, and commits it in its __exit__()
-method if no errors occur.  Intended usage is:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s">&quot;Writing data...&quot;</span><span class="p">):</span>
-    <span class="c"># everything written in this block is part of the transaction</span>
-    <span class="o">...</span>
-</pre></div>
-</div>
-<p>If the block exits without error, the transaction commits, otherwise
-the transaction should roll back the state of the underlying data store
-to the start of the transaction.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>notes</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Some information about the transaction, which may or may not be used
-by the implementation.</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>datas</strong> (<em>iterable of file-like objects</em>) &#8211; An iterator that provides the data file-like objects for the
+corresponding keys.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transaction</strong> (context manager) - A context manager for the transaction.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreTransactionStartEvent</strong> - This event should be emitted on entry into the transaction.</li>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreTransactionEndEvent</strong> - This event should be emitted on successful conclusion of the transaction, before any Set or Delete events are emitted.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set during the transaction.</li>
-<li><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key for all deleted keys.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</li>
 </ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.multiset_metadata">
+<tt class="descname">multiset_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the metadata for a collection of keys.</p>
+<p>Where supported by an implementation, this should perform the whole
+collection of sets as a single transaction.</p>
+<p>Like zip() if keys and metadatas have different lengths, then any excess
+values in the longer list should be silently ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
+corresponding keys.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.multiupdate_metadata">
+<tt class="descname">multiupdate_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the metadata for a collection of keys.</p>
+<p>Where supported by an implementation, this should perform the whole
+collection of sets as a single transaction.</p>
+<p>Like zip() if keys and metadatas have different lengths, then any excess
+values in the longer list should be silently ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</li>
+<li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
+corresponding keys.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
 </td>
 </tr>
 </tbody>
@@ -340,60 +564,33 @@ possible values for that metadata item.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.glob">
-<tt class="descname">glob</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.glob" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return keys which match glob-style patterns</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Glob-style pattern to match keys with.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - A iterable of keys which match the glob pattern.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.get_data">
-<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve a stream from a given key in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.get_metadata">
-<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.get_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the metadata for a given key in the key-value store.</p>
+<dt id="encore.storage.joined_store.JoinedStore.set">
+<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a stream of data into a given key in the key-value store.</p>
+<p>This may be left unimplemented by subclasses that represent a read-only
+key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
-<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the result.  If unspecified, then
-return the entire metadata dictionary.</li>
+<li><strong>value</strong> (<em>tuple of file-like, dict</em>) &#8211; A pair of objects, the first being a readable file-like object that
+provides stream of data from the key-value store.  The second is a
+dictionary of metadata for the key.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadata</strong> (dict) - A dictionary of metadata associated with the key.  The dictionary has keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</li>
+</ul>
 </td>
 </tr>
 </tbody>
@@ -409,7 +606,7 @@ return the entire metadata dictionary.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>data</strong> (<em>file-like</em>) &#8211; A readable file-like object the that provides stream of data from the
 key-value store.</li>
@@ -419,7 +616,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
@@ -442,288 +639,14 @@ metadata.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
 keys should be strings which are valid Python identifiers.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.update_metadata">
-<tt class="descname">update_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.update_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the metadata for a given key in the key-value store.</p>
-<p>This performs a dictionary update on the existing metadata with the
-provided metadata keys and values</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
-keys should be strings which are valid Python identifiers.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.multiget">
-<tt class="descname">multiget</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiget" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the data and metadata for a collection of keys.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of (file-like, dict) tuples) - An iterator of (data, metadata) pairs.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.multiset">
-<tt class="descname">multiset</tt><big>(</big><em>keys</em>, <em>values</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the data and metadata for a collection of keys.</p>
-<p>Where supported by an implementation, this should perform the whole
-collection of sets as a single transaction.</p>
-<p>Like zip() if keys and values have different lengths, then any excess
-values in the longer list should be silently ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>values</strong> (<em>iterable of (file-like, dict) tuples</em>) &#8211; An iterator that provides the (data, metadata) pairs for the
-corresponding keys.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
-Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.multiget_data">
-<tt class="descname">multiget_data</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiget_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the data for a collection of keys.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of file-like) - An iterator of file-like data objects corresponding to the keys.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.multiget_metadata">
-<tt class="descname">multiget_metadata</tt><big>(</big><em>keys</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the results.  If unspecified, then
-return the entire metadata dictionary.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadatas</strong> (iterator of dicts) - An iterator of dictionaries of metadata associated with the key. The dictionaries have keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.multiset_data">
-<tt class="descname">multiset_data</tt><big>(</big><em>keys</em>, <em>datas</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiset_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the data for a collection of keys.</p>
-<p>Where supported by an implementation, this should perform the whole
-collection of sets as a single transaction.</p>
-<p>Like zip() if keys and datas have different lengths, then any excess
-values in the longer list should be silently ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>datas</strong> (<em>iterable of file-like objects</em>) &#8211; An iterator that provides the data file-like objects for the
-corresponding keys.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
-Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.multiset_metadata">
-<tt class="descname">multiset_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the metadata for a collection of keys.</p>
-<p>Where supported by an implementation, this should perform the whole
-collection of sets as a single transaction.</p>
-<p>Like zip() if keys and metadatas have different lengths, then any excess
-values in the longer list should be silently ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
-corresponding keys.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.multiupdate_metadata">
-<tt class="descname">multiupdate_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the metadata for a collection of keys.</p>
-<p>Where supported by an implementation, this should perform the whole
-collection of sets as a single transaction.</p>
-<p>Like zip() if keys and metadatas have different lengths, then any excess
-values in the longer list should be silently ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
-corresponding keys.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.to_file">
-<tt class="descname">to_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.to_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Efficiently store the data associated with a key into a file.</p>
-<p>This method can be optionally overriden by subclasses to proved a more
-efficient way of copy the data from the underlying data store to a path
-in the filesystem.  The default implementation uses the get() method
-together with chunked reads from the returned data stream to the disk.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to store the data to.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
-Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to disk.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to disk.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to disk.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.from_file">
-<tt class="descname">from_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.from_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Efficiently read data from a file into a key in the key-value store.</p>
-<p>This method can be optionally overriden by subclasses to proved a more
-efficient way of copy the data from a path in the filesystem to the
-underlying data store.   The default implementation uses the set() method
-together with chunked reads from the disk which are fed into the data
-stream.</p>
-<p>This makes no attempt to set metadata.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to read the data from.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
-Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
-</ul>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
 </td>
 </tr>
 </tbody>
@@ -743,7 +666,7 @@ together with chunked reads from the returned data stream and join.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
@@ -754,7 +677,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>bytes</strong>  - The contents of the file-like object as bytes.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Events :</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
 <li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to extracting the data.</li>
 <li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is extracted.</li>
 <li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after extracting the data.</li>
@@ -766,25 +689,100 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="encore.storage.joined_store.JoinedStore.from_bytes">
-<tt class="descname">from_bytes</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.from_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Efficiently store a bytes object as the data associated with a key.</p>
+<dt id="encore.storage.joined_store.JoinedStore.to_file">
+<tt class="descname">to_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Efficiently store the data associated with a key into a file.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
-efficient way of copy the data from a bytes object to the underlying
-data store.  The default implementation uses the set() method
-together with a cStringIO.</p>
+efficient way of copy the data from the underlying data store to a path
+in the filesystem.  The default implementation uses the get() method
+together with chunked reads from the returned data stream to the disk.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
 identifier for the resource within the key-value store.</li>
-<li><strong>data</strong> (<em>bytes</em>) &#8211; The data as a bytes object.</li>
+<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to store the data to.</li>
 <li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
 default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to disk.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to disk.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to disk.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.transaction">
+<tt class="descname">transaction</tt><big>(</big><em>notes</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a transaction context manager</p>
+<p>Implementations which have no native notion of transactions may choose
+not to implement this.</p>
+<p>This method provides a context manager which creates a data store
+transaction in its __enter__() method, and commits it in its __exit__()
+method if no errors occur.  Intended usage is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s">&quot;Writing data...&quot;</span><span class="p">):</span>
+    <span class="c"># everything written in this block is part of the transaction</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>If the block exits without error, the transaction commits, otherwise
+the transaction should roll back the state of the underlying data store
+to the start of the transaction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>notes</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Some information about the transaction, which may or may not be used
+by the implementation.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transaction</strong> (context manager) - A context manager for the transaction.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreTransactionStartEvent</strong> - This event should be emitted on entry into the transaction.</li>
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreTransactionEndEvent</strong> - This event should be emitted on successful conclusion of the transaction, before any Set or Delete events are emitted.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set during the transaction.</li>
+<li><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key for all deleted keys.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.joined_store.JoinedStore.update_metadata">
+<tt class="descname">update_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.joined_store.JoinedStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the metadata for a given key in the key-value store.</p>
+<p>This performs a dictionary update on the existing metadata with the
+provided metadata keys and values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
 </td>
 </tr>
 </tbody>
@@ -810,19 +808,19 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="simple_auth_store.html" title="Simple Authenticating Store"
+          <a href="mounted_store.html" title="MountedStore"
              >next</a> |</li>
         <li class="right" >
-          <a href="static_url_store.html" title="Static URL Store"
+          <a href="dynamic_url_store.html" title="Dynamic URL Store"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Jul 24, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

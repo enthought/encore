@@ -18,7 +18,7 @@ HTTP Authentication::
 
     from encore.events.api import EventManager
     from encore.storage.static_url_store import StaticURLStore
-    
+
     event_manager = EventManager()
     store = StaticURLStore(event_manager, 'http://localhost:8080/', 'data', 'index.json')
     store.connect(credentials={'username': 'alibaba', password: 'Open Sesame'})
@@ -37,7 +37,7 @@ methods::
     value = store.get('my_document')
     datastream = value.data
     metadata = value.metadata
-    
+
 In this case datastream is a file-like object that streams bytes::
 
     data = datastream.read()
@@ -59,8 +59,12 @@ this::
     arr = numpy.empty(shape=size, dtype=dtype)
     arr.data[:] = data
 
-The :py:meth:`~.Filelike.read` method supports buffered reads if your data is larger than
-would comfortably fit into memory.
+The :py:meth:`~.Filelike.read` method supports buffered reads if your data is
+larger than would comfortably fit into memory.
+
+If you need to support random-access streaming, the value API also supports
+a :py:meth:`~.Value.range(start, end)` method that return the requested
+bytes as a readable stream.
 
 The metadata stores auxilliary information about the data that is stored in the
 key.  It is a dictionary of reasonably serializable values (frequently it will
@@ -69,7 +73,7 @@ serialize to JSON or similar format)::
     print 'Document title:', metadata['title']
     print 'Document author:', metadata['author']
     print 'Document encoding:', metadata['encoding']
-    
+
     # checksum
     import hashlib
     assert hashlib.sha1(document.read()).digest() == metadata['sha1']
@@ -141,7 +145,7 @@ file-like object with a :py:meth:`~.Filelike.read` method that can do buffering,
 dictionary of metadata as arguments::
 
     from cStringIO import StringIO
-    
+
     data = StringIO("Hello World")
     metadata = {'title': "Greeting", 'author': 'alibaba'}
     store.set('hello', (data, metadata))
@@ -183,7 +187,7 @@ Transactions are re-entrant, so it is safe to do the following::
         with store.transaction('Adding keypair'):
             store.set(keypair.key1, (keypair.data1, keypair.metadata1))
             store.set(keypair.key2, (keypair.data2, keypair.metadata2))
-    
+
     def add_many_keypairs(keypairs):
         with store.transaction('Adding many keypairs'):
             for keypair in keypairs:
@@ -208,4 +212,3 @@ Events
 The various stores use the Encore event system, which is why the stores must
 be supplied with a reference to an EventManager instance.  The events which are
 emitted are referenced in the documentation for each method.
-

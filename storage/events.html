@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Events &mdash; Encore 0.4.0 documentation</title>
+    <title>Events &mdash; Encore 0.6.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.4.0 documentation" href="../index.html" />
+    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
     <link rel="up" title="Storage" href="index.html" />
     <link rel="next" title="Utils" href="utils.html" />
     <link rel="prev" title="Key-Value Store API" href="abstract_store.html" /> 
@@ -47,7 +45,7 @@
         <li class="right" >
           <a href="abstract_store.html" title="Key-Value Store API"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
@@ -109,24 +107,49 @@ the event classes that are required aby the abstract API.</p>
 subclasses defined in this module.  When listening for events, you may want to
 listen on appropriate superclasses.</p>
 <p class="graphviz">
-<img src="../_images/inheritance-b310be2728875ea609d474a3a9c3962b6c9f6e6c.png" alt="Inheritance diagram of encore.events.api.BaseEvent, encore.events.progress_events.ProgressEvent, encore.events.progress_events.ProgressStartEvent, encore.events.progress_events.ProgressStepEvent, encore.events.progress_events.ProgressEndEvent, StoreEvent, StoreTransactionEvent, StoreTransactionStartEvent, StoreTransactionEndEvent, StoreKeyEvent, StoreModificationEvent, StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent, StoreProgressEvent, StoreProgressStartEvent, StoreProgressStepEvent, StoreProgressEndEvent" usemap="#inheritance1ddb2ccabe" class="inheritance"/>
-<map id="inheritance1ddb2ccabe" name="inheritance1ddb2ccabe">
-<area shape="rect" id="node1" href="#encore.storage.events.StoreUpdateEvent" title="StoreUpdateEvent" alt="" coords="633,49,746,74"/>
-<area shape="rect" id="node2" href="#encore.storage.events.StoreModificationEvent" title="StoreModificationEvent" alt="" coords="423,94,565,119"/>
-<area shape="rect" id="node7" href="#encore.storage.events.StoreDeleteEvent" title="StoreDeleteEvent" alt="" coords="635,94,744,119"/>
-<area shape="rect" id="node13" href="#encore.storage.events.StoreSetEvent" title="StoreSetEvent" alt="" coords="644,139,735,164"/>
-<area shape="rect" id="node4" href="../events/progress_events.html#encore.events.progress_events.ProgressEvent" title="ProgressEvent" alt="" coords="255,184,349,208"/>
-<area shape="rect" id="node9" href="#encore.storage.events.StoreProgressEvent" title="StoreProgressEvent" alt="" coords="433,184,555,208"/>
-<area shape="rect" id="node23" href="../events/progress_events.html#encore.events.progress_events.ProgressStartEvent" title="ProgressStartEvent" alt="" coords="434,228,553,253"/>
-<area shape="rect" id="node29" href="../events/progress_events.html#encore.events.progress_events.ProgressStepEvent" title="ProgressStepEvent" alt="" coords="435,139,552,164"/>
-<area shape="rect" id="node36" href="../events/progress_events.html#encore.events.progress_events.ProgressEndEvent" title="ProgressEndEvent" alt="" coords="437,273,551,298"/>
-<area shape="rect" id="node5" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent" title="BaseEvent" alt="" coords="4,144,76,169"/>
-<area shape="rect" id="node15" href="#encore.storage.events.StoreEvent" title="StoreEvent" alt="" coords="117,116,192,141"/>
-<area shape="rect" id="node22" href="#encore.storage.events.StoreProgressStartEvent" title="StoreProgressStartEvent" alt="" coords="616,228,763,253"/>
-<area shape="rect" id="node28" href="#encore.storage.events.StoreProgressStepEvent" title="StoreProgressStepEvent" alt="" coords="617,184,762,208"/>
-<area shape="rect" id="node35" href="#encore.storage.events.StoreProgressEndEvent" title="StoreProgressEndEvent" alt="" coords="619,273,761,298"/>
-<area shape="rect" id="node11" href="#encore.storage.events.StoreKeyEvent" title="StoreKeyEvent" alt="" coords="255,116,350,141"/>
-</map>
+digraph inheritance1ddb2ccabe {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;BaseEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Base class for all events.&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;ProgressEndEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;../events/progress_events.html#encore.events.progress_events.ProgressEndEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Event emitted at the end of an operation&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;ProgressEvent&quot; -&gt; &quot;ProgressEndEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;ProgressEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;../events/progress_events.html#encore.events.progress_events.ProgressEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Abstract base class for all progress events&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;BaseEvent&quot; -&gt; &quot;ProgressEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;ProgressStartEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;../events/progress_events.html#encore.events.progress_events.ProgressStartEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Event emitted at the start of an operation&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;ProgressEvent&quot; -&gt; &quot;ProgressStartEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;ProgressStepEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;../events/progress_events.html#encore.events.progress_events.ProgressStepEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Event emitted periodically during an operation&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;ProgressEvent&quot; -&gt; &quot;ProgressStepEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreDeleteEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreDeleteEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;An event generated when a value is deleted into a Key-Value Store&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;StoreModificationEvent&quot; -&gt; &quot;StoreDeleteEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;An abstract base class for events generated by a Key-Value Store&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;BaseEvent&quot; -&gt; &quot;StoreEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreKeyEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreKeyEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;An abstract base class for events related to a particular key in the&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;StoreEvent&quot; -&gt; &quot;StoreKeyEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreModificationEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreModificationEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;An abstract base class for modification events generated by a Key-Value Store&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;StoreKeyEvent&quot; -&gt; &quot;StoreModificationEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreProgressEndEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreProgressEndEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Attributes&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;ProgressEndEvent&quot; -&gt; &quot;StoreProgressEndEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreProgressEvent&quot; -&gt; &quot;StoreProgressEndEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreProgressEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreProgressEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Abstract base class for ProgressEvents generated by a Key-Value Store&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;ProgressEvent&quot; -&gt; &quot;StoreProgressEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreKeyEvent&quot; -&gt; &quot;StoreProgressEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreProgressStartEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreProgressStartEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Attributes&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;ProgressStartEvent&quot; -&gt; &quot;StoreProgressStartEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreProgressEvent&quot; -&gt; &quot;StoreProgressStartEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreProgressStepEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreProgressStepEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;Attributes&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;ProgressStepEvent&quot; -&gt; &quot;StoreProgressStepEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreProgressEvent&quot; -&gt; &quot;StoreProgressStepEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreSetEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreSetEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;An event generated when a value is set into a Key-Value Store&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;StoreModificationEvent&quot; -&gt; &quot;StoreSetEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreTransactionEndEvent&quot; [shape=box,style=&quot;setlinewidth(0.5)&quot;,fontsize=10,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,height=0.25];
+  &quot;StoreTransactionEvent&quot; -&gt; &quot;StoreTransactionEndEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreTransactionEvent&quot; [shape=box,style=&quot;setlinewidth(0.5)&quot;,fontsize=10,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,height=0.25];
+  &quot;StoreEvent&quot; -&gt; &quot;StoreTransactionEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreTransactionStartEvent&quot; [shape=box,style=&quot;setlinewidth(0.5)&quot;,fontsize=10,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,height=0.25];
+  &quot;StoreTransactionEvent&quot; -&gt; &quot;StoreTransactionStartEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;StoreUpdateEvent&quot; [style=&quot;setlinewidth(0.5)&quot;,URL=&quot;#encore.storage.events.StoreUpdateEvent&quot;,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,tooltip=&quot;An event generated when a value is updated into a Key-Value Store&quot;,height=0.25,shape=box,fontsize=10];
+  &quot;StoreModificationEvent&quot; -&gt; &quot;StoreUpdateEvent&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 </p>
 <span class="target" id="module-encore.storage.events"></span><div class="section" id="storage-events">
 <h3>Storage Events<a class="headerlink" href="#storage-events" title="Permalink to this headline">¶</a></h3>
@@ -450,14 +473,14 @@ A constant describing the end state of the operation.  One of <tt class="docutil
         <li class="right" >
           <a href="abstract_store.html" title="Key-Value Store API"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
           <li><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Jul 24, 2013.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
