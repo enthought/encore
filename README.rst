@@ -2,7 +2,7 @@
 EnCore - A collection of core-level utility modules
 ====================================================
 
-.. image:: https://travis-ci.org/enthought/encore.png
+`|build_status| <https://travis-ci.org/enthought/encore>`_
 
 This package consists of a collection of core utility packages useful for
 building Python applications.  This package is intended to be at the
@@ -11,6 +11,7 @@ aside from the Python Standard Library.
 
 Packages
 --------
+
 *Events:* A package implementing a lightweight application-wide Event dispatch system.  Listeners
 can subscribe to events based on Event type or by filtering on event attributes.  Typical uses
 include UI components listening to low-level progress notifications and change notification for
@@ -26,6 +27,7 @@ systems.
 
 Prerequisites
 -------------
+
 * Python >= 2.6 (not Python 3)
 
 * Sphinx, graphviz, pydot (documentation build)
@@ -35,3 +37,6 @@ Prerequisites
   - Requests (http://docs.python-requests.org/en/latest/)
 
   - Futures (https://code.google.com/p/pythonfutures/)
+
+
+.. |build_status| image:: https://travis-ci.org/enthought/encore.png
