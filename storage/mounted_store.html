@@ -1,0 +1,461 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MountedStore &mdash; Encore 0.6.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.6.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/et.ico"/>
+    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
+    <link rel="up" title="Storage" href="index.html" />
+    <link rel="next" title="Simple Authenticating Store" href="simple_auth_store.html" />
+    <link rel="prev" title="Joined Store" href="joined_store.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="simple_auth_store.html" title="Simple Authenticating Store"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="joined_store.html" title="Joined Store"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="joined_store.html"
+                        title="previous chapter">Joined Store</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="simple_auth_store.html"
+                        title="next chapter">Simple Authenticating Store</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/storage/mounted_store.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="module-encore.storage.mounted_store"></span><div class="section" id="mountedstore">
+<h1>MountedStore<a class="headerlink" href="#mountedstore" title="Permalink to this headline">¶</a></h1>
+<p>A store which combines two stores by mounting one of the stores at a particular
+point in the other store&#8217;s key space, prefixing all references to keys with
+the mount point.  This is similar in concept to mounting filesystems.</p>
+</div>
+<dl class="class">
+<dt id="encore.storage.mounted_store.MountedStore">
+<em class="property">class </em><tt class="descclassname">encore.storage.mounted_store.</tt><tt class="descname">MountedStore</tt><big>(</big><em>mount_point</em>, <em>mount_store</em>, <em>backing_store</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>A key-value store that mounts another store at a particular key prefix</p>
+<p>The backing store is treated as read-only, and only modifications are
+allowed to the first store, and only for keys which match the mounting
+prefix.</p>
+<p>The primary purpose for this is to have a local cache of a subsection of
+a remote store, such as a StaticURLStore or DynamicURLStore.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mount_point</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Key prefix for the mounted store.</li>
+<li><strong>mount_store</strong> (<em>AbstractStore</em>) &#8211; The store to be mounted</li>
+<li><strong>backing_store</strong> (<em>AbstractStore</em>) &#8211; The store that we are mounting against</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.connect">
+<tt class="descname">connect</tt><big>(</big><em>credentials=None</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to the key-value store, optionally with authentication</p>
+<p>This method creates or connects to any long-lived resources that the
+store requires.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>credentials</strong> &#8211; An object that can supply appropriate credentials to to authenticate
+the use of any required resources.  The exact form of the credentials
+is implementation-specific, but may be as simple as a
+<tt class="docutils literal"><span class="pre">(username,</span> <span class="pre">password)</span></tt> tuple.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.delete">
+<tt class="descname">delete</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a key from the repsository.</p>
+<p>This may be left unimplemented by subclasses that represent a read-only
+key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the key-value store</p>
+<p>This method disposes or disconnects to any long-lived resources that the
+store requires.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.get">
+<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>data</strong> (file-like) - A readable file-like object that provides stream of data from the key-value store</li>
+<li><strong>metadata</strong> (dictionary) - A dictionary of metadata for the key.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.info">
+<tt class="descname">info</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the key-value store</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>metadata</strong> (dict) - A dictionary of metadata giving information about the key-value store.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.is_connected">
+<tt class="descname">is_connected</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether or not the store is currently connected</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>connected</strong> (bool) - Whether or not the store is currently connected.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.push">
+<tt class="descname">push</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move a key from the mount store to the backing store</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.query">
+<tt class="descname">query</tt><big>(</big><em>select=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query for keys and metadata matching metadata provided as keyword arguments</p>
+<p>This provides a very simple querying interface that returns precise
+matches with the metadata.  If no arguments are supplied, the query
+will return the complete set of metadata for the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; An optional list of metadata keys to return.  If this is not None,
+then the metadata dictionaries will only have values for the specified
+keys populated.</li>
+<li><strong>kwargs</strong> &#8211; Arguments where the keywords are metadata keys, and values are
+possible values for that metadata item.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>result</strong> (iterable) - An iterable of (key, metadata) tuples where metadata matches all the specified values for the specified metadata keywords. If a key specified in select is not present in the metadata of a particular key, then it will not be present in the returned value.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.query_keys">
+<tt class="descname">query_keys</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.query_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query for keys matching metadata provided as keyword arguments</p>
+<p>This provides a very simple querying interface that returns precise
+matches with the metadata.  If no arguments are supplied, the query
+will return the complete set of keys for the key-value store.</p>
+<p>This is equivalent to <tt class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></tt>, but potentially
+more efficiently implemented.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; Arguments where the keywords are metadata keys, and values are
+possible values for that metadata item.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - An iterable of key-value store keys whose metadata matches all the specified values for the specified metadata keywords.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.set">
+<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a stream of data into a given key in the key-value store.</p>
+<p>This may be left unimplemented by subclasses that represent a read-only
+key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>value</strong> (<em>tuple of file-like, dict</em>) &#8211; A pair of objects, the first being a readable file-like object that
+provides stream of data from the key-value store.  The second is a
+dictionary of metadata for the key.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.set_data">
+<tt class="descname">set_data</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the data for a given key in the key-value store.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>data</strong> (<em>file-like</em>) &#8211; A readable file-like object the that provides stream of data from the
+key-value store.</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.set_metadata">
+<tt class="descname">set_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set new metadata for a given key in the key-value store.</p>
+<p>This replaces the existing metadata set for the key with a new set of
+metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.transaction">
+<tt class="descname">transaction</tt><big>(</big><em>notes</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a transaction context manager</p>
+<p>Implementations which have no native notion of transactions may choose
+not to implement this.</p>
+<p>This method provides a context manager which creates a data store
+transaction in its __enter__() method, and commits it in its __exit__()
+method if no errors occur.  Intended usage is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s">&quot;Writing data...&quot;</span><span class="p">):</span>
+    <span class="c"># everything written in this block is part of the transaction</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>If the block exits without error, the transaction commits, otherwise
+the transaction should roll back the state of the underlying data store
+to the start of the transaction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>notes</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Some information about the transaction, which may or may not be used
+by the implementation.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transaction</strong> (context manager) - A context manager for the transaction.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
+<li><strong>StoreTransactionStartEvent</strong> - This event should be emitted on entry into the transaction.</li>
+<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
+<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
+<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
+<li><strong>StoreTransactionEndEvent</strong> - This event should be emitted on successful conclusion of the transaction, before any Set or Delete events are emitted.</li>
+<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set during the transaction.</li>
+<li><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key for all deleted keys.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.storage.mounted_store.MountedStore.update_metadata">
+<tt class="descname">update_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set new metadata for a given key in the key-value store.</p>
+<p>This replaces the existing metadata set for the key with a new set of
+metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</li>
+<li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="simple_auth_store.html" title="Simple Authenticating Store"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="joined_store.html" title="Joined Store"
+             >previous</a> |</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Storage</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011-2013, Enthought, Inc..
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

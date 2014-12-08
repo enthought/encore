@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>encore.concurrent.futures Package &mdash; Encore 0.6.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.6.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/et.ico"/>
+    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
+    <link rel="up" title="Concurrent Package" href="index.html" />
+    <link rel="prev" title="encore.concurrent Package" href="encore.concurrent.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="encore.concurrent.html" title="encore.concurrent Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Concurrent Package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">encore.concurrent.futures Package</a><ul>
+<li><a class="reference internal" href="#threadpool-executors">ThreadPool Executors</a></li>
+<li><a class="reference internal" href="#module-encore.concurrent.futures.enhanced_thread_pool_executor"><tt class="docutils literal"><span class="pre">enhanced_thread_pool_executor</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-encore.concurrent.futures.synchronous"><tt class="docutils literal"><span class="pre">synchronous</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-encore.concurrent.futures.future"><tt class="docutils literal"><span class="pre">future</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-encore.concurrent.futures.abc_work_scheduler"><tt class="docutils literal"><span class="pre">abc_work_scheduler</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-encore.concurrent.futures.asynchronizer"><tt class="docutils literal"><span class="pre">asynchronizer</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-encore.concurrent.futures.serializer"><tt class="docutils literal"><span class="pre">serializer</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-encore.concurrent.futures.serializing_asynchronizer"><tt class="docutils literal"><span class="pre">serializing_asynchronizer</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="encore.concurrent.html"
+                        title="previous chapter">encore.concurrent Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/concurrent/encore.concurrent.futures.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="encore-concurrent-futures-package">
+<h1>encore.concurrent.futures Package<a class="headerlink" href="#encore-concurrent-futures-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="threadpool-executors">
+<h2>ThreadPool Executors<a class="headerlink" href="#threadpool-executors" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-encore.concurrent.futures.enhanced_thread_pool_executor">
+<span id="enhanced-thread-pool-executor-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">enhanced_thread_pool_executor</span></tt> Module<a class="headerlink" href="#module-encore.concurrent.futures.enhanced_thread_pool_executor" title="Permalink to this headline">¶</a></h2>
+<p>Implements EnhancedThreadPoolExecutor.</p>
+<p>This builds off of concurrent.futures.thread and implements the following
+changes:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Each worker can be initialized and unitialized with specified functions.</li>
+<li>&#8216;map&#8217; works without iterating (bugs.python.org/issue11777).</li>
+<li>Workers do not unnecessarily retain references to work items
+(bugs.python.org/issue16284).</li>
+<li>Workers do not use polling: <a class="reference external" href="http://bugs.python.org/issue11635">http://bugs.python.org/issue11635</a></li>
+<li>Optional <cite>name</cite> argument to prefix executor threads&#8217; names.</li>
+<li>Optional <cite>wait_on_exit</cite> argument to let worker threads die
+abruptly during jobs on interpreter exit instead of waiting to finish.</li>
+</ul>
+</div></blockquote>
+<p>The implementation is largely copied to avoid reliance on undocumented, private
+parts of the code. For example, &#8216;_threads_queues&#8217; is needed to properly
+manage threads in the ThreadPoolExecutor, but this is not guaranteed to exist
+in future implementations of concurrent.futures.thread.</p>
+<dl class="class">
+<dt id="encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor">
+<em class="property">class </em><tt class="descclassname">encore.concurrent.futures.enhanced_thread_pool_executor.</tt><tt class="descname">EnhancedThreadPoolExecutor</tt><big>(</big><em>max_workers</em>, <em>initializer=None</em>, <em>uninitializer=None</em>, <em>name=None</em>, <em>wait_at_exit=True</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">concurrent.futures._base.Executor</span></tt></p>
+<dl class="method">
+<dt id="encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.map">
+<tt class="descname">map</tt><big>(</big><em>fn</em>, <em>*iterables</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a iterator equivalent to map(fn, iter).</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>fn: A callable that will take take as many arguments as there are</dt>
+<dd>passed iterables.</dd>
+<dt>timeout: The maximum number of seconds to wait. If None, then there</dt>
+<dd>is no limit on the wait time.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>An iterator equivalent to: map(func, <a href="#id1"><span class="problematic" id="id2">*</span></a>iterables) but the calls may
+be evaluated out-of-order.</dd>
+<dt>Raises:</dt>
+<dd><dl class="first docutils">
+<dt>TimeoutError: If the entire result iterator could not be generated</dt>
+<dd>before the given timeout.</dd>
+</dl>
+<p class="last">Exception: If fn(<a href="#id3"><span class="problematic" id="id4">*</span></a>args) raises for any values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.shutdown">
+<tt class="descname">shutdown</tt><big>(</big><em>wait=True</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean-up the resources associated with the Executor.</p>
+<p>It is safe to call this method several times. Otherwise, no other
+methods can be called after this one.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>wait: If True then shutdown will not return until all running</dt>
+<dd>futures have finished executing and the resources used by the
+executor have been reclaimed.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.submit">
+<tt class="descname">submit</tt><big>(</big><em>fn</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.submit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits a callable to be executed with the given arguments.</p>
+<p>Schedules the callable to be executed as fn(<a href="#id5"><span class="problematic" id="id6">*</span></a>args, <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs) and returns
+a Future instance representing the execution of the callable.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>A Future representing the given call.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encore.concurrent.futures.synchronous">
+<span id="synchronous-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">synchronous</span></tt> Module<a class="headerlink" href="#module-encore.concurrent.futures.synchronous" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="encore.concurrent.futures.synchronous.SynchronousExecutor">
+<em class="property">class </em><tt class="descclassname">encore.concurrent.futures.synchronous.</tt><tt class="descname">SynchronousExecutor</tt><a class="headerlink" href="#encore.concurrent.futures.synchronous.SynchronousExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">concurrent.futures._base.Executor</span></tt></p>
+<p>Simple Executor subclass that executes everything directly synchronously
+in the current thread.  The submit method of this executor blocks until
+the call is complete.  No cancellation of submitted tasks is possible.</p>
+<dl class="method">
+<dt id="encore.concurrent.futures.synchronous.SynchronousExecutor.shutdown">
+<tt class="descname">shutdown</tt><big>(</big><em>wait=True</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.synchronous.SynchronousExecutor.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean-up the resources associated with the Executor.</p>
+<p>It is safe to call this method several times. Otherwise, no other
+methods can be called after this one.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>wait: If True then shutdown will not return until all running</dt>
+<dd>futures have finished executing and the resources used by the
+executor have been reclaimed.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.concurrent.futures.synchronous.SynchronousExecutor.submit">
+<tt class="descname">submit</tt><big>(</big><em>fn</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.synchronous.SynchronousExecutor.submit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits a callable to be executed with the given arguments.</p>
+<p>Schedules the callable to be executed as fn(<a href="#id9"><span class="problematic" id="id10">*</span></a>args, <a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs) and returns
+a Future instance representing the execution of the callable.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>A Future representing the given call.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encore.concurrent.futures.future">
+<span id="future-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">future</span></tt> Module<a class="headerlink" href="#module-encore.concurrent.futures.future" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="encore.concurrent.futures.future.Future">
+<em class="property">class </em><tt class="descclassname">encore.concurrent.futures.future.</tt><tt class="descname">Future</tt><a class="headerlink" href="#encore.concurrent.futures.future.Future" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">concurrent.futures._base.Future</span></tt></p>
+<dl class="method">
+<dt id="encore.concurrent.futures.future.Future.set_exception">
+<tt class="descname">set_exception</tt><big>(</big><em>exception</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.future.Future.set_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the result of the future as being the given exception.</p>
+<p>Should only be used by Executor implementations and unit tests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.concurrent.futures.future.Future.traceback">
+<tt class="descname">traceback</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.concurrent.futures.future.Future.traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the formatted traceback of the error that occured in the
+Executor worker, or None if no error occurred.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encore.concurrent.futures.abc_work_scheduler">
+<span id="abc-work-scheduler-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">abc_work_scheduler</span></tt> Module<a class="headerlink" href="#module-encore.concurrent.futures.abc_work_scheduler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler">
+<em class="property">class </em><tt class="descclassname">encore.concurrent.futures.abc_work_scheduler.</tt><tt class="descname">ABCWorkScheduler</tt><big>(</big><em>executor</em>, <em>name=None</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a></p>
+<p>An abstract class to implement various job scheduling and execution
+models using executors.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is an experimental API and is subject to change.</p>
+</div>
+<dl class="method">
+<dt id="encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler.shutdown">
+<tt class="descname">shutdown</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean up and wait for pending operations.</p>
+<p>The call is synchronous:  when the call returns, all pending
+operations have completed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler.submit">
+<tt class="descname">submit</tt><big>(</big><em>operation</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler.submit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schedule an operation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler.wait">
+<tt class="descname">wait</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler.wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for all current and pending operations to complete.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-encore.concurrent.futures.asynchronizer">
+<span id="asynchronizer-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">asynchronizer</span></tt> Module<a class="headerlink" href="#module-encore.concurrent.futures.asynchronizer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="encore.concurrent.futures.asynchronizer.Asynchronizer">
+<em class="property">class </em><tt class="descclassname">encore.concurrent.futures.asynchronizer.</tt><tt class="descname">Asynchronizer</tt><big>(</big><em>executor</em>, <em>name=None</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.asynchronizer.Asynchronizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler" title="encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler"><tt class="xref py py-class docutils literal"><span class="pre">encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler</span></tt></a></p>
+<p>A &#8216;forgetful&#8217; scheduling of operations.</p>
+<p>The Asynchronizer executes at most a single operation at a time. Requests
+to <cite>submit</cite> a new operation while an operation is executed are stored for
+future execution, with each new submission overwriting the prior.  When a
+running operation completes, the most recent submission (if one exists) is
+then executed. Therefore, operations submitted between the previous and
+current execution are discarded.  The last operation submitted is
+guaranteed to eventually be executed.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is an experimental API and is subject to change.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-encore.concurrent.futures.serializer">
+<span id="serializer-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">serializer</span></tt> Module<a class="headerlink" href="#module-encore.concurrent.futures.serializer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="encore.concurrent.futures.serializer.Serializer">
+<em class="property">class </em><tt class="descclassname">encore.concurrent.futures.serializer.</tt><tt class="descname">Serializer</tt><big>(</big><em>executor</em>, <em>name=None</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.serializer.Serializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler" title="encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler"><tt class="xref py py-class docutils literal"><span class="pre">encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler</span></tt></a></p>
+<p>Execute all submitted jobs in order.</p>
+<p>All submitted operations are stored in a deque and are scheduled in
+sequence.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is an experimental API and is subject to change.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-encore.concurrent.futures.serializing_asynchronizer">
+<span id="serializing-asynchronizer-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">serializing_asynchronizer</span></tt> Module<a class="headerlink" href="#module-encore.concurrent.futures.serializing_asynchronizer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="encore.concurrent.futures.serializing_asynchronizer.SerializingAsynchronizer">
+<em class="property">class </em><tt class="descclassname">encore.concurrent.futures.serializing_asynchronizer.</tt><tt class="descname">SerializingAsynchronizer</tt><big>(</big><em>executor</em>, <em>name=None</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#encore.concurrent.futures.serializing_asynchronizer.SerializingAsynchronizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler" title="encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler"><tt class="xref py py-class docutils literal"><span class="pre">encore.concurrent.futures.abc_work_scheduler.ABCWorkScheduler</span></tt></a></p>
+<p>Provides Asynchronizer functionality for multiple operations.</p>
+<p>The SerializingAsynchronizer provides the same guarantees as the
+<a class="reference internal" href="#encore.concurrent.futures.asynchronizer.Asynchronizer" title="encore.concurrent.futures.asynchronizer.Asynchronizer"><tt class="xref py py-class docutils literal"><span class="pre">Asynchronizer</span></tt></a> for
+multiple different operations.  For any submitted callable, requests
+to submit a new operation while an operation of <strong>the same</strong>
+callable is underway, the new operation is stored overwriting the
+prior.  Different submitted callables are executed serially in the
+order in which they were originally submitted.</p>
+<p>For example if long-running callable <tt class="docutils literal"><span class="pre">C</span></tt> is submitted, then
+callable <tt class="docutils literal"><span class="pre">A</span></tt>, then callable <tt class="docutils literal"><span class="pre">B</span></tt>, then callable <tt class="docutils literal"><span class="pre">A</span></tt> again (all
+while <tt class="docutils literal"><span class="pre">C</span></tt> is running), then the order of execution will be <tt class="docutils literal"><span class="pre">C</span></tt>,
+<tt class="docutils literal"><span class="pre">A</span></tt>, <tt class="docutils literal"><span class="pre">B</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is an experimental API and is subject to change.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="encore.concurrent.html" title="encore.concurrent Package"
+             >previous</a> |</li>
+        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Concurrent Package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011-2013, Enthought, Inc..
+      Last updated on Dec 08, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
