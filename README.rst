@@ -2,6 +2,8 @@
 EnCore - A collection of core-level utility modules
 ====================================================
 
+.. image:: https://travis-ci.org/enthought/encore.png
+
 This package consists of a collection of core utility packages useful for
 building Python applications.  This package is intended to be at the
 bottom of the software stack and have zero required external dependencies
@@ -14,7 +16,7 @@ can subscribe to events based on Event type or by filtering on event attributes.
 include UI components listening to low-level progress notifications and change notification for
 distributed resources.
 
-*Storage:* Abstract base classes and concrete implementations of a basic key-value storage API.  
+*Storage:* Abstract base classes and concrete implementations of a basic key-value storage API.
 The API is intended to be general purpose enough to support a variety of local and remote storage
 systems.
 
@@ -33,8 +35,3 @@ Prerequisites
   - Requests (http://docs.python-requests.org/en/latest/)
 
   - Futures (https://code.google.com/p/pythonfutures/)
-
-Build Status
-------------
-
-.. image:: https://travis-ci.org/enthought/encore.png
