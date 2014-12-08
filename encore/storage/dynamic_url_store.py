@@ -5,6 +5,19 @@
 # This file is open source software distributed according to the terms in
 # LICENSE.txt
 #
+"""
+Dynamic URL Store
+=================
+
+This module contains the :py:class:`~DynamicURLStore` store that communicates
+with a remote HTTP server which provides the actual data storage.  This is a
+store which implements the basic operations via HTTP GET, POST, PUT and DELETE
+commands as described in the class documentation.
+
+The implementation relies on the third-party `requests` library to handle the
+HTTP operations.
+
+"""
 
 import json
 import urllib
@@ -173,38 +186,44 @@ class DynamicURLStore(AbstractAuthorizingStore):
 
         <base>/<key>/<part>
 
-    Where <base> is a common prefix, <key> is the key of interest, and
-    <part> is one of "data", "metadata" or "auth".  If the store does not
-    follow this format, you can provide a differnt `url_format` argument
-    and a different mapping of `part`s to aspects of the key.
+    Where `<base>` is a common prefix, `<key>` is the key of interest, and
+    `<part>` is one of "data", "metadata" or "auth".  If the store does not
+    follow this format, you can provide a differnt ``url_format`` argument
+    and a different mapping of `<part>` to aspects of the key.
 
     The server is expected to respond to queries against these URLS in the
     following ways:
 
-        GET <base>/<key>/data - return the bytes in the body of the response
+        `GET <base>/<key>/data`
+            return the bytes in the body of the response
 
-        PUT <base>/<key>/data - accept the data bytes from the body of the
+        `PUT <base>/<key>/data`
+            accept the data bytes from the body of the request
+
+        `GET <base>/<key>/metadata`
+            return metadata as JSON
+
+        `PUT <base>/<key>/metadata`
+            set the metadata based on JSON contained in the body of the request
+
+        `POST <base>/<key>/metadata`
+            update the metadata based on JSON contained in the body of the
+            request (as `dict.update()`)
+
+        `GET <base>/<key>/auth`
+            return permissions information as JSON
+
+        `PUT <base>/<key>/auth`
+            set the permissions based on JSON contained in the body of the
             request
 
-        GET <base>/<key>/metadata - return metadata as JSON
+        `POST <base>/<key>/metadata`
+            update the permissions based on JSON contained in the body of the
+            request
 
-        PUT <base>/<key>/metadata - set the metadata based on JSON contained in
-            the body of the request
-
-        POST <base>/<key>/metadata - update the metadata based on JSON
-            contained in the body of the request (as `dict.update()`)
-
-        GET <base>/<key>/auth - return permissions information as JSON
-
-        PUT <base>/<key>/auth - set the permissions based on JSON contained in
-            the body of the request
-
-        POST <base>/<key>/metadata - update the permissions based on JSON
-            contained in the body of the request
-
-    In addition, a DELETE request to a URL of the form <base>/<key> should
+    In addition, a DELETE request to a URL of the form `<base>/<key>` should
     remove the key from the remote store.  This pattern is configurable via
-    the url_format_no_part argument to the constructor.
+    the ``url_format_no_part`` argument to the constructor.
 
     In addition, the server should have a query URL which accepts GET reuqests
     containing a JSON data structure of metadata key, value pairs to filter

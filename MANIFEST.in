@@ -1,0 +1,9 @@
+include CHANGES.txt
+include LICENSE.txt
+include README.rst
+graft docs
+prune docs/build
+recursive-exclude docs *.pyc
+graft examples
+recursive-exclude examples *.pyc
+recursive-include encore *.py
