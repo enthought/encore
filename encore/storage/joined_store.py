@@ -30,6 +30,7 @@ class JoinedStore(AbstractAuthorizingStore):
     event_manager :
         An event_manager which implements the :py:class:`~.abstract_event_manager.BaseEventManager`
         API.
+        
     stores : list of stores
         The stores that are joined together by this store.
         
