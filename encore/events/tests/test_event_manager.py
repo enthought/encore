@@ -11,6 +11,8 @@ import mock
 import weakref
 import threading
 
+import six
+
 # Local imports.
 from encore.events.event_manager import EventManager, BaseEvent
 from encore.events.api import (get_event_manager, set_event_manager,
@@ -396,7 +398,7 @@ class TestEventManager(unittest.TestCase):
         evt = MyEvt()
         self.evt_mgr.connect(BaseEvent, callback)
         self.evt_mgr.emit(evt)
-        self.assertEqual(call_seq, range(3))
+        self.assertEqual(call_seq, list(six.moves.range(3)))
 
     def test_reentrant_disconnect_emit(self):
         """ Test listener is called even if it is disconnected before notify.
