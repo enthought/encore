@@ -16,9 +16,11 @@ import itertools
 import bisect
 import heapq
 import threading
-from types import MethodType
 import weakref
+from types import MethodType
 import traceback
+
+import six
 
 # Logging.
 logger = logging.getLogger(__name__)
@@ -97,7 +99,7 @@ class MethodNotifier(object):
             if objc is None:
                 # Bound method whose object has been garbage collected.
                 return
-        return MethodType(self.func, objc, self.cls)
+        return six.create_bound_method(self.func, objc)
 
 ###############################################################################
 # `EventInfo` Private Class.
@@ -250,7 +252,7 @@ class EventInfo(object):
                 listener = linfo[-1]
                 id = self.get_id(listener())
                 if id in l_filter:
-                    for key, value in l_filter[id].iteritems():
+                    for key, value in six.iteritems(l_filter[id]):
                         attr = event
                         try:
                             # Get extended attributes of the event.
