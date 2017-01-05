@@ -3,7 +3,7 @@ python:
   - 2.7
   - 3.5
 install:
-  - pip install coverage requests futures sphinx
+  - pip install coverage requests futures sphinx six
   - python setup.py install
 script:
   - nosetests --with-coverage --cover-package=encore
