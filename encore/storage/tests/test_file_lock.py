@@ -29,8 +29,11 @@ def cleanup_files():
 
 
 class FileLockTest(unittest.TestCase):
+
     def setUp(self):
-        self.path = os.tempnam(tempfile.gettempdir(), 'share')
+        _, self.path = tempfile.mkstemp(
+            suffix='share', dir=tempfile.gettempdir()
+        )
         self.lock = FileLock(self.path)
 
     def tearDown(self):
@@ -84,17 +87,19 @@ class FileLockTest(unittest.TestCase):
         self.assertFalse(self.lock.locked())
         
     def test_data(self):
-        self.lock = FileLock(self.path, data="%s\n"%os.getpid())
+        self.lock = FileLock(self.path, data=b"%i\n" % os.getpid())
         self.lock.acquire()
         self.assertTrue(self.lock.acquired())
         self.assertTrue(self.lock.locked())
         self.assertTrue(os.path.exists(self.lock.full_path))
-        self.assertEqual(self.lock.get_data(), "%s\n"%os.getpid())
+        self.assertEqual(self.lock.get_data(), b"%i\n" % os.getpid())
 
 
 class SharedFileLockTest(unittest.TestCase):
     def setUp(self):
-        self.path = os.tempnam(tempfile.gettempdir(), 'share')
+        _, self.path = tempfile.mkstemp(
+            suffix='share', dir=tempfile.gettempdir()
+        )
         self.lock = SharedFileLock(self.path)
         self.lock2 = SharedFileLock(self.path)
 
@@ -124,7 +129,9 @@ class SharedFileLockTest(unittest.TestCase):
 class MixedFileLockTest(unittest.TestCase):
     """ Test mixed usage of shared and exclusive locks. """
     def setUp(self):
-        self.path = os.tempnam(tempfile.gettempdir(), 'share')
+        _, self.path = tempfile.mkstemp(
+            suffix='share', dir=tempfile.gettempdir()
+        )
         self.elock = FileLock(self.path) # Exclusive lock
         self.slock = SharedFileLock(self.path) # Shared lock
         self.slock2 = SharedFileLock(self.path)
