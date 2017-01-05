@@ -1,7 +1,47 @@
 Encore Change Log
 =================
 
+0.6.1.dev
+---------
+
 New Features
 ~~~~~~~~~~~~
 
-* Added `concurrent.threadtools` module and `synchronized` decorator (PR #91)
+Improvements
+~~~~~~~~~~~~
+
+Fixes
+~~~~~
+
+0.6.0
+-----
+
+This is an incremental release, featuring mainly on improvements to the
+`DynamicURLStore`.  The most siginifcant new addition to the API is the ability
+to request ranges of data from store value, meaning that it is easier to use
+the store API for random access streaming, if desired.
+
+New Features
+~~~~~~~~~~~~
+
+* Added `MountedStore` store subclass. (PR#75)
+* Added `concurrent.threadtools` module and `synchronized` decorator. (PR #91)
+* Added the ability to request ranges of data from store values. (PR#76)
+
+Improvements
+~~~~~~~~~~~~
+
+* Improved `get_data()` calls for `DynamicURLStore` instances. (PR#90)
+* `DynamicURLStore` now accepts `401` return codes to indicate unauthorised
+  keys. (PR#88)
+* `DynamicURLStore` now implements `delete()` via sending an HTTP DELETE to
+  the appropriate URL. (PR#87)
+* `DynamicURLStore` uses streaming to send data. (PR#82)
+* Refuse server-side compression for the `DynamicURLStore`. (PR#82)
+
+Fixes
+~~~~~
+
+* Fix attribute collision with futures 2.2.0. (PR#94)
+* Fix race condition in file store. (PR#83)
+* Various other minor fixes.
