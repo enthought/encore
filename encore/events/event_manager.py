@@ -67,15 +67,15 @@ class MethodNotifier(object):
     """
     __slots__ = ['func', 'cls', 'obj', '_notify', '_args']
     def __init__(self, meth, notify=None, args=()):
-        self.func = meth.im_func
-        self.cls = meth.im_class
-        obj = meth.im_self
+        self.func = meth.__func__
+        self.cls = meth.__self__.__class__
+        obj = meth.__self__
         if obj is None:
             # Unbound Method.
             self.obj = None
         else:
             # Bound method.
-            self.obj = weakref.ref(meth.im_self, self.notify)
+            self.obj = weakref.ref(meth.__self__, self.notify)
         if notify:
             self._notify = notify
             self._args = args
@@ -211,13 +211,13 @@ class EventInfo(object):
     def get_id(self, func):
         """ Get an id as unique key for the function. """
         if type(func) is MethodType:
-            obj = func.im_self
+            obj = func.__self__
             if obj is None:
                 # Unbound method
-                return weakref.ref(func.im_func),weakref.ref(func.im_class)
+                return weakref.ref(func.__func__),weakref.ref(func.__self__.__class__)
             else:
                 # Bound method.
-                return weakref.ref(func.im_func),weakref.ref(func.im_self)
+                return weakref.ref(func.__func__),weakref.ref(func.__self__)
         else:
             return func
 

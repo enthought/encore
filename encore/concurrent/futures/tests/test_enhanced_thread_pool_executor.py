@@ -327,8 +327,8 @@ class EnhancedThreadPoolExecutorTest(EnhancedThreadPoolMixin, unittest.TestCase)
 
     def test_map_exception(self):
         i = self.executor.map(divmod, [1, 1, 1, 1], [2, 3, 0, 5])
-        self.assertEqual(i.next(), (0, 1))
-        self.assertEqual(i.next(), (0, 1))
+        self.assertEqual(next(i), (0, 1))
+        self.assertEqual(next(i), (0, 1))
         self.assertRaises(ZeroDivisionError, i.next)
 
     def test_map_timeout(self):

@@ -94,7 +94,7 @@ class SimpleTransactionContext(object):
                 source=self.store))
             # grab Set & veto events for later emission
             self.store.event_manager.connect(StoreModificationEvent, self._handle_event,
-                {'source': self.store}, sys.maxint)
+                {'source': self.store}, sys.maxsize)
 
     def _handle_event(self, event):
         self._events.append(event)
@@ -172,7 +172,7 @@ class BufferIteratorIO(object):
         """
         while len(self.buffer) < buffer_size:
             try:
-                data = self.iterator.next()
+                data = next(self.iterator)
             except StopIteration:
                 break
             self.buffer += data
