@@ -96,7 +96,7 @@ class FileLock(object):
             self._open_mode |= os.O_BINARY
             
         if data is None:
-            self._data = b'%b\n%i\n%b\n%i\n%b' % (
+            self._data = b'%s\n%i\n%s\n%i\n%s' % (
                 socket.gethostname().encode('ascii'), os.getpid(),
                 getpass.getuser().encode('ascii'),
                 self.uid, b'LOCK'
