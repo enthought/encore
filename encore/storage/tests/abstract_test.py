@@ -6,7 +6,7 @@
 #
 
 from unittest import TestCase, skip
-from cStringIO import StringIO
+from six import StringIO
 from contextlib import contextmanager
 from tempfile import mkdtemp
 from shutil import rmtree
@@ -53,7 +53,7 @@ class AbstractStoreReadTest(TestCase):
         if self.store is None:
             self.skipTest('Abstract test case')
         value = self.store.get('test1')
-        self.assertEqual(value.data.read(), 'test2\n')
+        self.assertEqual(value.data.read(), b'test2\n')
         self.assertEqual(value.metadata, {
             'a_str': 'test3',
             'an_int': 1,
@@ -81,13 +81,13 @@ class AbstractStoreReadTest(TestCase):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = self.store.get_data('test1')
-        self.assertEqual(data.read(), 'test2\n')
+        self.assertEqual(data.read(), b'test2\n')
 
     def test_get_data_range(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = self.store.get_data_range('test1', 1, 3)
-        self.assertEqual(data.read(), 'es')
+        self.assertEqual(data.read(), b'es')
 
     def test_get_metadata(self):
         if self.store is None:
@@ -140,7 +140,7 @@ class AbstractStoreReadTest(TestCase):
             self.skipTest('Abstract test case')
         result = self.store.multiget('key'+str(i) for i in range(10))
         for i, value in enumerate(result):
-            self.assertEqual(value.data.read(), 'value'+str(i))
+            self.assertEqual(value.data.read(), b'value%i' % i)
             self.assertEqual(value.size, 6)
             expected = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
@@ -152,7 +152,7 @@ class AbstractStoreReadTest(TestCase):
             self.skipTest('Abstract test case')
         result = self.store.multiget_data('key'+str(i) for i in range(10))
         for i, data in enumerate(result):
-            self.assertEqual(data.read(), 'value'+str(i))
+            self.assertEqual(data.read(), b'value%i' % i)
 
     def test_multiget_metadata(self):
         if self.store is None:
@@ -270,7 +270,7 @@ class AbstractStoreReadTest(TestCase):
         if self.store is None:
             self.skipTest('Abstract test case')
         data = self.store.to_bytes('test1')
-        self.assertEqual(data, 'test2\n')
+        self.assertEqual(data, b'test2\n')
 
     def test_to_file(self):
         if self.store is None:
@@ -278,23 +278,20 @@ class AbstractStoreReadTest(TestCase):
         with temp_dir() as directory:
             filepath = os.path.join(directory, 'test')
             self.store.to_file('test1', filepath)
-            written = open(filepath, 'rb').read()
-            self.assertEquals(written, 'test2\n')
+            with open(filepath, 'rb') as fh:
+                written = fh.read()
+            self.assertEqual(written, b'test2\n')
 
-    @skip
+    @skip('not sure why this test was marked as skipped')
     def test_to_file_large(self):
         if self.store is None:
             self.skipTest('Abstract test case')
         self.utils_large()
-        #print list(self.store.query_keys())
-        #print list(self.store1.query_keys())
-        #print list(self.store2.query_keys())
-        #print list(self.store3.query_keys())
         with temp_dir() as directory:
             filepath = os.path.join(directory, 'test')
             self.store.to_file('test3', filepath)
             written = open(filepath).read()
-            self.assertEquals(written, 'test4'*10000000)
+            self.assertEqual(written, 'test4'*10000000)
 
 
 class AbstractStoreWriteTest(TestCase):
@@ -583,8 +580,8 @@ class AbstractStoreWriteTest(TestCase):
         self.store.multiset(keys, zip(datas, metadatas))
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
-            self.assertEquals(self.store.get_data(keys[i]).read(), values[i])
-            self.assertEquals(self.store.get_metadata(keys[i]), metadatas[i])
+            self.assertEqual(self.store.get_data(keys[i]).read(), values[i])
+            self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
 
     def test_multiset_overwrite(self):
         if self.store is None:
@@ -596,8 +593,8 @@ class AbstractStoreWriteTest(TestCase):
         self.store.multiset(keys, zip(datas, metadatas))
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
-            self.assertEquals(self.store.get_data(keys[i]).read(), values[i])
-            self.assertEquals(self.store.get_metadata(keys[i]), metadatas[i])
+            self.assertEqual(self.store.get_data(keys[i]).read(), values[i])
+            self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
 
     def test_multiset_data(self):
         if self.store is None:
@@ -609,10 +606,10 @@ class AbstractStoreWriteTest(TestCase):
         metadatas = [{'meta': True, 'meta1': -i} for i in range(10)]
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
-            self.assertEquals(self.store.get_data(keys[i]).read(), values[i])
+            self.assertEqual(self.store.get_data(keys[i]).read(), values[i])
             # for the time being we make no assertions about what happens to the
             # data of an object because of behaviour of JoinedStore
-            #self.assertEquals(self.store.get_metadata(keys[i]), metadatas[i])
+            #self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
 
     def test_multiset_metadata(self):
         if self.store is None:
@@ -623,10 +620,10 @@ class AbstractStoreWriteTest(TestCase):
         values = ['existing_value'+str(i) for i in range(10)]
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
-            self.assertEquals(self.store.get_metadata(keys[i]), metadatas[i])
+            self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
             # for the time being we make no assertions about what happens to the
             # metadata of an object because of behaviour of JoinedStore
-            #self.assertEquals(self.store.get_data(keys[i]).read(), values[i])
+            #self.assertEqual(self.store.get_data(keys[i]).read(), values[i])
 
     def test_multiupdate_metadata(self):
         if self.store is None:
@@ -638,7 +635,7 @@ class AbstractStoreWriteTest(TestCase):
             self.assertTrue(self.store.exists(keys[i]))
             expected = {'meta': True}
             expected.update(metadatas[i])
-            self.assertEquals(self.store.get_metadata(keys[i]), metadatas[i])
+            self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
 
     def test_from_file(self):
         """ Test that from_file works
