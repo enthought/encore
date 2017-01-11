@@ -5,7 +5,7 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from six import StringIO
+from six import BytesIO
 import time
 
 from .abstract_store import Value, AuthorizationError
@@ -25,7 +25,7 @@ class StringValue(Value):
     @property
     def data(self):
         if self._data_stream is None:
-            self._data_stream = StringIO(self._data)
+            self._data_stream = BytesIO(self._data)
         return self._data_stream
 
     @property
@@ -37,4 +37,4 @@ class StringValue(Value):
         raise AuthorizationError("key not owned by user")
 
     def range(self, start=None, end=None):
-        return StringIO(self._data[slice(start, end)])
+        return BytesIO(self._data[slice(start, end)])

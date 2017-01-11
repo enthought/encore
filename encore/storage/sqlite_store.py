@@ -283,7 +283,7 @@ class SqliteStore(AbstractStore):
         row = self._get_columns_by_key(key, ['data'])
         if row is None:
             raise KeyError(key)
-        data = cStringIO.StringIO(row['data'])
+        data = StringIO(row['data'])
         return data
 
 
