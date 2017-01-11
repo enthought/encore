@@ -18,9 +18,9 @@ This class is provided in part as a sample implementation of the API.
 
 """
 
-import cStringIO
+from six import StringIO
 import sqlite3
-import cPickle
+from six.moves import cPickle
 import time
 
 from .abstract_store import AbstractStore

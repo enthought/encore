@@ -70,7 +70,12 @@ class MethodNotifier(object):
     __slots__ = ['func', 'cls', 'obj', '_notify', '_args']
     def __init__(self, meth, notify=None, args=()):
         self.func = meth.__func__
-        self.cls = meth.__self__.__class__
+
+        if six.PY2:
+            self.cls = meth.im_class
+        else:
+            self.cls = meth.__self__.__class__
+
         obj = meth.__self__
         if obj is None:
             # Unbound Method.
@@ -93,13 +98,14 @@ class MethodNotifier(object):
         obj = self.obj
         if obj is None:
             # Unbound method.
-            objc = None
+            return six.create_unbound_method(self.func, self.cls)
         else:
             objc = obj()
             if objc is None:
                 # Bound method whose object has been garbage collected.
                 return
-        return six.create_bound_method(self.func, objc)
+
+            return six.create_bound_method(self.func, objc)
 
 ###############################################################################
 # `EventInfo` Private Class.

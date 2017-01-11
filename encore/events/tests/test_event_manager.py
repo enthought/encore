@@ -452,9 +452,12 @@ class TestEventManager(unittest.TestCase):
         """ Test if instance methods are called.
         """
         data = []
+
         class MyHeavyObject(BaseEvent):
+
             def callback(self, evt):
                 data.append(1)
+
             def callback_unbound(self):
                 data.append(2)
 

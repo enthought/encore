@@ -22,9 +22,9 @@ data values can be stored in the key-value store.
 """
 
 from abc import ABCMeta, abstractmethod, abstractproperty
-from itertools import izip
+from six.moves import zip as izip
 import fnmatch
-from cStringIO import StringIO
+from six import StringIO
 import warnings
 
 from encore.events.api import get_event_manager

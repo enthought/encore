@@ -17,7 +17,7 @@ This class is provided in part as a sample implementation of the API.
 
 """
 
-from cStringIO import StringIO
+from six import StringIO
 import time
 
 from .abstract_store import AbstractStore

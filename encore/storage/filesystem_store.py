@@ -42,7 +42,7 @@ def init_shared_store(path, magic_fname='.FSStore'):
     """
     magic_path = os.path.join(path, magic_fname)
     with open(magic_path, 'wb') as magic_fp:
-        magic_fp.write('__version__ = 0\n')
+        magic_fp.write(b'__version__ = 0\n')
 
 ################################################################################
 # SharedFSStore class.
