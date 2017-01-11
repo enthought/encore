@@ -5,11 +5,13 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 import time
+from unittest import TestCase
 
-import encore.storage.tests.abstract_test as abstract_test
+from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..dict_memory_store import DictMemoryStore
 
-class DictMemoryStoreReadTest(abstract_test.AbstractStoreReadTest):
+
+class DictMemoryStoreReadTest(TestCase, StoreReadTestMixin):
     
     def setUp(self):
         """ Set up a data store for the test case
@@ -32,7 +34,7 @@ class DictMemoryStoreReadTest(abstract_test.AbstractStoreReadTest):
         self.store = DictMemoryStore()
         t = time.time()
         self.store._store['test1'] = (
-            'test2\n', {
+            b'test2\n', {
                 'a_str': 'test3',
                 'an_int': 1,
                 'a_float': 2.0,
@@ -43,13 +45,13 @@ class DictMemoryStoreReadTest(abstract_test.AbstractStoreReadTest):
         for i in range(10):
             t = time.time()
             self.store._store['key%d'%i] = (
-                'value%d' % i, {'query_test1': 'value', 'query_test2': i},
+                b'value%d' % i, {'query_test1': 'value', 'query_test2': i},
                 t, t)
             if i % 2 == 0:
                 self.store._store['key%d'%i][1]['optional'] = True
 
 
-class DictMemoryStoreWriteTest(abstract_test.AbstractStoreWriteTest):
+class DictMemoryStoreWriteTest(TestCase, StoreWriteTestMixin):
     
     def setUp(self):
         """ Set up a data store for the test case

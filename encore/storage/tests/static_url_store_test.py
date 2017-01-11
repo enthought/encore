@@ -5,11 +5,12 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-import os
-import threading
-from tempfile import mkdtemp
-from shutil import rmtree
 import json
+import os
+from shutil import rmtree
+from tempfile import mkdtemp
+import threading
+from unittest import TestCase
 
 
 from six import itertools, next
@@ -18,12 +19,14 @@ from six.moves import socketserver as SocketServer
 from six.moves.BaseHTTPServer import HTTPServer
 from six.moves.SimpleHTTPServer import SimpleHTTPRequestHandler
 
-import encore.storage.tests.abstract_test as abstract_test
+from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..static_url_store import StaticURLStore
 
 port_counter = itertools.count()
 
-class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
+
+class StaticURLStoreReadTest(TestCase, StoreReadTestMixin):
+
     resolution = 'second'
 
     def setUp(self):

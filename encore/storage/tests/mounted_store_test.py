@@ -5,10 +5,10 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from unittest import TestCase
 import time
+from unittest import TestCase
 
-import encore.storage.tests.abstract_test as abstract_test
+from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..mounted_store import MountedStore
 from ..dict_memory_store import DictMemoryStore
 from ..string_value import StringValue
@@ -126,7 +126,7 @@ class MountedStoreTest(TestCase):
         self.assertEqual(value.metadata, {"metakey": "mounted"})
 
 
-class MountedStoreReadTest(abstract_test.AbstractStoreReadTest):
+class MountedStoreReadTest(TestCase, StoreReadTestMixin):
 
     def setUp(self):
         """ Set up a data store for the test case
@@ -170,10 +170,7 @@ class MountedStoreReadTest(abstract_test.AbstractStoreReadTest):
             stores[i%2]._store['key%d'%i] = ('value%d' % i, metadata, t, t)
         self.store = MountedStore('', self.mounted_store, self.backing_store)
 
-    #def utils_large(self):
-    #    self.store2.from_bytes('test3', '')#'test4'*10000000)
-
-class MountedStoreWriteTest(abstract_test.AbstractStoreWriteTest):
+class MountedStoreWriteTest(TestCase, StoreWriteTestMixin):
 
     def setUp(self):
         """ Set up a data store for the test case

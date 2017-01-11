@@ -1,10 +1,10 @@
-import os
-from tempfile import mkdtemp
 from unittest import TestCase
 from ..dynamic_url_store import DynamicURLStore
 
+
 class DynamicURLStoreTest(TestCase):
     ''' TODO: This should be a full test suite. '''
+
     def setUp(self):
         self.store = DynamicURLStore('http://localhost',
                                      None,

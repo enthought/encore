@@ -6,15 +6,16 @@
 #
 
 import os
-from tempfile import mkdtemp
 from shutil import rmtree
 import sqlite3
+from tempfile import mkdtemp
 import time
+from unittest import TestCase
 
-import encore.storage.tests.abstract_test as abstract_test
+from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..sqlite_store import SqliteStore
 
-class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
+class SqliteStoreReadTest(TestCase, StoreReadTestMixin):
 
     def setUp(self):
         """ Set up a data store for the test case
@@ -81,7 +82,7 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
         rmtree(self.path)
 
 
-class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
+class SqliteStoreWriteTest(TestCase, StoreWriteTestMixin):
 
     def setUp(self):
         """ Set up a data store for the test case
