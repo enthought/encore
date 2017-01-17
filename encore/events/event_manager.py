@@ -258,7 +258,7 @@ class EventInfo(object):
                 listener = linfo[-1]
                 id = self.get_id(listener())
                 if id in l_filter:
-                    for key, value in six.iteritems(l_filter[id]):
+                    for key, value in l_filter[id].items():
                         attr = event
                         try:
                             # Get extended attributes of the event.
