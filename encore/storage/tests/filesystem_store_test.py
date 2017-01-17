@@ -14,6 +14,7 @@ from unittest import TestCase
 from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..filesystem_store import FileSystemStore, init_shared_store
 
+
 class BaseFileSystemStoreTestCase(TestCase):
 
     resolution = 'second'
@@ -22,16 +23,17 @@ class BaseFileSystemStoreTestCase(TestCase):
         rmtree(self.path)
 
     def utils_large(self):
-        self._write_data('test3', 'test4'*10000000)
+        self._write_data('test3', b'test4'*10000000)
         self._write_metadata('test3', {})
             
     def _write_data(self, filename, data):
-        with file(os.path.join(self.path, filename+'.data'), 'wb') as fp:
+        with open(os.path.join(self.path, filename+'.data'), 'wb') as fp:
             fp.write(data)
     
     def _write_metadata(self, filename, metadata):
-        with file(os.path.join(self.path, filename+'.metadata'), 'wb') as fp:
-            json.dump(metadata, fp)
+        with open(os.path.join(self.path, filename+'.metadata'), 'wb') as fp:
+            metadata_str = json.dumps(metadata)
+            fp.write(metadata_str.encode('utf-8'))
     
 
 class FileSystemStoreReadTest(BaseFileSystemStoreTestCase, StoreReadTestMixin):
@@ -55,7 +57,7 @@ class FileSystemStoreReadTest(BaseFileSystemStoreTestCase, StoreReadTestMixin):
         super(FileSystemStoreReadTest, self).setUp()
         self.path = mkdtemp()
         init_shared_store(self.path)
-        self._write_data('test1', 'test2\n')
+        self._write_data('test1', b'test2\n')
 
         self._write_metadata('test1', {
             'a_str': 'test3',
@@ -67,7 +69,7 @@ class FileSystemStoreReadTest(BaseFileSystemStoreTestCase, StoreReadTestMixin):
         })
         
         for i in range(10):
-            self._write_data('key%d'%i, 'value%d' % i)
+            self._write_data('key%d'%i, b'value%d' % i)
             metadata = {'query_test1': 'value',
                 'query_test2': i}
             if i % 2 == 0:
@@ -78,7 +80,7 @@ class FileSystemStoreReadTest(BaseFileSystemStoreTestCase, StoreReadTestMixin):
         self.store.connect()
 
     def utils_large(self):
-        self._write_data('test3', 'test4'*10000000)
+        self._write_data('test3', b'test4'*10000000)
         self._write_metadata('test3', {})
 
 
@@ -103,7 +105,7 @@ class FileSystemStoreWriteTest(BaseFileSystemStoreTestCase, StoreWriteTestMixin)
         super(FileSystemStoreWriteTest, self).setUp()
         self.path = mkdtemp()
         init_shared_store(self.path)
-        self._write_data('test1', 'test2\n')
+        self._write_data('test1', b'test2\n')
 
         self._write_metadata('test1', {
             'a_str': 'test3',
@@ -116,7 +118,7 @@ class FileSystemStoreWriteTest(BaseFileSystemStoreTestCase, StoreWriteTestMixin)
 
         for i in range(10):
             key = 'existing_key'+str(i)
-            data = 'existing_value'+str(i)
+            data = b'existing_value%i' % i
             metadata = {'meta': True, 'meta1': -i}
             self._write_data(key, data)
             self._write_metadata(key, metadata)

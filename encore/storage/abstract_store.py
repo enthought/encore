@@ -24,7 +24,7 @@ data values can be stored in the key-value store.
 from abc import ABCMeta, abstractmethod, abstractproperty
 from six.moves import zip as izip
 import fnmatch
-from six import StringIO
+from six import BytesIO
 import warnings
 
 from encore.events.api import get_event_manager
@@ -1056,7 +1056,8 @@ class AbstractStore(AbstractReadOnlyStore):
             default if they need to.  The default is 1048576 bytes (1 MiB).
 
         """
-        self.set_data(key, StringIO(data), buffer_size)
+        self.set_data(key, BytesIO(data), buffer_size)
+
 
 class AbstractAuthorizingStore(AbstractStore):
     """ Abstract base class for Key-Value Store API with permissioning

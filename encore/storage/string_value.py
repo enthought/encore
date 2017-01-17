@@ -5,16 +5,14 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from six import BytesIO
+from six import BytesIO, string_types
 import time
 
 from .abstract_store import Value, AuthorizationError
 
 class StringValue(Value):
 
-    def __init__(self, data='', metadata=None, created=None, modified=None):
-        if not isinstance(data, basestring):
-            raise ValueError(data)
+    def __init__(self, data=b'', metadata=None, created=None, modified=None):
         self._data = data
         self._data_stream = None
         self._metadata = metadata if metadata is not None else {}

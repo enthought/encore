@@ -132,8 +132,8 @@ def write_log(func, event='w'):
                 id = int(text.split()[0]) + 1
             else:
                 id = 1
-            new_line = '%d %s %s %s\n'%(id, event, time, key)
-            log_file.write(new_line)
+            new_line = '%d %s %s %s\n' % (id, event, time, key)
+            log_file.write(new_line.encode('utf-8'))
             log_file.close()
 
             if id % store._logrotate_limit == 0:
@@ -295,8 +295,9 @@ class LockingFileSystemStore(FileSystemStore):
         basename = os.path.basename
         if kwargs.keys() == ['type']:
             typ =  kwargs['type']
-            if typ in ('file','dir'):
+            if typ in ('file', 'dir'):
                 pattern = '{0}.*.metadata'.format(typ)
+                print('Pattern ', os.path.join(self._root, pattern))
                 for i in glob.iglob(os.path.join(self._root, pattern)):
                     yield basename(i)[:-9]
                 return
@@ -411,11 +412,12 @@ class LockingFileSystemStore(FileSystemStore):
             size = os.stat(log_path).st_size
             with open(log_path, 'rb') as f:
                 first_log = f.readline()
-                f.seek(size/2)
+                f.seek(size//2)
                 f.readline()
                 split_pos = f.tell()
                 f.seek(0)
-                with open(log_path+'.%s'%first_log.split(' ',1)[0], 'wb') as f2:
+                file_name = '{}.{}'.format(log_path, first_log.split(b' ', 1)[0].decode('ascii'))
+                with open(file_name, 'wb') as f2:
                     f2.write(f.read(split_pos))
                 new_text = f.read()
             with open(log_path, 'wb') as f:

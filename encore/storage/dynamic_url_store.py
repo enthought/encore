@@ -19,9 +19,10 @@ HTTP operations.
 
 """
 
+from email.utils import parsedate_tz, mktime_tz
 import json
-import urllib
-import rfc822
+
+from six.moves.urllib.parse import quote
 
 import requests
 
@@ -57,7 +58,7 @@ class RequestsURLValue(Value):
 
         modified = response.headers.get('Last-Modified', None)
         if modified is not None:
-            modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
+            modified = mktime_tz(parsedate_tz(modified))
         self._modified = modified
 
         mimetype = response.headers.get('Content-Type',
@@ -168,7 +169,7 @@ class RequestsURLValue(Value):
 
         modified = self._data_response.headers.get('Last-Modified', None)
         if modified is not None:
-            modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
+            modified = mktime_tz(parsedate_tz(modified))
         self._modified = modified
 
         mimetype = self._data_response.headers.get('Content-Type',
@@ -245,7 +246,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
         return self._user_tag
 
     def _url(self, key, part=""):
-        safe_key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
+        safe_key = quote(key, safe="/~!$&'()*+,;=:@")
 
         if part:
             url = self.url_format.format(base=self.base_url,
@@ -265,7 +266,7 @@ class DynamicURLStore(AbstractAuthorizingStore):
         response.raise_for_status()
 
     def get(self, key):
-        safe_key = urllib.quote(key, safe="/~!$&'()*+,;=:@")
+        safe_key = quote(key, safe="/~!$&'()*+,;=:@")
         result = RequestsURLValue(self._session, self.base_url, safe_key,
                                   self.url_format, self.parts)
 

@@ -12,8 +12,13 @@ from tempfile import mkdtemp
 import time
 from unittest import TestCase
 
+import six
+
 from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..sqlite_store import SqliteStore
+
+if six.PY3:
+    buffer = sqlite3.Binary
 
 class SqliteStoreReadTest(TestCase, StoreReadTestMixin):
 
@@ -52,7 +57,7 @@ class SqliteStoreReadTest(TestCase, StoreReadTestMixin):
 
         t = time.time()
         connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (
-            b'test1',
+            'test1',
             {
                 'a_str': 'test3',
                 'an_int': 1,
@@ -63,7 +68,7 @@ class SqliteStoreReadTest(TestCase, StoreReadTestMixin):
             }, t, t,
             buffer(b'test2\n')))
         for i in range(10):
-            key = b'key%d'%i
+            key = 'key%d' % i
             data = buffer(b'value%d' % i)
             metadata = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
@@ -117,7 +122,7 @@ class SqliteStoreWriteTest(TestCase, StoreWriteTestMixin):
 
         t = time.time()
         connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (
-            b'test1',
+            'test1',
             {
                 'a_str': 'test3',
                 'an_int': 1,
@@ -128,7 +133,7 @@ class SqliteStoreWriteTest(TestCase, StoreWriteTestMixin):
             }, t, t,
             buffer(b'test2\n')))
         for i in range(10):
-            key = b'existing_key%d'%i
+            key = 'existing_key%d'%i
             data = buffer(b'existing_value%d' % i)
             metadata = {'meta': True, 'meta1': -i}
             connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (key, metadata, t, t, data))

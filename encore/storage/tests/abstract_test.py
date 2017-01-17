@@ -12,7 +12,7 @@ from tempfile import mkdtemp
 import time
 from unittest import TestCase, skip
 
-from six import StringIO
+from six import BytesIO
 
 
 @contextmanager
@@ -225,13 +225,8 @@ class StoreWriteTestMixin(object):
     resolution = 'arbitrary'
 
     def test_set(self):
-        """ Test that set works
 
-        Subclasses should call this via super(), then validate that things
-        were stored correctly.
-
-        """
-        data = StringIO('test4')
+        data = BytesIO(b'test4')
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -247,7 +242,7 @@ class StoreWriteTestMixin(object):
         test_end = time.time()
         if self.resolution == 'second':
             test_end = int(test_end)+1
-        self.assertEqual(self.store.to_bytes('test3'), 'test4')
+        self.assertEqual(self.store.to_bytes('test3'), b'test4')
         self.assertEqual(self.store.get_metadata('test3'), metadata)
 
         value = self.store.get('test3')
@@ -262,7 +257,7 @@ class StoreWriteTestMixin(object):
         were stored correctly.
 
         """
-        data = StringIO('test4')
+        data = BytesIO(b'test4')
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -281,7 +276,7 @@ class StoreWriteTestMixin(object):
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
-        data = StringIO('test4'*10000000) # 50 MB of data
+        data = BytesIO(b'test4'*10000000) # 50 MB of data
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -291,7 +286,7 @@ class StoreWriteTestMixin(object):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         self.store.set('test3', (data, metadata))
-        self.assertEqual(self.store.to_bytes('test3'), 'test4'*10000000)
+        self.assertEqual(self.store.to_bytes('test3'), b'test4'*10000000)
         self.assertEqual(self.store.get_metadata('test3'), metadata)
 
     def test_set_buffer(self):
@@ -300,7 +295,7 @@ class StoreWriteTestMixin(object):
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
-        data = StringIO('test4'*8000)
+        data = BytesIO(b'test4'*8000)
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -310,11 +305,11 @@ class StoreWriteTestMixin(object):
             'a_dict_1': {'one': 1, 'two': 2, 'three': 3}
         }
         self.store.set('test3', (data, metadata), 8000)
-        self.assertEqual(self.store.to_bytes('test3'), 'test4'*8000)
+        self.assertEqual(self.store.to_bytes('test3'), b'test4'*8000)
         self.assertEqual(self.store.get_metadata('test3'), metadata)
 
     def test_set_data(self):
-        data = StringIO('test4')
+        data = BytesIO(b'test4')
         test_start = time.time()
         if self.resolution == 'second':
             test_start = int(test_start)
@@ -322,7 +317,7 @@ class StoreWriteTestMixin(object):
         test_end = time.time()
         if self.resolution == 'second':
             test_end = int(test_end)+1
-        self.assertEqual(self.store.to_bytes('test1'), 'test4')
+        self.assertEqual(self.store.to_bytes('test1'), b'test4')
         value = self.store.get('test1')
         self.assertGreaterEqual(value.modified, test_start)
         #self.assertLessEqual(value.created, test_start)
@@ -340,7 +335,7 @@ class StoreWriteTestMixin(object):
         #})
 
     def test_set_data_new(self):
-        data = StringIO('test4')
+        data = BytesIO(b'test4')
         test_start = time.time()
         if self.resolution == 'second':
             test_start = int(test_start)
@@ -348,7 +343,7 @@ class StoreWriteTestMixin(object):
         test_end = time.time()
         if self.resolution == 'second':
             test_end = int(test_end)+1
-        self.assertEqual(self.store.to_bytes('test3'), 'test4')
+        self.assertEqual(self.store.to_bytes('test3'), b'test4')
         value = self.store.get('test3')
         self.assertGreaterEqual(value.modified, test_start)
         #self.assertGreaterEqual(value.created, test_start)
@@ -364,9 +359,9 @@ class StoreWriteTestMixin(object):
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
-        data = StringIO('test4'*10000000) # 50 MB of data
+        data = BytesIO(b'test4'*10000000) # 50 MB of data
         self.store.set_data('test3', data)
-        self.assertEqual(self.store.to_bytes('test3'), 'test4'*10000000)
+        self.assertEqual(self.store.to_bytes('test3'), b'test4'*10000000)
 
     def test_set_data_buffer(self):
         """ Test that set works with a different-sized buffer
@@ -374,9 +369,9 @@ class StoreWriteTestMixin(object):
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
-        data = StringIO('test4'*8000)
+        data = BytesIO(b'test4'*8000)
         self.store.set_data('test1', data)
-        self.assertEqual(self.store.to_bytes('test1'), 'test4'*8000)
+        self.assertEqual(self.store.to_bytes('test1'), b'test4'*8000)
 
     def test_set_metadata(self):
         """ Test that set_metadata works
@@ -454,8 +449,8 @@ class StoreWriteTestMixin(object):
 
     def test_multiset(self):
         keys = ['set_key'+str(i) for i in range(10)]
-        values = ['set_value'+str(i) for i in range(10)]
-        datas = [StringIO(value) for value in values]
+        values = [b'set_value%i' % i for i in range(10)]
+        datas = [BytesIO(value) for value in values]
         metadatas = [{'meta1': i, 'meta2': True} for i in range(10)]
         self.store.multiset(keys, zip(datas, metadatas))
         for i in range(10):
@@ -465,8 +460,8 @@ class StoreWriteTestMixin(object):
 
     def test_multiset_overwrite(self):
         keys = ['existing_key'+str(i) for i in range(10)]
-        values = ['set_value'+str(i) for i in range(10)]
-        datas = [StringIO(value) for value in values]
+        values = [b'set_value%i' % i for i in range(10)]
+        datas = [BytesIO(value) for value in values]
         metadatas = [{'meta1': i, 'meta2': True} for i in range(10)]
         self.store.multiset(keys, zip(datas, metadatas))
         for i in range(10):
@@ -476,8 +471,8 @@ class StoreWriteTestMixin(object):
 
     def test_multiset_data(self):
         keys = ['existing_key'+str(i) for i in range(10)]
-        values = ['set_value'+str(i) for i in range(10)]
-        datas = [StringIO(value) for value in values]
+        values = [b'set_value%i' % i for i in range(10)]
+        datas = [BytesIO(value) for value in values]
         self.store.multiset_data(keys, datas)
         metadatas = [{'meta': True, 'meta1': -i} for i in range(10)]
         for i in range(10):
@@ -518,9 +513,9 @@ class StoreWriteTestMixin(object):
         with temp_dir() as directory:
             filepath = os.path.join(directory, 'test')
             with open(filepath, 'wb') as fp:
-                fp.write('test4')
+                fp.write(b'test4')
             self.store.from_file('test3', filepath)
-        self.assertEqual(self.store.to_bytes('test3'), 'test4')
+        self.assertEqual(self.store.to_bytes('test3'), b'test4')
 
     def test_from_file_large(self):
         """ Test that from_file works for large files (~50 MB)
@@ -531,15 +526,10 @@ class StoreWriteTestMixin(object):
         with temp_dir() as directory:
             filepath = os.path.join(directory, 'test')
             with open(filepath, 'wb') as fp:
-                fp.write('test4'*10000000)
+                fp.write(b'test4'*10000000)
             self.store.from_file('test3', filepath)
-        self.assertEqual(self.store.to_bytes('test3'), 'test4'*10000000)
+        self.assertEqual(self.store.to_bytes('test3'), b'test4'*10000000)
 
     def test_from_bytes(self):
-        """ Test that from bytes works
-
-        Subclasses should call this via super(), then validate that things
-        were stored correctly.
-        """
-        self.store.from_bytes('test3', 'test4')
-        self.assertEqual(self.store.to_bytes('test3'), 'test4')
+        self.store.from_bytes('test3', b'test4')
+        self.assertEqual(self.store.to_bytes('test3'), b'test4')

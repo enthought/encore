@@ -57,6 +57,7 @@ class JoinedStoreReadTest(TestCase, StoreReadTestMixin):
             stores[i%3]._store['key%d'%i] = (b'value%d' % i, metadata, t, t)
         self.store = JoinedStore(stores)
 
+
 class JoinedStoreWriteTest(TestCase, StoreWriteTestMixin):
     
     def setUp(self):
@@ -81,7 +82,7 @@ class JoinedStoreWriteTest(TestCase, StoreWriteTestMixin):
         self.store3 = DictMemoryStore()
         t = time.time()
         self.store2._store['test1'] = (
-            'test2\n',
+            b'test2\n',
             {
                 'a_str': 'test3',
                 'an_int': 1,
@@ -94,7 +95,7 @@ class JoinedStoreWriteTest(TestCase, StoreWriteTestMixin):
         stores = [self.store1, self.store2, self.store3]
         for i in range(10):
             key = 'existing_key'+str(i)
-            data = 'existing_value'+str(i)
+            data = b'existing_value%i' % i
             metadata = {'meta': True, 'meta1': -i}
             t = time.time()
             stores[i%3]._store[key] = (data, metadata, t, t)

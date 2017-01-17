@@ -11,6 +11,8 @@ import threading
 import datetime
 import time
 
+import six
+
 # Local imports.
 from encore.storage.locking_filesystem_store import LockingFileSystemStore
 from .filesystem_store_test import FileSystemStoreReadTest, FileSystemStoreWriteTest
@@ -39,6 +41,7 @@ class LockingFileSystemStoreReadTest(FileSystemStoreReadTest):
         super(LockingFileSystemStoreReadTest, self).setUp()
         self.store = LockingFileSystemStore(self.path)
         self.store.connect()
+
 
 class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
     
@@ -110,17 +113,21 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
         time.sleep(1)
         new = datetime.datetime.utcnow()
         not_so_old = new - datetime.timedelta(seconds=0.5)
-        store.set_metadata('file.2', {'timestamp':str(new)})
-        store.set_metadata('dir.3', {'timestamp':str(new)})
-        store.set_metadata('foo.4', {'timestamp':str(new)})
+        store.set_metadata('file.2', {'timestamp': str(new)})
+        store.set_metadata('dir.3', {'timestamp': str(new)})
+        store.set_metadata('foo.4', {'timestamp': str(new)})
 
         # Query on types.
-        self.assertItemsEqual(store.query_keys(type='file'),
-                              ['file.1', 'file.2'])
-        self.assertItemsEqual(store.query_keys(type='dir'),
-                              ['dir.3'])
-        self.assertItemsEqual(store.query_keys(type='foo'),
-                              [])
+        results = list(store.query_keys(type='file'))
+
+        if six.PY2:
+            assert_items_equal = self.assertItemsEqual
+        else:
+            assert_items_equal = self.assertCountEqual
+
+        assert_items_equal(results, ['file.1', 'file.2'])
+        assert_items_equal(store.query_keys(type='dir'), ['dir.3'])
+        assert_items_equal(store.query_keys(type='foo'), [])
 
         # Note: The timestamp metadata key is not used to return results.
         # The results are for service side logged last_modified, which

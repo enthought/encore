@@ -32,12 +32,12 @@ class SimpleAuthStoreReadTest(TestCase, StoreReadTestMixin):
         and set into 'self.store'.
         """
         super(SimpleAuthStoreReadTest, self).setUp()
-        encoder = make_encoder("test")
+        encoder = make_encoder(b"test")
         wrapped_store = DictMemoryStore()
         self.store = SimpleAuthStore(wrapped_store, encoder)
         t = time.time()
-        wrapped_store._store['.user_test'] = (encoder('test'),  {}, t, t)
-        wrapped_store._store['test1'] = ('test2\n', {
+        wrapped_store._store['.user_test'] = (encoder(b'test'),  {}, t, t)
+        wrapped_store._store['test1'] = (b'test2\n', {
             'a_str': 'test3',
             'an_int': 1,
             'a_float': 2.0,
@@ -48,7 +48,7 @@ class SimpleAuthStoreReadTest(TestCase, StoreReadTestMixin):
         for i in range(10):
             t = time.time()
             wrapped_store._store['key%d'%i] = (
-                'value%d' % i, {'query_test1': 'value', 'query_test2': i},
+                b'value%d' % i, {'query_test1': 'value', 'query_test2': i},
                 t, t)
             if i % 2 == 0:
                 wrapped_store._store['key%d'%i][1]['optional'] = True
@@ -74,13 +74,13 @@ class SimpleAuthStoreWriteTest(TestCase, StoreWriteTestMixin):
        
         and set into 'self.store'.
         """
-        encoder = make_encoder("test")
+        encoder = make_encoder(b"test")
         wrapped_store = DictMemoryStore()
         self.store = SimpleAuthStore(wrapped_store, encoder)
         t = time.time()
-        wrapped_store._store['.user_test'] = (encoder('test'),  {}, t, t)
+        wrapped_store._store['.user_test'] = (encoder(b'test'),  {}, t, t)
         wrapped_store._store['test1'] = (
-            'test2\n',
+            b'test2\n',
             {
                 'a_str': 'test3',
                 'an_int': 1,
@@ -92,7 +92,7 @@ class SimpleAuthStoreWriteTest(TestCase, StoreWriteTestMixin):
         )
         for i in range(10):
             key = 'existing_key'+str(i)
-            data = 'existing_value'+str(i)
+            data = b'existing_value%i' % i
             metadata = {'meta': True, 'meta1': -i}
             t = time.time()
             wrapped_store._store[key] = (data, metadata, t, t)

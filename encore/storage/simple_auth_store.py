@@ -40,7 +40,7 @@ def make_encoder(salt, hasher=None):
     
     Parameters
     ----------
-    salt : str
+    salt : bytes
         A salt that is added to the user-supplied password before hashing.
         This salt should be kept secret, but needs to be remembered across
         invocations (ie. the same salt needs to be used every time the password
@@ -110,7 +110,8 @@ class SimpleAuthStore(AbstractStore):
             
         """
         self._username = credentials['username']
-        self._token = self.encoder(credentials['password'])
+        # We only support utf-8 encoded byte strings for the encoding
+        self._token = self.encoder(credentials['password'].encode('utf-8'))
         
         if 'connect' not in self.check_permissions():
             raise AuthenticationError('User "%s" is not authenticated for connection' % self._username)
