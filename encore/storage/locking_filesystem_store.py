@@ -293,8 +293,8 @@ class LockingFileSystemStore(FileSystemStore):
         """
         # Optimize for special cases.
         basename = os.path.basename
-        if kwargs.keys() == ['type']:
-            typ =  kwargs['type']
+        if 'type' in kwargs:
+            typ = kwargs['type']
             if typ in ('file', 'dir'):
                 pattern = '{0}.*.metadata'.format(typ)
                 print('Pattern ', os.path.join(self._root, pattern))
