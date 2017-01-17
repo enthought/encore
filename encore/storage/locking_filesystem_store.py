@@ -27,13 +27,16 @@ Ex. Client A reads file1 and then reads file2, whereas client B reads file2
 """
 
 # System library imports.
-import os
-import glob
 from contextlib import contextmanager
-from functools import wraps
 import datetime
+from functools import wraps
+import glob
+import io
+import os
 import time
 import threading
+
+from six import string_types
 
 # ETS library imports.
 from .events import StoreSetEvent, StoreUpdateEvent,\
@@ -297,7 +300,6 @@ class LockingFileSystemStore(FileSystemStore):
             typ = kwargs['type']
             if typ in ('file', 'dir'):
                 pattern = '{0}.*.metadata'.format(typ)
-                print('Pattern ', os.path.join(self._root, pattern))
                 for i in glob.iglob(os.path.join(self._root, pattern)):
                     yield basename(i)[:-9]
                 return
@@ -322,7 +324,7 @@ class LockingFileSystemStore(FileSystemStore):
 
         """
         timestamp = since
-        if isinstance(timestamp, basestring):
+        if isinstance(timestamp, string_types):
             ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
             timestamp = datetime.datetime.strptime(timestamp, ISO_FORMAT)
         timestamp -= self._max_time_delta
@@ -517,15 +519,17 @@ class LockingFileSystemStore(FileSystemStore):
         key is the str key which is modified in the commit.
 
         """
+        ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
         try:
-            with open(self._log_file, 'rb') as log_file:
-                ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+            with io.open(self._log_file, 'r', encoding='utf-8') as log_file:
                 for line in log_file:
                     line = line.rstrip('\n')
                     id, typ, date, time, key = line.split(' ', 4)
-                    yield int(id), typ, datetime.datetime.strptime(date+' '+time,
-                                                         ISO_FORMAT), key
-        except (IOError, ValueError):
+                    tstamp = datetime.datetime.strptime(
+                        '%s %s' % (date, time), ISO_FORMAT
+                    )
+                    yield int(id), typ, tstamp, key
+        except (IOError, ValueError) as exc:
             pass
 
     def __del__(self):
