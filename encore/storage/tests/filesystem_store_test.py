@@ -27,11 +27,11 @@ class BaseFileSystemStoreTestCase(TestCase):
         self._write_metadata('test3', {})
             
     def _write_data(self, filename, data):
-        with open(os.path.join(self.path, filename+'.data'), 'wb') as fp:
+        with open(os.path.join(self.path, filename + '.data'), 'wb') as fp:
             fp.write(data)
     
     def _write_metadata(self, filename, metadata):
-        with open(os.path.join(self.path, filename+'.metadata'), 'wb') as fp:
+        with open(os.path.join(self.path, filename + '.metadata'), 'wb') as fp:
             metadata_str = json.dumps(metadata)
             fp.write(metadata_str.encode('utf-8'))
     

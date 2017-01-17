@@ -454,31 +454,35 @@ class LockingFileSystemStore(FileSystemStore):
             with self._locking(self._log_file, recurse=True):
                 try:
                     f = open(self._log_file)
+                    size = os.stat(self._log_file).st_size
+                    f.seek(max(size - 1024, 0))
+                    text = f.read(1024)
+                    lines = text.splitlines()
+                    if lines:
+                        id = lines[-1][0]
                 except IOError:
                     return None
-                size = os.stat(self._log_file).st_size
-                f.seek(max(size-1024, 0))
-                text = f.read(1024)
-                lines = text.splitlines()
-                if lines:
-                    id = lines[-1][0]
+                finally:
+                    f.close()
         else:
             with self._locking(self._log_file, recurse=True):
                 try:
                     f = open(self._log_file)
+                    text = f.read()
+                    seek = self._search_log(id, text)
+                    if seek < 0:
+                        return None
+                    text = text[seek:]
+                    for line in text.splitlines():
+                        try:
+                            id, typ, date, time, key = line.split(' ', 4)
+                            self._emit_remote_event(id, typ, date, time, key)
+                        except ValueError:
+                            pass
                 except IOError:
                     return None
-                text = f.read()
-                seek = self._search_log(id, text)
-                if seek < 0:
-                    return None
-                text = text[seek:]
-                for line in text.splitlines():
-                    try:
-                        id, typ, date, time, key = line.split(' ', 4)
-                        self._emit_remote_event(id, typ, date, time, key)
-                    except ValueError:
-                        pass
+                finally:
+                    f.close()
         return id
 
     def _search_log(self, id, text):

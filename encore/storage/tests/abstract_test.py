@@ -33,7 +33,8 @@ class StoreReadTestMixin(object):
 
     def test_get(self):
         value = self.store.get('test1')
-        self.assertEqual(value.data.read(), b'test2\n')
+        with value.data as data:
+            self.assertEqual(data.read(), b'test2\n')
         self.assertEqual(value.metadata, {
             'a_str': 'test3',
             'an_int': 1,
@@ -43,25 +44,25 @@ class StoreReadTestMixin(object):
             'a_dict': {'one': 1, 'two': 2, 'three': 3}
         })
         self.assertEqual(value.size, 6)
-        # can't guarantee a particular modified and created, but should exist and be
-        # greater than the test start time.
-        #self.assertGreaterEqual(value.created, self.test_start)
-        #self.assertGreaterEqual(value.modified, self.test_start)
 
     def test_get_copies(self):
-        """ Metadata returned from separate get()s should not be same object"""
+        # Metadata returned from separate get()s should not be same object
         data1, metadata1 = self.store.get('test1')
         metadata1['extra_key'] = 'extra_value'
         data2, metadata2 = self.store.get('test1')
         self.assertNotEqual(metadata2, metadata1)
+        data1.close()
+        data2.close()
 
     def test_get_data(self):
         data = self.store.get_data('test1')
-        self.assertEqual(data.read(), b'test2\n')
+        with data:
+            self.assertEqual(data.read(), b'test2\n')
 
     def test_get_data_range(self):
         data = self.store.get_data_range('test1', 1, 3)
-        self.assertEqual(data.read(), b'es')
+        with data:
+            self.assertEqual(data.read(), b'es')
 
     def test_get_metadata(self):
         metadata = self.store.get_metadata('test1')
@@ -102,7 +103,8 @@ class StoreReadTestMixin(object):
     def test_multiget(self):
         result = self.store.multiget('key'+str(i) for i in range(10))
         for i, value in enumerate(result):
-            self.assertEqual(value.data.read(), b'value%i' % i)
+            with value.data as data:
+                self.assertEqual(data.read(), b'value%i' % i)
             self.assertEqual(value.size, 6)
             expected = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
@@ -112,7 +114,8 @@ class StoreReadTestMixin(object):
     def test_multiget_data(self):
         result = self.store.multiget_data('key'+str(i) for i in range(10))
         for i, data in enumerate(result):
-            self.assertEqual(data.read(), b'value%i' % i)
+            with data:
+                self.assertEqual(data.read(), b'value%i' % i)
 
     def test_multiget_metadata(self):
         result = self.store.multiget_metadata('key'+str(i) for i in range(10))
@@ -455,7 +458,8 @@ class StoreWriteTestMixin(object):
         self.store.multiset(keys, zip(datas, metadatas))
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
-            self.assertEqual(self.store.get_data(keys[i]).read(), values[i])
+            with self.store.get_data(keys[i]) as data_fh:
+                self.assertEqual(data_fh.read(), values[i])
             self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
 
     def test_multiset_overwrite(self):
@@ -466,7 +470,8 @@ class StoreWriteTestMixin(object):
         self.store.multiset(keys, zip(datas, metadatas))
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
-            self.assertEqual(self.store.get_data(keys[i]).read(), values[i])
+            with self.store.get_data(keys[i]) as data_fh:
+                self.assertEqual(data_fh.read(), values[i])
             self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
 
     def test_multiset_data(self):
@@ -477,10 +482,8 @@ class StoreWriteTestMixin(object):
         metadatas = [{'meta': True, 'meta1': -i} for i in range(10)]
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
-            self.assertEqual(self.store.get_data(keys[i]).read(), values[i])
-            # for the time being we make no assertions about what happens to the
-            # data of an object because of behaviour of JoinedStore
-            #self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
+            with self.store.get_data(keys[i]) as data_fh:
+                self.assertEqual(data_fh.read(), values[i])
 
     def test_multiset_metadata(self):
         keys = ['existing_key'+str(i) for i in range(10)]
@@ -490,9 +493,6 @@ class StoreWriteTestMixin(object):
         for i in range(10):
             self.assertTrue(self.store.exists(keys[i]))
             self.assertEqual(self.store.get_metadata(keys[i]), metadatas[i])
-            # for the time being we make no assertions about what happens to the
-            # metadata of an object because of behaviour of JoinedStore
-            #self.assertEqual(self.store.get_data(keys[i]).read(), values[i])
 
     def test_multiupdate_metadata(self):
         keys = ['existing_key'+str(i) for i in range(10)]

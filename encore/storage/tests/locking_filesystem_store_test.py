@@ -75,7 +75,8 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
             store.set_metadata('key%d'%i, {'name':'key%d'%i})
             store.update_metadata('key', {'name':'key-%d'%i})
 
-        log = [line.split(' ', 4) for line in open(self.store._log_file).readlines()]
+        with open(self.store._log_file) as log_fh:
+            log = [line.split(' ', 4) for line in log_fh.readlines()]
         self.assertEqual(log[-1][0], '25')
         self.assertEqual(len(glob.glob(store._log_file+'.*')), store._log_keep)
 
@@ -119,6 +120,7 @@ class LockingFileSystemStoreWriteTest(FileSystemStoreWriteTest):
 
         # Query on types.
         results = list(store.query_keys(type='file'))
+        print('Results :', results)
 
         if six.PY2:
             assert_items_equal = self.assertItemsEqual

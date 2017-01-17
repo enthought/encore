@@ -555,11 +555,14 @@ class AbstractReadOnlyStore(object):
             with StoreProgressManager(self.event_manager, self, None,
                     "Saving key '%s' to file '%s'" % (key, path), -1,
                     key=key, metadata=metadata) as progress:
-                for buffer in buffer_iterator(data, buffer_size):
-                    fp.write(buffer)
-                    bytes_written += len(buffer)
-                    progress("Saving key '%s' to file '%s' (%d bytes written)"
-                        % (key, path, bytes_written))
+                with data:
+                    for buffer in buffer_iterator(data, buffer_size):
+                        fp.write(buffer)
+                        bytes_written += len(buffer)
+                        progress(
+                            "Saving key '%s' to file '%s' (%d bytes written)"
+                            % (key, path, bytes_written)
+                        )
 
 
     def to_bytes(self, key, buffer_size=1048576):
@@ -598,7 +601,11 @@ class AbstractReadOnlyStore(object):
             extracting the data.
 
         """
-        return b''.join(buffer_iterator(self.get_data(key), buffer_size))
+        data_fh = self.get_data(key)
+        try:
+            return b''.join(buffer_iterator(data_fh, buffer_size))
+        finally:
+            data_fh.close()
 
 
 class AbstractStore(AbstractReadOnlyStore):

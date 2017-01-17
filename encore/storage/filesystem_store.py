@@ -47,6 +47,7 @@ def init_shared_store(path, magic_fname='.FSStore'):
     with open(magic_path, 'wb') as magic_fp:
         magic_fp.write(b'__version__ = 0\n')
 
+
 ################################################################################
 # SharedFSStore class.
 ################################################################################
@@ -207,12 +208,13 @@ class FileSystemStore(AbstractStore):
                     message="Setting key '%s'" % key, key=key,
                     metadata=metadata)
             with progress:
-                for buffer in buffer_iterator(data_stream, buffer_size):
-                    fp.write(buffer)
-                    fp.flush()
-                    bytes_written += len(buffer) 
-                    progress("Setting key '%s' (%d bytes written)"
-                        % (key, bytes_written))
+                with data_stream:
+                    for buffer in buffer_iterator(data_stream, buffer_size):
+                        fp.write(buffer)
+                        fp.flush()
+                        bytes_written += len(buffer)
+                        progress("Setting key '%s' (%d bytes written)"
+                            % (key, bytes_written))
         
         if update:
             self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
