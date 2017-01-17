@@ -5,11 +5,16 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from six.moves import urllib
 from email.utils import parsedate_tz, mktime_tz
 
+from six.moves import urllib
+
+
 from .abstract_store import Value, AuthorizationError
-from .utils import BufferIteratorIO, buffer_iterator
+from .utils import (
+    BufferIteratorIO, buffer_iterator, add_context_manager_support
+)
+
 
 class URLValue(Value):
 
@@ -61,7 +66,10 @@ class URLValue(Value):
         request = urllib.request.Request(self._url, headers={
             'Range': 'bytes={0}-{1}'.format(start_string, end_string),
         })
+
         stream = self._opener.open(request)
+        add_context_manager_support(stream)
+
         if stream.getcode() == 206:
             # it worked!
             return stream
@@ -90,5 +98,7 @@ class URLValue(Value):
         if modified is not None:
             modified = mktime_tz(parsedate_tz(modified))
         self._modified = modified
+
+        self._data_stream = add_context_manager_support(self._data_stream)
 
         return self._data_stream

@@ -40,8 +40,9 @@ class FileValue(Value):
         self._data_stream.seek(start)
         if end is not None:
             max_bytes = end-start
-            return BufferIteratorIO(buffer_iterator(self._data_stream,
-                                                    max_bytes=max_bytes))
+            return BufferIteratorIO(
+                buffer_iterator(self._data_stream, max_bytes=max_bytes)
+            )
         else:
             return self._data_stream
 

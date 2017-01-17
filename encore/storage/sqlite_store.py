@@ -29,7 +29,10 @@ from six.moves import cPickle
 from .abstract_store import AbstractStore
 from .string_value import StringValue
 from .events import StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent
-from .utils import buffer_iterator, SimpleTransactionContext, StoreProgressManager
+from .utils import (
+    buffer_iterator, SimpleTransactionContext, StoreProgressManager,
+    add_context_manager_support
+)
 
 if six.PY3:
     buffer = sqlite3.Binary
@@ -289,7 +292,7 @@ class SqliteStore(AbstractStore):
         row = self._get_columns_by_key(key, ['data'])
         if row is None:
             raise KeyError(key)
-        data = BytesIO(row['data'])
+        data = add_context_manager_support(BytesIO(row['data']))
         return data
 
 

@@ -10,9 +10,18 @@ import os
 from shutil import rmtree
 from tempfile import mkdtemp
 import time
-from unittest import TestCase, skip
+from unittest import skip
 
 from six import BytesIO
+
+from ..utils import add_context_manager_support
+
+
+def create_file_like_data(data_bytes):
+    # The store are supposed to received file-like data streams
+    return add_context_manager_support(
+        BytesIO(data_bytes)
+    )
 
 
 @contextmanager
@@ -229,7 +238,7 @@ class StoreWriteTestMixin(object):
 
     def test_set(self):
 
-        data = BytesIO(b'test4')
+        data = create_file_like_data(b'test4')
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -260,7 +269,7 @@ class StoreWriteTestMixin(object):
         were stored correctly.
 
         """
-        data = BytesIO(b'test4')
+        data = create_file_like_data(b'test4')
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -279,7 +288,7 @@ class StoreWriteTestMixin(object):
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
-        data = BytesIO(b'test4'*10000000) # 50 MB of data
+        data = create_file_like_data(b'test4'*10000000) # 50 MB of data
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -298,7 +307,7 @@ class StoreWriteTestMixin(object):
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
-        data = BytesIO(b'test4'*8000)
+        data = create_file_like_data(b'test4'*8000)
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -312,7 +321,7 @@ class StoreWriteTestMixin(object):
         self.assertEqual(self.store.get_metadata('test3'), metadata)
 
     def test_set_data(self):
-        data = BytesIO(b'test4')
+        data = create_file_like_data(b'test4')
         test_start = time.time()
         if self.resolution == 'second':
             test_start = int(test_start)
@@ -323,22 +332,10 @@ class StoreWriteTestMixin(object):
         self.assertEqual(self.store.to_bytes('test1'), b'test4')
         value = self.store.get('test1')
         self.assertGreaterEqual(value.modified, test_start)
-        #self.assertLessEqual(value.created, test_start)
         self.assertLessEqual(value.modified, test_end)
-        #self.assertLessEqual(value.created, test_end)
-        # for the time being we make no assertions about what happens to the
-        # metadata of an existing object because of behaviour of JoinedStore
-        #self.assertEqual(self.store.get_metadata('test1'), {
-        #    'a_str': 'test3',
-        #    'an_int': 1,
-        #    'a_float': 2.0,
-        #    'a_bool': True,
-        #    'a_list': ['one', 'two', 'three'],
-        #    'a_dict': {'one': 1, 'two': 2, 'three': 3}
-        #})
 
     def test_set_data_new(self):
-        data = BytesIO(b'test4')
+        data = create_file_like_data(b'test4')
         test_start = time.time()
         if self.resolution == 'second':
             test_start = int(test_start)
@@ -349,12 +346,7 @@ class StoreWriteTestMixin(object):
         self.assertEqual(self.store.to_bytes('test3'), b'test4')
         value = self.store.get('test3')
         self.assertGreaterEqual(value.modified, test_start)
-        #self.assertGreaterEqual(value.created, test_start)
         self.assertLessEqual(value.modified, test_end)
-        #self.assertLessEqual(value.created, test_end)
-        # for the time being we make no assertions about what happens to the
-        # metadata of an new object because of behaviour of JoinedStore
-        #self.assertEqual(self.store.get_metadata('test3'), {})
 
     def test_set_data_large(self):
         """ Test that set works with large (~50 MB) data
@@ -362,7 +354,7 @@ class StoreWriteTestMixin(object):
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
-        data = BytesIO(b'test4'*10000000) # 50 MB of data
+        data = create_file_like_data(b'test4'*10000000) # 50 MB of data
         self.store.set_data('test3', data)
         self.assertEqual(self.store.to_bytes('test3'), b'test4'*10000000)
 
@@ -372,16 +364,11 @@ class StoreWriteTestMixin(object):
         Subclasses should call this via super(), then validate that things
         were stored correctly.
         """
-        data = BytesIO(b'test4'*8000)
+        data = create_file_like_data(b'test4'*8000)
         self.store.set_data('test1', data)
         self.assertEqual(self.store.to_bytes('test1'), b'test4'*8000)
 
     def test_set_metadata(self):
-        """ Test that set_metadata works
-
-        Subclasses should call this via super(), then validate that things
-        were stored correctly.
-        """
         metadata = {
             'a_str': 'test5',
             'an_int': 2,
@@ -400,12 +387,7 @@ class StoreWriteTestMixin(object):
         self.assertEqual(self.store.get_metadata('test1'), metadata)
         value = self.store.get('test1')
         self.assertGreaterEqual(value.modified, test_start)
-        #self.assertLessEqual(value.created, test_start)
         self.assertLessEqual(value.modified, test_end)
-        #self.assertLessEqual(value.created, test_end)
-        # for the time being we make no assertions about what happens to the
-        # data of an existing object because of behaviour of JoinedStore
-        #self.assertEqual(self.store.to_bytes('test1'), 'test2\n')
 
     def test_set_metadata_copies(self):
         """ Test that set_metadata copies the provided metadata
@@ -453,7 +435,7 @@ class StoreWriteTestMixin(object):
     def test_multiset(self):
         keys = ['set_key'+str(i) for i in range(10)]
         values = [b'set_value%i' % i for i in range(10)]
-        datas = [BytesIO(value) for value in values]
+        datas = [create_file_like_data(value) for value in values]
         metadatas = [{'meta1': i, 'meta2': True} for i in range(10)]
         self.store.multiset(keys, zip(datas, metadatas))
         for i in range(10):
@@ -465,7 +447,7 @@ class StoreWriteTestMixin(object):
     def test_multiset_overwrite(self):
         keys = ['existing_key'+str(i) for i in range(10)]
         values = [b'set_value%i' % i for i in range(10)]
-        datas = [BytesIO(value) for value in values]
+        datas = [create_file_like_data(value) for value in values]
         metadatas = [{'meta1': i, 'meta2': True} for i in range(10)]
         self.store.multiset(keys, zip(datas, metadatas))
         for i in range(10):
@@ -477,7 +459,7 @@ class StoreWriteTestMixin(object):
     def test_multiset_data(self):
         keys = ['existing_key'+str(i) for i in range(10)]
         values = [b'set_value%i' % i for i in range(10)]
-        datas = [BytesIO(value) for value in values]
+        datas = [create_file_like_data(value) for value in values]
         self.store.multiset_data(keys, datas)
         metadatas = [{'meta': True, 'meta1': -i} for i in range(10)]
         for i in range(10):

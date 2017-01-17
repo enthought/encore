@@ -16,11 +16,37 @@ Utilities for key-value stores.
 import sys
 import itertools
 
+import six
+from six import create_bound_method
+
 from encore.events.api import ProgressManager
 from .events import (StoreTransactionStartEvent, StoreTransactionEndEvent,
     StoreProgressStartEvent, StoreProgressStepEvent, StoreProgressEndEvent,
     StoreModificationEvent)
 
+
+def add_context_manager_support(obj):
+    """ Add empty __enter__ and __exit__ methods on a given object.
+
+    This function is required to be called on any object used by the data()
+    methods on the stores. They are supposed to be file-like byte streams.
+    Adding the support for using them as context managers allows us to make
+    sure we clean the resources when a proper __exit__ method is available.
+
+    """
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+    if not hasattr(obj, '__enter__'):
+        obj.__enter__ = create_bound_method(__enter__, obj)
+    if not hasattr(obj, '__exit__'):
+        obj.__exit__ = create_bound_method(__exit__, obj)
+
+    return obj
 
 class StoreProgressManager(ProgressManager):
     """ :py:class:`encore.events.progress_events.ProgressManager` subclass that

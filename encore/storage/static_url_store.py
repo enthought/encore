@@ -34,6 +34,7 @@ import time
 from .abstract_store import AbstractReadOnlyStore
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 from .url_value import URLValue
+from .utils import add_context_manager_support
 
 
 def basic_auth_factory(**kwargs):
@@ -255,11 +256,12 @@ class StaticURLStore(AbstractReadOnlyStore):
         """
         if self.exists(key):
             url = self.root_url + urllib.parse.quote(self.data_path + key)
-            return self._opener.open(url)
+            stream = self._opener.open(url)
+            add_context_manager_support(stream)
+            return stream
         else:
             raise KeyError(key)
 
-    
     def get_metadata(self, key, select=None):
         """ Retrieve the metadata for a given key in the key-value store.
         

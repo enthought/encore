@@ -5,10 +5,11 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from six import BytesIO, string_types
+from six import BytesIO
 import time
 
 from .abstract_store import Value, AuthorizationError
+from .utils import add_context_manager_support
 
 class StringValue(Value):
 
@@ -24,6 +25,7 @@ class StringValue(Value):
     def data(self):
         if self._data_stream is None:
             self._data_stream = BytesIO(self._data)
+            add_context_manager_support(self._data_stream)
         return self._data_stream
 
     @property
@@ -35,4 +37,6 @@ class StringValue(Value):
         raise AuthorizationError("key not owned by user")
 
     def range(self, start=None, end=None):
-        return BytesIO(self._data[slice(start, end)])
+        data_range = BytesIO(self._data[slice(start, end)])
+        add_context_manager_support(data_range)
+        return data_range

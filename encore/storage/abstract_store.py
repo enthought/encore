@@ -29,7 +29,9 @@ import warnings
 
 from encore.events.api import get_event_manager
 
-from .utils import StoreProgressManager, buffer_iterator
+from .utils import (
+    StoreProgressManager, buffer_iterator, add_context_manager_support
+)
 
 class StoreError(RuntimeError):
     pass
@@ -1063,7 +1065,7 @@ class AbstractStore(AbstractReadOnlyStore):
             default if they need to.  The default is 1048576 bytes (1 MiB).
 
         """
-        self.set_data(key, BytesIO(data), buffer_size)
+        self.set_data(key, add_context_manager_support(BytesIO(data)), buffer_size)
 
 
 class AbstractAuthorizingStore(AbstractStore):

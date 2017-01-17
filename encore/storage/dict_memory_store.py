@@ -22,7 +22,10 @@ import time
 
 from .abstract_store import AbstractStore
 from .string_value import StringValue
-from .utils import buffer_iterator, DummyTransactionContext, StoreProgressManager
+from .utils import (
+    buffer_iterator, DummyTransactionContext, StoreProgressManager,
+    add_context_manager_support
+)
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 
 
@@ -246,7 +249,7 @@ class DictMemoryStore(AbstractStore):
             key-value store.
 
         """
-        return BytesIO(self._store[key][0])
+        return add_context_manager_support(BytesIO(self._store[key][0]))
 
 
     def get_metadata(self, key, select=None):
