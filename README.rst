@@ -34,7 +34,7 @@ systems.
 Prerequisites
 -------------
 
-* Python >= 2.6 (not Python 3)
+* Python >= 2.7 or Python >= 3.4
 
 * Sphinx, graphviz, pydot (documentation build)
 

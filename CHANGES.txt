@@ -1,17 +1,21 @@
 Encore Change Log
 =================
 
-0.6.1.dev
----------
+0.7.0
+-----
+
+This release brings Python 3 support to Encore.  We no longer support Python 2.6.
 
 New Features
 ~~~~~~~~~~~~
 
-Improvements
-~~~~~~~~~~~~
+* Python 3 support (PR#102).
+* Add a delayed asynchronizer that enforces an interval between operations (PR#63).
 
 Fixes
 ~~~~~
+
+* Fix doc warnings and htmlhelp name (PR#100).
 
 0.6.0
 -----
