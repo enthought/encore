@@ -1,7 +1,7 @@
 Abstract Event Manager API
 ==========================
 
-.. pymodule:: encore.events.abstract_event_manager
+.. currentmodule:: encore.events.abstract_event_manager
 
 .. automodule:: encore.events.abstract_event_manager
     

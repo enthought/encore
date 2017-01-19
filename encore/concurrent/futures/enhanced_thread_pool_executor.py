@@ -15,14 +15,15 @@
 
 This builds off of concurrent.futures.thread and implements the following
 changes:
-    * Each worker can be initialized and unitialized with specified functions.
-    * 'map' works without iterating (bugs.python.org/issue11777).
-    * Workers do not unnecessarily retain references to work items
-      (bugs.python.org/issue16284).
-    * Workers do not use polling: http://bugs.python.org/issue11635
-    * Optional `name` argument to prefix executor threads' names.
-    * Optional `wait_on_exit` argument to let worker threads die
-      abruptly during jobs on interpreter exit instead of waiting to finish.
+
+* Each worker can be initialized and uninitialised with specified functions.
+* 'map' works without iterating (bugs.python.org/issue11777).
+* Workers do not unnecessarily retain references to work items
+  (bugs.python.org/issue16284).
+* Workers do not use polling: http://bugs.python.org/issue11635
+* Optional `name` argument to prefix executor threads' names.
+* Optional `wait_on_exit` argument to let worker threads die
+  abruptly during jobs on interpreter exit instead of waiting to finish.
 
 The implementation is largely copied to avoid reliance on undocumented, private
 parts of the code. For example, '_threads_queues' is needed to properly
@@ -231,13 +232,15 @@ class EnhancedThreadPoolExecutor(_base.Executor):
                 is no limit on the wait time.
 
         Returns:
-            An iterator equivalent to: map(func, *iterables) but the calls may
+            An iterator equivalent to: map(func, \*iterables) but the calls may
             be evaluated out-of-order.
 
         Raises:
             TimeoutError: If the entire result iterator could not be generated
                 before the given timeout.
-            Exception: If fn(*args) raises for any values.
+                
+            Exception: If fn(\*args) raises for any values.
+            
         """
         timeout = kwargs.get('timeout')
         if timeout is not None:

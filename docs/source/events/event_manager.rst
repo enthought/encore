@@ -1,7 +1,7 @@
 Event Manager Implementation
 ============================
 
-.. pymodule:: encore.events.event_manager
+.. currentmodule:: encore.events.event_manager
 
 .. automodule:: encore.events.event_manager
     
