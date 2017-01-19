@@ -29,8 +29,8 @@
     <link rel="next" title="Usage" href="usage.html" />
     <link rel="prev" title="Storage" href="index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -45,11 +45,11 @@
         <li class="right" >
           <a href="index.html" title="Storage"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
@@ -77,12 +77,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="usage.html"
                         title="next chapter">Usage</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/storage/concepts.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/storage/concepts.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -90,9 +92,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -101,7 +100,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="key-value-store-concepts">
 <h1>Key-Value Store Concepts<a class="headerlink" href="#key-value-store-concepts" title="Permalink to this headline">¶</a></h1>
@@ -131,14 +130,12 @@ locally if I need to&#8221;).  However any generic implementation must make
 trade-offs, and the trade-offs may end up being inappropriate for particular use
 cases (eg. &#8220;Now I need to have an in-memory code-block store for efficiency, and
 my store&#8217;s optimized for remote access...&#8221;).</p>
-<p class="graphviz">
-digraph diagram1 {
+<img src="../_images/graphviz-4fe448c25666224d5a61b9b717d6e7beab5b64bb.png" alt="digraph diagram1 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store&quot; -&gt; &quot;General Implementation&quot;;
 &quot;Code Block Store&quot; -&gt; &quot;General Implementation&quot;;
 &quot;Configuration Store&quot; -&gt; &quot;General Implementation&quot;
-}
-</p>
+}" />
 <p>Alternatively, it is tempting to start from the task that is being attempted
 (eg. &#8220;I need to store eggs, so I build an egg store&#8221;) and then generalize the
 implementation (eg. &#8220;Now I need to store eggs remotely, so I&#8217;ll build a remote
@@ -146,16 +143,14 @@ egg store, but at least I&#8217;ll use the same API&#8221;).  However, again the
 of the implementation may make it inappropriate for particular use cases (eg.
 &#8220;Now I need a code-block store, so I&#8217;ll wrap up my code-blocks as eggs and use
 an egg store... but now they&#8217;re 100 times bigger than they need to be...&#8221;)</p>
-<p class="graphviz">
-digraph diagram2 {
+<img src="../_images/graphviz-1fc5d190e5db4a8dc3db4b5586f87bd7c09ac68e.png" alt="digraph diagram2 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store API&quot; -&gt; &quot;Memory Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;Disk Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;HTTP Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;Cached Store&quot;
 &quot;Egg Store API&quot; -&gt; &quot;SQL Store&quot;
-}
-</p>
+}" />
 <p>This storage API instead to simply provides an API through which data providers
 and data consumers can talk.  The API deliberately makes no assumptions about
 what is being stored (eg. eggs vs. code blocks) but also makes no assumptions
@@ -167,8 +162,7 @@ code-block store logic which uses the API, and my in-memory store logic which
 implements the API, and join them together&#8221;).  Not every combination may make
 sense (an in-memory egg store is probably a bad idea, for example), but the
 ability to pick and choose allows a great deal of flexibility.</p>
-<p class="graphviz">
-digraph diagram2 {
+<img src="../_images/graphviz-9426fb227cb49e5e2cd93da35d0ce91542315638.png" alt="digraph diagram2 {
 node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Egg Store&quot; -&gt; &quot;Key-Value Store API&quot;
 &quot;Code Block Store&quot; -&gt; &quot;Key-Value Store API&quot;
@@ -178,8 +172,7 @@ node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
 &quot;Key-Value Store API&quot; -&gt; &quot;HTTP Store&quot;
 &quot;Key-Value Store API&quot; -&gt; &quot;Cached Store&quot;
 &quot;Key-Value Store API&quot; -&gt; &quot;SQL Store&quot;
-}
-</p>
+}" />
 <p>This also reflects the reality that developers frequently do not have complete
 freedom to choose the best possible data store solution due to external
 constraints.  By writing to the storage API, you have the opportunity to more
@@ -222,16 +215,16 @@ composition and replication of key-value stores.</p>
 but does not have to actually open those resources until they are requested.</p>
 <p>For writable repositories, data should be supplied to keys via a Value subclass,
 if possible.  This allows copying between repositories using code like:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">repo1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">repo1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">repo1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">repo1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>or copying between keys with code like:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">repo</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key2</span><span class="p">))</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">repo</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key2</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Since files are likely to be common targets for extracting data from values, or
 sources for data being stored, the key-value store API provides utility methods
-<tt class="docutils literal"><span class="pre">to_file()</span></tt> and <tt class="docutils literal"><span class="pre">from_file()</span></tt>.  Simple default implementations of these methods are
+<code class="docutils literal"><span class="pre">to_file()</span></code> and <code class="docutils literal"><span class="pre">from_file()</span></code>.  Simple default implementations of these methods are
 provided, but implementations of the key-value store API may be able to override
 these to be more efficient, depending on the nature of the back-end data store.</p>
 <p>For backwards compatibility, value objects express an API that makes them appear
@@ -261,10 +254,10 @@ identifiers, and whose values can be serialized into reasonable human-readable
 form (basically, you should be able to represent the dictionary as JSON, XML,
 YAML, or similar in a clear and sane way, because some underlying datastore
 <em>will</em>).</p>
-<p>Metadata can be retrieved via the <tt class="docutils literal"><span class="pre">get_metadata()</span></tt> method or as the second element
-of the tuple returned by <tt class="docutils literal"><span class="pre">get()</span></tt>.  Metadata can be set using <tt class="docutils literal"><span class="pre">set()</span></tt> or
-<tt class="docutils literal"><span class="pre">set_metadata()</span></tt> and existing metadata can be modified using
-<tt class="docutils literal"><span class="pre">update_metadata()</span></tt> (similarly to the way that the <tt class="docutils literal"><span class="pre">update()</span></tt> method works
+<p>Metadata can be retrieved via the <code class="docutils literal"><span class="pre">get_metadata()</span></code> method or as the second element
+of the tuple returned by <code class="docutils literal"><span class="pre">get()</span></code>.  Metadata can be set using <code class="docutils literal"><span class="pre">set()</span></code> or
+<code class="docutils literal"><span class="pre">set_metadata()</span></code> and existing metadata can be modified using
+<code class="docutils literal"><span class="pre">update_metadata()</span></code> (similarly to the way that the <code class="docutils literal"><span class="pre">update()</span></code> method works
 for dictionaries).</p>
 <p>There is nothing that ensures that metadata and the corresponding data are
 synchronised for a particular object.  It is up to the user of the API to ensure
@@ -303,18 +296,18 @@ to the user code as to what information is stored.</p>
 </div>
 <div class="section" id="connecting-and-disconnecting">
 <h2>Connecting and Disconnecting<a class="headerlink" href="#connecting-and-disconnecting" title="Permalink to this headline">¶</a></h2>
-<p>Before a store can be used, its <tt class="docutils literal"><span class="pre">connect()</span></tt> method must be called to allow any
+<p>Before a store can be used, its <code class="docutils literal"><span class="pre">connect()</span></code> method must be called to allow any
 long-lived resources to be allocated and prepared for use, and to optionally
 handle any authentication that might be required.</p>
-<p>Conversely, the store&#8217;s <tt class="docutils literal"><span class="pre">disconnect()</span></tt> method should be called when code is
+<p>Conversely, the store&#8217;s <code class="docutils literal"><span class="pre">disconnect()</span></code> method should be called when code is
 done with the store, allowing it to release any long-lived resources.</p>
 </div>
 <div class="section" id="querying">
 <h2>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h2>
-<p>A very simple querying API is provided by default.  The <tt class="docutils literal"><span class="pre">query()</span></tt> method simply
+<p>A very simple querying API is provided by default.  The <code class="docutils literal"><span class="pre">query()</span></code> method simply
 takes a collection of keyword arguments and interprets them as metadata keys
 and values.  It returns all the keys and corresponding metadata that match all
-of the supplied arguments.  <tt class="docutils literal"><span class="pre">query_keys()</span></tt> does the same, but only returns the
+of the supplied arguments.  <code class="docutils literal"><span class="pre">query_keys()</span></code> does the same, but only returns the
 matching keys.</p>
 <p>Subclasses may choose to provide more sophisticated querying mechanisms.</p>
 </div>
@@ -323,7 +316,7 @@ matching keys.</p>
 <p>The base abstract key-value store has no notion of transactions, since we want to
 handle the read-only and simple writer cases efficiently.  However, if the
 underlying storage mechanism has the notion of a transaction, this can be
-encapsulated by writing a context manager for transactions.  The <tt class="docutils literal"><span class="pre">transaction()</span></tt>
+encapsulated by writing a context manager for transactions.  The <code class="docutils literal"><span class="pre">transaction()</span></code>
 method returns an instance of the appropriate context manager.</p>
 </div>
 <div class="section" id="events">
@@ -360,7 +353,7 @@ will put the store into the correct state.</dd>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -375,14 +368,14 @@ will put the store into the correct state.</dd>
         <li class="right" >
           <a href="index.html" title="Storage"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" >Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Dec 08, 2014.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2011-2017, Enthought, Inc..
+      Last updated on Jan 19, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>

@@ -29,8 +29,8 @@
     <link rel="next" title="Joined Store" href="joined_store.html" />
     <link rel="prev" title="Static URL Store" href="static_url_store.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -45,11 +45,11 @@
         <li class="right" >
           <a href="static_url_store.html" title="Static URL Store"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
@@ -60,12 +60,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="joined_store.html"
                         title="next chapter">Joined Store</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/storage/dynamic_url_store.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/storage/dynamic_url_store.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -73,9 +75,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -84,11 +83,11 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-encore.storage.dynamic_url_store"></span><div class="section" id="dynamic-url-store">
 <h1>Dynamic URL Store<a class="headerlink" href="#dynamic-url-store" title="Permalink to this headline">¶</a></h1>
-<p>This module contains the <a class="reference internal" href="#encore.storage.dynamic_url_store.DynamicURLStore" title="encore.storage.dynamic_url_store.DynamicURLStore"><tt class="xref py py-class docutils literal"><span class="pre">DynamicURLStore</span></tt></a> store that communicates
+<p>This module contains the <a class="reference internal" href="#encore.storage.dynamic_url_store.DynamicURLStore" title="encore.storage.dynamic_url_store.DynamicURLStore"><code class="xref py py-class docutils literal"><span class="pre">DynamicURLStore</span></code></a> store that communicates
 with a remote HTTP server which provides the actual data storage.  This is a
 store which implements the basic operations via HTTP GET, POST, PUT and DELETE
 commands as described in the class documentation.</p>
@@ -97,16 +96,16 @@ HTTP operations.</p>
 </div>
 <dl class="class">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore">
-<em class="property">class </em><tt class="descclassname">encore.storage.dynamic_url_store.</tt><tt class="descname">DynamicURLStore</tt><big>(</big><em>base_url</em>, <em>query_url</em>, <em>url_format='{base}/{key}/{part}'</em>, <em>url_format_no_part='{base}/{key}'</em>, <em>parts={'permissions': 'auth'</em>, <em>'data': 'data'</em>, <em>'metadata': 'metadata'}</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">encore.storage.dynamic_url_store.</code><code class="descname">DynamicURLStore</code><span class="sig-paren">(</span><em>base_url</em>, <em>query_url</em>, <em>url_format='{base}/{key}/{part}'</em>, <em>url_format_no_part='{base}/{key}'</em>, <em>parts={'permissions': 'auth'</em>, <em>'data': 'data'</em>, <em>'metadata': 'metadata'}</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store implementation which gets and sets from a web server</p>
 <p>This store expects a server which exposes URLs for each key.  By default
 these URLs are of the form:</p>
-<div class="highlight-python"><div class="highlight"><pre>&lt;base&gt;/&lt;key&gt;/&lt;part&gt;
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">base</span><span class="o">&gt;/&lt;</span><span class="n">key</span><span class="o">&gt;/&lt;</span><span class="n">part</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>Where <cite>&lt;base&gt;</cite> is a common prefix, <cite>&lt;key&gt;</cite> is the key of interest, and
 <cite>&lt;part&gt;</cite> is one of &#8220;data&#8221;, &#8220;metadata&#8221; or &#8220;auth&#8221;.  If the store does not
-follow this format, you can provide a differnt <tt class="docutils literal"><span class="pre">url_format</span></tt> argument
+follow this format, you can provide a differnt <code class="docutils literal"><span class="pre">url_format</span></code> argument
 and a different mapping of <cite>&lt;part&gt;</cite> to aspects of the key.</p>
 <p>The server is expected to respond to queries against these URLS in the
 following ways:</p>
@@ -135,13 +134,13 @@ request</dd>
 </div></blockquote>
 <p>In addition, a DELETE request to a URL of the form <cite>&lt;base&gt;/&lt;key&gt;</cite> should
 remove the key from the remote store.  This pattern is configurable via
-the <tt class="docutils literal"><span class="pre">url_format_no_part</span></tt> argument to the constructor.</p>
+the <code class="docutils literal"><span class="pre">url_format_no_part</span></code> argument to the constructor.</p>
 <p>In addition, the server should have a query URL which accepts GET reuqests
 containing a JSON data structure of metadata key, value pairs to filter
 with, and should return a list of macthing keys, one per line.</p>
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.connect">
-<tt class="descname">connect</tt><big>(</big><em>credentials=None</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.connect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">connect</code><span class="sig-paren">(</span><em>credentials=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to a DynamicURLStore</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -156,7 +155,7 @@ and a requests Session initialized with appropriate authentication.</td>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.delete">
-<tt class="descname">delete</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.delete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a key from the repsository.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
@@ -175,7 +174,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.get">
-<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -194,7 +193,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.get_data">
-<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -213,7 +212,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.get_metadata">
-<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -239,7 +238,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.get_permissions">
-<tt class="descname">get_permissions</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_permissions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_permissions</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the set of permissions the user has</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -263,7 +262,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.query">
-<tt class="descname">query</tt><big>(</big><em>select=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query</code><span class="sig-paren">(</span><em>select=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys and metadata matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
@@ -290,12 +289,12 @@ possible values for that metadata item.</li>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.query_keys">
-<tt class="descname">query_keys</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.query_keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query_keys</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.query_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
 will return the complete set of keys for the key-value store.</p>
-<p>This is equivalent to <tt class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></tt>, but potentially
+<p>This is equivalent to <code class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></code>, but potentially
 more efficiently implemented.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -312,7 +311,7 @@ possible values for that metadata item.</td>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.set">
-<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set</code><span class="sig-paren">(</span><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store a stream of data into a given key in the key-value store.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
@@ -344,7 +343,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.set_data">
-<tt class="descname">set_data</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_data</code><span class="sig-paren">(</span><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the data for a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -375,7 +374,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.set_metadata">
-<tt class="descname">set_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set new metadata for a given key in the key-value store.</p>
 <p>This replaces the existing metadata set for the key with a new set of
 metadata.</p>
@@ -400,7 +399,7 @@ keys should be strings which are valid Python identifiers.</li>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.set_permissions">
-<tt class="descname">set_permissions</tt><big>(</big><em>key</em>, <em>permissions</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_permissions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_permissions</code><span class="sig-paren">(</span><em>key</em>, <em>permissions</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the permissions on a key the user owns</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -426,14 +425,14 @@ permission with at least one tag.</li>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.transaction">
-<tt class="descname">transaction</tt><big>(</big><em>notes</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.transaction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">transaction</code><span class="sig-paren">(</span><em>notes</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a transaction context manager</p>
 <p>This class does not support transactions, so it returns a dummy object.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.update_metadata">
-<tt class="descname">update_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.update_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the metadata for a given key in the key-value store.</p>
 <p>This performs a dictionary update on the existing metadata with the
 provided metadata keys and values</p>
@@ -458,7 +457,7 @@ keys should be strings which are valid Python identifiers.</li>
 
 <dl class="method">
 <dt id="encore.storage.dynamic_url_store.DynamicURLStore.update_permissions">
-<tt class="descname">update_permissions</tt><big>(</big><em>key</em>, <em>permissions</em><big>)</big><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.update_permissions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_permissions</code><span class="sig-paren">(</span><em>key</em>, <em>permissions</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.update_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add permissions on a key the user owns</p>
 <p>The tags provided in the permissions dictionary will be added to the
 existing set of tags for each permission.</p>
@@ -492,7 +491,7 @@ tags which have that permission.</li>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -507,14 +506,14 @@ tags which have that permission.</li>
         <li class="right" >
           <a href="static_url_store.html" title="Static URL Store"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" >Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Dec 08, 2014.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2011-2017, Enthought, Inc..
+      Last updated on Jan 19, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>

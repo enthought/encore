@@ -29,8 +29,8 @@
     <link rel="next" title="Dynamic URL Store" href="dynamic_url_store.html" />
     <link rel="prev" title="File System Store" href="filesystem_store.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -45,11 +45,11 @@
         <li class="right" >
           <a href="filesystem_store.html" title="File System Store"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
@@ -60,12 +60,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="dynamic_url_store.html"
                         title="next chapter">Dynamic URL Store</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/storage/static_url_store.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/storage/static_url_store.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -73,9 +75,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -84,28 +83,28 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-encore.storage.static_url_store"></span><div class="section" id="static-url-store">
 <h1>Static URL Store<a class="headerlink" href="#static-url-store" title="Permalink to this headline">¶</a></h1>
-<p>This module contains the <a class="reference internal" href="#encore.storage.static_url_store.StaticURLStore" title="encore.storage.static_url_store.StaticURLStore"><tt class="xref py py-class docutils literal"><span class="pre">StaticURLStore</span></tt></a> store that communicates
+<p>This module contains the <a class="reference internal" href="#encore.storage.static_url_store.StaticURLStore" title="encore.storage.static_url_store.StaticURLStore"><code class="xref py py-class docutils literal"><span class="pre">StaticURLStore</span></code></a> store that communicates
 with a remote HTTP server which provides the actual data storage.  This is a
 simple read-only store that can be run against a static HTTP server which
 provides a json file with all metadata and then serves data from URLs from
 another path.  The metadata URL is polled periodically for updates.</p>
 <p>A typical static server might be layed out as:</p>
-<div class="highlight-python"><div class="highlight"><pre>base_directory/
-    index.json
-    data/
-        key1
-        key2
-        ...
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">base_directory</span><span class="o">/</span>
+    <span class="n">index</span><span class="o">.</span><span class="n">json</span>
+    <span class="n">data</span><span class="o">/</span>
+        <span class="n">key1</span>
+        <span class="n">key2</span>
+        <span class="o">...</span>
 </pre></div>
 </div>
 </div>
 <dl class="class">
 <dt id="encore.storage.static_url_store.StaticURLStore">
-<em class="property">class </em><tt class="descclassname">encore.storage.static_url_store.</tt><tt class="descname">StaticURLStore</tt><big>(</big><em>root_url</em>, <em>data_path</em>, <em>query_path</em>, <em>poll=300</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">encore.storage.static_url_store.</code><code class="descname">StaticURLStore</code><span class="sig-paren">(</span><em>root_url</em>, <em>data_path</em>, <em>query_path</em>, <em>poll=300</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>A read-only key-value store that is a front end for data served via URLs</p>
 <p>All data is assumed to be served from some root url.  In addition
 the store requires knowledge of two paths: a data prefix URL which is a 
@@ -113,11 +112,11 @@ partial URL to which the keys will be appended when requesting data, and a
 query URL which is a single URL which provides all metadata as a json
 encoded file.</p>
 <p>For example, an HTTP server may store data at URLs of the form:</p>
-<div class="highlight-python"><div class="highlight"><pre>http://www.example.com/data/&lt;key&gt;
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">data</span><span class="o">/&lt;</span><span class="n">key</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>and may store the metadata at:</p>
-<div class="highlight-python"><div class="highlight"><pre>http://www.example.com/index.json
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>These would have a root url of &#8220;<a class="reference external" href="http://www.example.com/">http://www.example.com/</a>&#8221;, a data path
@@ -141,7 +140,7 @@ using the cached metadata.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>event_manager</strong> &#8211; An event_manager which implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><tt class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></tt></a>
+<li><strong>event_manager</strong> &#8211; An event_manager which implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a>
 API.</li>
 <li><strong>root_url</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The base url that data is served from.</li>
 <li><strong>data_path</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The URL prefix that the data is served from.</li>
@@ -154,7 +153,7 @@ API.</li>
 </table>
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.connect">
-<tt class="descname">connect</tt><big>(</big><em>credentials=None</em>, <em>proxy_handler=None</em>, <em>auth_handler_factory=None</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.connect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">connect</code><span class="sig-paren">(</span><em>credentials=None</em>, <em>proxy_handler=None</em>, <em>auth_handler_factory=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to the key-value store, optionally with authentication</p>
 <p>This method creates appropriate urllib2 openers for the store.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -181,7 +180,7 @@ method.</li>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.disconnect">
-<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.disconnect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect from the key-value store</p>
 <p>This method disposes or disconnects to any long-lived resources that the
 store requires.</p>
@@ -189,7 +188,7 @@ store requires.</p>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.exists">
-<tt class="descname">exists</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.exists" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exists</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test whether or not a key exists in the key-value store</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -206,7 +205,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.get">
-<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -229,7 +228,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.get_data">
-<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -248,7 +247,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.get_metadata">
-<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -274,7 +273,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.glob">
-<tt class="descname">glob</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.glob" title="Permalink to this definition">¶</a></dt>
+<code class="descname">glob</code><span class="sig-paren">(</span><em>pattern</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.glob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return keys which match glob-style patterns</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -290,7 +289,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.is_connected">
-<tt class="descname">is_connected</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.is_connected" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether or not the store is currently connected</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -304,7 +303,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.multiget">
-<tt class="descname">multiget</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the data and metadata for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -323,7 +322,7 @@ unique identifier for a resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.multiget_data">
-<tt class="descname">multiget_data</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget_data</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the data for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -342,7 +341,7 @@ unique identifier for a resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.multiget_metadata">
-<tt class="descname">multiget_metadata</tt><big>(</big><em>keys</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -368,7 +367,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.query">
-<tt class="descname">query</tt><big>(</big><em>select=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query</code><span class="sig-paren">(</span><em>select=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys and metadata matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
@@ -395,12 +394,12 @@ possible values for that metadata item.</li>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.query_keys">
-<tt class="descname">query_keys</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.query_keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query_keys</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.query_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
 will return the complete set of keys for the key-value store.</p>
-<p>This is equivalent to <tt class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></tt>, but potentially
+<p>This is equivalent to <code class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></code>, but potentially
 more efficiently implemented.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -417,7 +416,7 @@ possible values for that metadata item.</td>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.to_bytes">
-<tt class="descname">to_bytes</tt><big>(</big><em>key</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.to_bytes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_bytes</code><span class="sig-paren">(</span><em>key</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.to_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store the data associated with a key into a bytes object.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from the underlying data store to a bytes
@@ -452,7 +451,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.to_file">
-<tt class="descname">to_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_file</code><span class="sig-paren">(</span><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store the data associated with a key into a file.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from the underlying data store to a path
@@ -485,7 +484,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.static_url_store.StaticURLStore.update_index">
-<tt class="descname">update_index</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.update_index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.static_url_store.StaticURLStore.update_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request the most recent version of the metadata</p>
 <p>This downloads the json file at the query_path location, and updates
 the local metadata cache with this information.  It then emits events
@@ -505,7 +504,7 @@ the update.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -520,14 +519,14 @@ the update.</p>
         <li class="right" >
           <a href="filesystem_store.html" title="File System Store"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" >Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Dec 08, 2014.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2011-2017, Enthought, Inc..
+      Last updated on Jan 19, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>

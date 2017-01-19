@@ -29,8 +29,8 @@
     <link rel="next" title="Events" href="events.html" />
     <link rel="prev" title="Usage" href="usage.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -45,11 +45,11 @@
         <li class="right" >
           <a href="usage.html" title="Usage"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
@@ -60,12 +60,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="events.html"
                         title="next chapter">Events</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/storage/abstract_store.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/storage/abstract_store.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -73,9 +75,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -84,7 +83,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-encore.storage.abstract_store"></span><div class="section" id="key-value-store-api">
 <h1>Key-Value Store API<a class="headerlink" href="#key-value-store-api" title="Permalink to this headline">¶</a></h1>
@@ -98,39 +97,39 @@ stored, and so while the key use case is for egg repositories, potentially any
 data values can be stored in the key-value store.</p>
 <dl class="class">
 <dt id="encore.storage.abstract_store.Value">
-<em class="property">class </em><tt class="descclassname">encore.storage.abstract_store.</tt><tt class="descname">Value</tt><a class="headerlink" href="#encore.storage.abstract_store.Value" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">encore.storage.abstract_store.</code><code class="descname">Value</code><a class="headerlink" href="#encore.storage.abstract_store.Value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for file-like objects used by Key-Value stores</p>
 <dl class="docutils">
-<dt>size <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd>The size of the data in bytes, or None if a continuous stream or unknown.</dd>
-<dt>created <span class="classifier-delimiter">:</span> <span class="classifier">timestamp</span></dt>
-<dd>The creation time of the key as a floating point UTC timestamp in seconds
+<dt>size</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">int</span><dd>The size of the data in bytes, or None if a continuous stream or unknown.</dd>
+<dt>created</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">timestamp</span><dd>The creation time of the key as a floating point UTC timestamp in seconds
 after the Unix Epoch.</dd>
-<dt>modified <span class="classifier-delimiter">:</span> <span class="classifier">timestamp</span></dt>
-<dd>The modification time of the key as a floating point UTC timestamp in seconds
+<dt>modified</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">timestamp</span><dd>The modification time of the key as a floating point UTC timestamp in seconds
 after the Unix Epoch.</dd>
 </dl>
 <dl class="attribute">
 <dt id="encore.storage.abstract_store.Value.data">
-<tt class="descname">data</tt><a class="headerlink" href="#encore.storage.abstract_store.Value.data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">data</code><a class="headerlink" href="#encore.storage.abstract_store.Value.data" title="Permalink to this definition">¶</a></dt>
 <dd><p>The byte stream of data contained in the value</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.Value.iterdata">
-<tt class="descname">iterdata</tt><big>(</big><em>buffer_size=1048576</em>, <em>progress=None</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.Value.iterdata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">iterdata</code><span class="sig-paren">(</span><em>buffer_size=1048576</em>, <em>progress=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.Value.iterdata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an iterator over the data stream</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="encore.storage.abstract_store.Value.metadata">
-<tt class="descname">metadata</tt><a class="headerlink" href="#encore.storage.abstract_store.Value.metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.abstract_store.Value.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>The metadata dictionary of the value</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="encore.storage.abstract_store.Value.permissions">
-<tt class="descname">permissions</tt><a class="headerlink" href="#encore.storage.abstract_store.Value.permissions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">permissions</code><a class="headerlink" href="#encore.storage.abstract_store.Value.permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>The permissions dictionary of the value</p>
 <p>This is only available if the user has ownership privileges for the key.
 Because different stores have different permission conventions, this
@@ -139,7 +138,7 @@ will not be used when setting a value.</p>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.Value.range">
-<tt class="descname">range</tt><big>(</big><em>start=None</em>, <em>end=None</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.Value.range" title="Permalink to this definition">¶</a></dt>
+<code class="descname">range</code><span class="sig-paren">(</span><em>start=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.Value.range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a stream with a range of bytes from the data</p>
 </dd></dl>
 
@@ -147,19 +146,19 @@ will not be used when setting a value.</p>
 
 <dl class="class">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore">
-<em class="property">class </em><tt class="descclassname">encore.storage.abstract_store.</tt><tt class="descname">AbstractReadOnlyStore</tt><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">encore.storage.abstract_store.</code><code class="descname">AbstractReadOnlyStore</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for read-only Key-Value Store API</p>
 <p>This class implements some of the API so that it can be used with super()
 where appropriate.</p>
 <dl class="attribute">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.event_manager">
-<tt class="descname">event_manager</tt><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.event_manager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><tt class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></tt></a> API.</p>
+<code class="descname">event_manager</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.event_manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a> API.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.connect">
-<tt class="descname">connect</tt><big>(</big><em>credentials=None</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.connect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">connect</code><span class="sig-paren">(</span><em>credentials=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to the key-value store, optionally with authentication</p>
 <p>This method creates or connects to any long-lived resources that the
 store requires.</p>
@@ -170,7 +169,7 @@ store requires.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>credentials</strong> &#8211; An object that can supply appropriate credentials to to authenticate
 the use of any required resources.  The exact form of the credentials
 is implementation-specific, but may be as simple as a
-<tt class="docutils literal"><span class="pre">(username,</span> <span class="pre">password)</span></tt> tuple.</td>
+<code class="docutils literal"><span class="pre">(username,</span> <span class="pre">password)</span></code> tuple.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>AuthorizationError</strong> - If the credentials are not valid, this error will be raised.</td>
 </tr>
@@ -180,7 +179,7 @@ is implementation-specific, but may be as simple as a
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.disconnect">
-<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.disconnect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect from the key-value store</p>
 <p>This method disposes or disconnects to any long-lived resources that the
 store requires.</p>
@@ -188,7 +187,7 @@ store requires.</p>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.exists">
-<tt class="descname">exists</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.exists" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exists</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test whether or not a key exists in the key-value store</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -205,7 +204,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.get">
-<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -224,7 +223,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.get_data">
-<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -243,7 +242,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.get_data_range">
-<tt class="descname">get_data_range</tt><big>(</big><em>key</em>, <em>start=None</em>, <em>end=None</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_data_range" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data_range</code><span class="sig-paren">(</span><em>key</em>, <em>start=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_data_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a partial stream from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -269,7 +268,7 @@ identifier for the resource within the key-value store.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.get_metadata">
-<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -295,7 +294,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.glob">
-<tt class="descname">glob</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.glob" title="Permalink to this definition">¶</a></dt>
+<code class="descname">glob</code><span class="sig-paren">(</span><em>pattern</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.glob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return keys which match glob-style patterns</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -311,7 +310,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.is_connected">
-<tt class="descname">is_connected</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.is_connected" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether or not the store is currently connected</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -325,7 +324,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget">
-<tt class="descname">multiget</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the data and metadata for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -344,7 +343,7 @@ unique identifier for a resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget_data">
-<tt class="descname">multiget_data</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget_data</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the data for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -363,7 +362,7 @@ unique identifier for a resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget_metadata">
-<tt class="descname">multiget_metadata</tt><big>(</big><em>keys</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -389,7 +388,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.query">
-<tt class="descname">query</tt><big>(</big><em>select=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query</code><span class="sig-paren">(</span><em>select=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys and metadata matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
@@ -416,12 +415,12 @@ possible values for that metadata item.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.query_keys">
-<tt class="descname">query_keys</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.query_keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query_keys</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.query_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
 will return the complete set of keys for the key-value store.</p>
-<p>This is equivalent to <tt class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></tt>, but potentially
+<p>This is equivalent to <code class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></code>, but potentially
 more efficiently implemented.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -438,7 +437,7 @@ possible values for that metadata item.</td>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.to_bytes">
-<tt class="descname">to_bytes</tt><big>(</big><em>key</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.to_bytes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_bytes</code><span class="sig-paren">(</span><em>key</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.to_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store the data associated with a key into a bytes object.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from the underlying data store to a bytes
@@ -473,7 +472,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractReadOnlyStore.to_file">
-<tt class="descname">to_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_file</code><span class="sig-paren">(</span><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store the data associated with a key into a file.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from the underlying data store to a path
@@ -508,19 +507,19 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="class">
 <dt id="encore.storage.abstract_store.AbstractStore">
-<em class="property">class </em><tt class="descclassname">encore.storage.abstract_store.</tt><tt class="descname">AbstractStore</tt><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">encore.storage.abstract_store.</code><code class="descname">AbstractStore</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for Key-Value Store API</p>
 <p>This class implements some of the API so that it can be used with super()
 where appropriate.</p>
 <dl class="attribute">
 <dt id="encore.storage.abstract_store.AbstractStore.event_manager">
-<tt class="descname">event_manager</tt><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.event_manager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><tt class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></tt></a> API.</p>
+<code class="descname">event_manager</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.event_manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a> API.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.delete">
-<tt class="descname">delete</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.delete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a key from the repsository.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
@@ -539,7 +538,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.from_bytes">
-<tt class="descname">from_bytes</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.from_bytes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">from_bytes</code><span class="sig-paren">(</span><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.from_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store a bytes object as the data associated with a key.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from a bytes object to the underlying
@@ -565,7 +564,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.from_file">
-<tt class="descname">from_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.from_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">from_file</code><span class="sig-paren">(</span><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently read data from a file into a key in the key-value store.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from a path in the filesystem to the
@@ -593,7 +592,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.multiset">
-<tt class="descname">multiset</tt><big>(</big><em>keys</em>, <em>values</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiset</code><span class="sig-paren">(</span><em>keys</em>, <em>values</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the data and metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
@@ -628,7 +627,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.multiset_data">
-<tt class="descname">multiset_data</tt><big>(</big><em>keys</em>, <em>datas</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiset_data</code><span class="sig-paren">(</span><em>keys</em>, <em>datas</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the data for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
@@ -663,7 +662,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.multiset_metadata">
-<tt class="descname">multiset_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiset_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>metadatas</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
@@ -690,7 +689,7 @@ corresponding keys.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.multiupdate_metadata">
-<tt class="descname">multiupdate_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiupdate_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>metadatas</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
@@ -717,7 +716,7 @@ corresponding keys.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.set">
-<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set</code><span class="sig-paren">(</span><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store a stream of data into a given key in the key-value store.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
@@ -749,7 +748,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.set_data">
-<tt class="descname">set_data</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_data</code><span class="sig-paren">(</span><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the data for a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -780,7 +779,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.set_metadata">
-<tt class="descname">set_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set new metadata for a given key in the key-value store.</p>
 <p>This replaces the existing metadata set for the key with a new set of
 metadata.</p>
@@ -805,15 +804,15 @@ keys should be strings which are valid Python identifiers.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.transaction">
-<tt class="descname">transaction</tt><big>(</big><em>notes</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.transaction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">transaction</code><span class="sig-paren">(</span><em>notes</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a transaction context manager</p>
 <p>Implementations which have no native notion of transactions may choose
 not to implement this.</p>
 <p>This method provides a context manager which creates a data store
 transaction in its __enter__() method, and commits it in its __exit__()
 method if no errors occur.  Intended usage is:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s">&quot;Writing data...&quot;</span><span class="p">):</span>
-    <span class="c"># everything written in this block is part of the transaction</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s2">&quot;Writing data...&quot;</span><span class="p">):</span>
+    <span class="c1"># everything written in this block is part of the transaction</span>
     <span class="o">...</span>
 </pre></div>
 </div>
@@ -848,7 +847,7 @@ by the implementation.</p>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractStore.update_metadata">
-<tt class="descname">update_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.update_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the metadata for a given key in the key-value store.</p>
 <p>This performs a dictionary update on the existing metadata with the
 provided metadata keys and values</p>
@@ -875,7 +874,7 @@ keys should be strings which are valid Python identifiers.</li>
 
 <dl class="class">
 <dt id="encore.storage.abstract_store.AbstractAuthorizingStore">
-<em class="property">class </em><tt class="descclassname">encore.storage.abstract_store.</tt><tt class="descname">AbstractAuthorizingStore</tt><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">encore.storage.abstract_store.</code><code class="descname">AbstractAuthorizingStore</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for Key-Value Store API with permissioning</p>
 <p>This class implements some of the API so that it can be used with super()
 where appropriate.</p>
@@ -890,13 +889,13 @@ tags for &#8216;user&#8217;, &#8216;group&#8217; and &#8216;other&#8217;; while 
 tags from a role-based authentication system.</p>
 <dl class="attribute">
 <dt id="encore.storage.abstract_store.AbstractAuthorizingStore.event_manager">
-<tt class="descname">event_manager</tt><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.event_manager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><tt class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></tt></a> API.</p>
+<code class="descname">event_manager</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.event_manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a> API.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractAuthorizingStore.get_permissions">
-<tt class="descname">get_permissions</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.get_permissions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_permissions</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.get_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the set of permissions the user has</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -920,7 +919,7 @@ tags from a role-based authentication system.</p>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractAuthorizingStore.set_permissions">
-<tt class="descname">set_permissions</tt><big>(</big><em>key</em>, <em>permissions</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.set_permissions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_permissions</code><span class="sig-paren">(</span><em>key</em>, <em>permissions</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.set_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the permissions on a key the user owns</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -946,7 +945,7 @@ permission with at least one tag.</li>
 
 <dl class="method">
 <dt id="encore.storage.abstract_store.AbstractAuthorizingStore.update_permissions">
-<tt class="descname">update_permissions</tt><big>(</big><em>key</em>, <em>permissions</em><big>)</big><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.update_permissions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_permissions</code><span class="sig-paren">(</span><em>key</em>, <em>permissions</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.update_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add permissions on a key the user owns</p>
 <p>The tags provided in the permissions dictionary will be added to the
 existing set of tags for each permission.</p>
@@ -973,7 +972,7 @@ tags which have that permission.</li>
 
 <dl class="attribute">
 <dt id="encore.storage.abstract_store.AbstractAuthorizingStore.user_tag">
-<tt class="descname">user_tag</tt><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.user_tag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">user_tag</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.user_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>A tag that represents the user</p>
 </dd></dl>
 
@@ -987,7 +986,7 @@ tags which have that permission.</li>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -1002,14 +1001,14 @@ tags which have that permission.</li>
         <li class="right" >
           <a href="usage.html" title="Usage"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" >Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Dec 08, 2014.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2011-2017, Enthought, Inc..
+      Last updated on Jan 19, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>

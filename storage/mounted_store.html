@@ -29,8 +29,8 @@
     <link rel="next" title="Simple Authenticating Store" href="simple_auth_store.html" />
     <link rel="prev" title="Joined Store" href="joined_store.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -45,11 +45,11 @@
         <li class="right" >
           <a href="joined_store.html" title="Joined Store"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
@@ -60,12 +60,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="simple_auth_store.html"
                         title="next chapter">Simple Authenticating Store</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/storage/mounted_store.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/storage/mounted_store.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -73,9 +75,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -84,7 +83,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-encore.storage.mounted_store"></span><div class="section" id="mountedstore">
 <h1>MountedStore<a class="headerlink" href="#mountedstore" title="Permalink to this headline">¶</a></h1>
@@ -94,7 +93,7 @@ the mount point.  This is similar in concept to mounting filesystems.</p>
 </div>
 <dl class="class">
 <dt id="encore.storage.mounted_store.MountedStore">
-<em class="property">class </em><tt class="descclassname">encore.storage.mounted_store.</tt><tt class="descname">MountedStore</tt><big>(</big><em>mount_point</em>, <em>mount_store</em>, <em>backing_store</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">encore.storage.mounted_store.</code><code class="descname">MountedStore</code><span class="sig-paren">(</span><em>mount_point</em>, <em>mount_store</em>, <em>backing_store</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>A key-value store that mounts another store at a particular key prefix</p>
 <p>The backing store is treated as read-only, and only modifications are
 allowed to the first store, and only for keys which match the mounting
@@ -107,8 +106,8 @@ a remote store, such as a StaticURLStore or DynamicURLStore.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>mount_point</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Key prefix for the mounted store.</li>
-<li><strong>mount_store</strong> (<em>AbstractStore</em>) &#8211; The store to be mounted</li>
-<li><strong>backing_store</strong> (<em>AbstractStore</em>) &#8211; The store that we are mounting against</li>
+<li><strong>mount_store</strong> (<a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractStore" title="encore.storage.abstract_store.AbstractStore"><em>AbstractStore</em></a>) &#8211; The store to be mounted</li>
+<li><strong>backing_store</strong> (<a class="reference internal" href="abstract_store.html#encore.storage.abstract_store.AbstractStore" title="encore.storage.abstract_store.AbstractStore"><em>AbstractStore</em></a>) &#8211; The store that we are mounting against</li>
 </ul>
 </td>
 </tr>
@@ -116,7 +115,7 @@ a remote store, such as a StaticURLStore or DynamicURLStore.</p>
 </table>
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.connect">
-<tt class="descname">connect</tt><big>(</big><em>credentials=None</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.connect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">connect</code><span class="sig-paren">(</span><em>credentials=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to the key-value store, optionally with authentication</p>
 <p>This method creates or connects to any long-lived resources that the
 store requires.</p>
@@ -127,7 +126,7 @@ store requires.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>credentials</strong> &#8211; An object that can supply appropriate credentials to to authenticate
 the use of any required resources.  The exact form of the credentials
 is implementation-specific, but may be as simple as a
-<tt class="docutils literal"><span class="pre">(username,</span> <span class="pre">password)</span></tt> tuple.</td>
+<code class="docutils literal"><span class="pre">(username,</span> <span class="pre">password)</span></code> tuple.</td>
 </tr>
 </tbody>
 </table>
@@ -135,7 +134,7 @@ is implementation-specific, but may be as simple as a
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.delete">
-<tt class="descname">delete</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.delete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a key from the repsository.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
@@ -154,7 +153,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.disconnect">
-<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.disconnect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect from the key-value store</p>
 <p>This method disposes or disconnects to any long-lived resources that the
 store requires.</p>
@@ -162,7 +161,7 @@ store requires.</p>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.get">
-<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -185,7 +184,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.info">
-<tt class="descname">info</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.info" title="Permalink to this definition">¶</a></dt>
+<code class="descname">info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get information about the key-value store</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -199,7 +198,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.is_connected">
-<tt class="descname">is_connected</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.is_connected" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether or not the store is currently connected</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -213,13 +212,13 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.push">
-<tt class="descname">push</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.push" title="Permalink to this definition">¶</a></dt>
+<code class="descname">push</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.push" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move a key from the mount store to the backing store</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.query">
-<tt class="descname">query</tt><big>(</big><em>select=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query</code><span class="sig-paren">(</span><em>select=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys and metadata matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
@@ -246,12 +245,12 @@ possible values for that metadata item.</li>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.query_keys">
-<tt class="descname">query_keys</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.query_keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query_keys</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.query_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
 will return the complete set of keys for the key-value store.</p>
-<p>This is equivalent to <tt class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></tt>, but potentially
+<p>This is equivalent to <code class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></code>, but potentially
 more efficiently implemented.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -268,7 +267,7 @@ possible values for that metadata item.</td>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.set">
-<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set</code><span class="sig-paren">(</span><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store a stream of data into a given key in the key-value store.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
@@ -302,7 +301,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.set_data">
-<tt class="descname">set_data</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_data</code><span class="sig-paren">(</span><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the data for a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -333,7 +332,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.set_metadata">
-<tt class="descname">set_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.set_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set new metadata for a given key in the key-value store.</p>
 <p>This replaces the existing metadata set for the key with a new set of
 metadata.</p>
@@ -358,15 +357,15 @@ keys should be strings which are valid Python identifiers.</li>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.transaction">
-<tt class="descname">transaction</tt><big>(</big><em>notes</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.transaction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">transaction</code><span class="sig-paren">(</span><em>notes</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a transaction context manager</p>
 <p>Implementations which have no native notion of transactions may choose
 not to implement this.</p>
 <p>This method provides a context manager which creates a data store
 transaction in its __enter__() method, and commits it in its __exit__()
 method if no errors occur.  Intended usage is:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s">&quot;Writing data...&quot;</span><span class="p">):</span>
-    <span class="c"># everything written in this block is part of the transaction</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s2">&quot;Writing data...&quot;</span><span class="p">):</span>
+    <span class="c1"># everything written in this block is part of the transaction</span>
     <span class="o">...</span>
 </pre></div>
 </div>
@@ -401,7 +400,7 @@ by the implementation.</p>
 
 <dl class="method">
 <dt id="encore.storage.mounted_store.MountedStore.update_metadata">
-<tt class="descname">update_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.mounted_store.MountedStore.update_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set new metadata for a given key in the key-value store.</p>
 <p>This replaces the existing metadata set for the key with a new set of
 metadata.</p>
@@ -433,7 +432,7 @@ keys should be strings which are valid Python identifiers.</li>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -448,14 +447,14 @@ keys should be strings which are valid Python identifiers.</li>
         <li class="right" >
           <a href="joined_store.html" title="Joined Store"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" >Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Dec 08, 2014.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2011-2017, Enthought, Inc..
+      Last updated on Jan 19, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>
