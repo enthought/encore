@@ -28,8 +28,8 @@
     <link rel="next" title="encore.concurrent Package" href="encore.concurrent.html" />
     <link rel="prev" title="Simple Authenticating Store" href="../storage/simple_auth_store.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,10 +44,10 @@
         <li class="right" >
           <a href="../storage/simple_auth_store.html" title="Simple Authenticating Store"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
@@ -70,12 +70,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="encore.concurrent.html"
                         title="next chapter">encore.concurrent Package</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/concurrent/index.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/concurrent/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -83,9 +85,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -94,34 +93,34 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="concurrent-package">
 <h1>Concurrent Package<a class="headerlink" href="#concurrent-package" title="Permalink to this headline">¶</a></h1>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">encore.concurrent</span></tt> module provides utilities and libraries to
+<p>The <code class="xref py py-mod docutils literal"><span class="pre">encore.concurrent</span></code> module provides utilities and libraries to
 assist with threaded and other parallel code.</p>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">encore.concurrent.futures</span></tt> subpackage provides an enhanced
-version of the <tt class="docutils literal"><span class="pre">concurrent.futures</span></tt> package for Python 2.7 with some
+<p>The <code class="xref py py-mod docutils literal"><span class="pre">encore.concurrent.futures</span></code> subpackage provides an enhanced
+version of the <code class="docutils literal"><span class="pre">concurrent.futures</span></code> package for Python 2.7 with some
 useful experimental additions.</p>
-<p>The <a class="reference internal" href="encore.concurrent.html#module-encore.concurrent.threadtools" title="encore.concurrent.threadtools"><tt class="xref py py-mod docutils literal"><span class="pre">encore.concurrent.threadtools</span></tt></a> module provides some utilities
+<p>The <a class="reference internal" href="encore.concurrent.html#module-encore.concurrent.threadtools" title="encore.concurrent.threadtools"><code class="xref py py-mod docutils literal"><span class="pre">encore.concurrent.threadtools</span></code></a> module provides some utilities
 that encapsulate useful patterns in threaded code.</p>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="encore.concurrent.html">encore.concurrent Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.html#module-encore.concurrent.threadtools"><tt class="docutils literal"><span class="pre">threadtools</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.html#module-encore.concurrent.threadtools"><code class="docutils literal"><span class="pre">threadtools</span></code> Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="encore.concurrent.futures.html">encore.concurrent.futures Package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#threadpool-executors">ThreadPool Executors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.enhanced_thread_pool_executor"><tt class="docutils literal"><span class="pre">enhanced_thread_pool_executor</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.synchronous"><tt class="docutils literal"><span class="pre">synchronous</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.future"><tt class="docutils literal"><span class="pre">future</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.abc_work_scheduler"><tt class="docutils literal"><span class="pre">abc_work_scheduler</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.asynchronizer"><tt class="docutils literal"><span class="pre">asynchronizer</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.serializer"><tt class="docutils literal"><span class="pre">serializer</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.serializing_asynchronizer"><tt class="docutils literal"><span class="pre">serializing_asynchronizer</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.enhanced_thread_pool_executor"><code class="docutils literal"><span class="pre">enhanced_thread_pool_executor</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.synchronous"><code class="docutils literal"><span class="pre">synchronous</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.future"><code class="docutils literal"><span class="pre">future</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.abc_work_scheduler"><code class="docutils literal"><span class="pre">abc_work_scheduler</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.asynchronizer"><code class="docutils literal"><span class="pre">asynchronizer</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.serializer"><code class="docutils literal"><span class="pre">serializer</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.serializing_asynchronizer"><code class="docutils literal"><span class="pre">serializing_asynchronizer</span></code> Module</a></li>
 </ul>
 </li>
 </ul>
@@ -130,9 +129,9 @@ that encapsulate useful patterns in threaded code.</p>
 <div class="section" id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference internal" href="../genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="../py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="../search.html"><em>Search Page</em></a></li>
+<li><a class="reference internal" href="../genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="../py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="../search.html"><span class="std std-ref">Search Page</span></a></li>
 </ul>
 </div>
 <div class="section" id="license">
@@ -194,7 +193,7 @@ Licensed to PSF under a Contributor Agreement.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -209,13 +208,13 @@ Licensed to PSF under a Contributor Agreement.</p>
         <li class="right" >
           <a href="../storage/simple_auth_store.html" title="Simple Authenticating Store"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Dec 08, 2014.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2011-2017, Enthought, Inc..
+      Last updated on Jan 19, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>

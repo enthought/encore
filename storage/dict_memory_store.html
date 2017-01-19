@@ -29,8 +29,8 @@
     <link rel="next" title="Sqlite Store" href="sqlite_store.html" />
     <link rel="prev" title="Utils" href="utils.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -45,11 +45,11 @@
         <li class="right" >
           <a href="utils.html" title="Utils"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
@@ -60,12 +60,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="sqlite_store.html"
                         title="next chapter">Sqlite Store</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/storage/dict_memory_store.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/storage/dict_memory_store.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -73,9 +75,6 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -84,7 +83,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-encore.storage.dict_memory_store"></span><div class="section" id="memory-store">
 <h1>Memory Store<a class="headerlink" href="#memory-store" title="Permalink to this headline">¶</a></h1>
@@ -94,7 +93,7 @@ in any way to reduce memory usage.</p>
 <p>This class is provided in part as a sample implementation of the API.</p>
 <dl class="class">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore">
-<em class="property">class </em><tt class="descclassname">encore.storage.dict_memory_store.</tt><tt class="descname">DictMemoryStore</tt><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">encore.storage.dict_memory_store.</code><code class="descname">DictMemoryStore</code><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary-based in-memory Store</p>
 <p>This is a simple implementation of the key-value store API that lives entirely
 in memory.  This uses a dictionary of StringValue objects to store all
@@ -105,13 +104,13 @@ private attributes.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event_manager</strong> &#8211; An object which implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><tt class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></tt></a> API.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event_manager</strong> &#8211; An object which implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a> API.</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.connect">
-<tt class="descname">connect</tt><big>(</big><em>credentials=None</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.connect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">connect</code><span class="sig-paren">(</span><em>credentials=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to the key-value store</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -126,7 +125,7 @@ so credentials are ignored.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.delete">
-<tt class="descname">delete</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.delete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a key from the repsository.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -143,7 +142,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.disconnect">
-<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.disconnect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect from the key-value store</p>
 <p>This store does not authenticate, and has no external resources, so this
 does nothing</p>
@@ -151,7 +150,7 @@ does nothing</p>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.exists">
-<tt class="descname">exists</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.exists" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exists</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test whether or not a key exists in the key-value store</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -168,7 +167,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.from_bytes">
-<tt class="descname">from_bytes</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.from_bytes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">from_bytes</code><span class="sig-paren">(</span><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.from_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently read data from a bytes object into a key in the key-value store.</p>
 <p>This makes no attempt to set metadata.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -189,7 +188,7 @@ identifier for the resource within the key-value store.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.from_file">
-<tt class="descname">from_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.from_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">from_file</code><span class="sig-paren">(</span><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently read data from a file into a key in the key-value store.</p>
 <p>This makes no attempt to set metadata.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -210,7 +209,7 @@ identifier for the resource within the key-value store.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.get">
-<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -233,7 +232,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.get_data">
-<tt class="descname">get_data</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream from a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -250,7 +249,7 @@ identifier for the resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.get_metadata">
-<tt class="descname">get_metadata</tt><big>(</big><em>key</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a given key in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -276,7 +275,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.glob">
-<tt class="descname">glob</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.glob" title="Permalink to this definition">¶</a></dt>
+<code class="descname">glob</code><span class="sig-paren">(</span><em>pattern</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.glob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return keys which match glob-style patterns</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -292,7 +291,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.is_connected">
-<tt class="descname">is_connected</tt><big>(</big><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.is_connected" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether or not the store is currently connected</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -306,7 +305,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.multiget">
-<tt class="descname">multiget</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the data and metadata for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -325,7 +324,7 @@ unique identifier for a resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.multiget_data">
-<tt class="descname">multiget_data</tt><big>(</big><em>keys</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiget_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget_data</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiget_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the data for a collection of keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -344,7 +343,7 @@ unique identifier for a resource within the key-value store.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.multiget_metadata">
-<tt class="descname">multiget_metadata</tt><big>(</big><em>keys</em>, <em>select=None</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiget_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -370,7 +369,7 @@ return the entire metadata dictionary.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.multiset">
-<tt class="descname">multiset</tt><big>(</big><em>keys</em>, <em>values</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiset" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiset</code><span class="sig-paren">(</span><em>keys</em>, <em>values</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the data and metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
@@ -405,7 +404,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.multiset_data">
-<tt class="descname">multiset_data</tt><big>(</big><em>keys</em>, <em>datas</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiset_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiset_data</code><span class="sig-paren">(</span><em>keys</em>, <em>datas</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiset_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the data for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
@@ -440,7 +439,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.multiset_metadata">
-<tt class="descname">multiset_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiset_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>metadatas</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
@@ -467,7 +466,7 @@ corresponding keys.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.multiupdate_metadata">
-<tt class="descname">multiupdate_metadata</tt><big>(</big><em>keys</em>, <em>metadatas</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">multiupdate_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>metadatas</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
@@ -494,7 +493,7 @@ corresponding keys.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.query">
-<tt class="descname">query</tt><big>(</big><em>select=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query</code><span class="sig-paren">(</span><em>select=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys and metadata matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
@@ -521,12 +520,12 @@ possible values for that metadata item.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.query_keys">
-<tt class="descname">query_keys</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.query_keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">query_keys</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.query_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
 will return the complete set of keys for the key-value store.</p>
-<p>This is equivalent to <tt class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></tt>, but potentially
+<p>This is equivalent to <code class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></code>, but potentially
 more efficiently implemented.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -543,7 +542,7 @@ possible values for that metadata item.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.set">
-<tt class="descname">set</tt><big>(</big><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.set" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set</code><span class="sig-paren">(</span><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store a stream of data into a given key in the key-value store.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
@@ -577,7 +576,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.set_data">
-<tt class="descname">set_data</tt><big>(</big><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.set_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_data</code><span class="sig-paren">(</span><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.set_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the data for a given key in the key-value store.</p>
 <p>If the key does not already exist, it tacitly creates an empty metadata
 object.</p>
@@ -610,7 +609,7 @@ default if they need to.  The default is 1048576 bytes (1 MiB).</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.set_metadata">
-<tt class="descname">set_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.set_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.set_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set new metadata for a given key in the key-value store.</p>
 <p>This replaces the existing metadata set for the key with a new set of
 metadata.  If the key does not already exist, it tacitly creates an
@@ -636,7 +635,7 @@ keys should be strings which are valid Python identifiers.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.to_bytes">
-<tt class="descname">to_bytes</tt><big>(</big><em>key</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.to_bytes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_bytes</code><span class="sig-paren">(</span><em>key</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.to_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store the data associated with a key into a bytes object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -655,7 +654,7 @@ identifier for the resource within the key-value store.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.to_file">
-<tt class="descname">to_file</tt><big>(</big><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_file</code><span class="sig-paren">(</span><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store the data associated with a key into a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -675,7 +674,7 @@ identifier for the resource within the key-value store.</li>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.transaction">
-<tt class="descname">transaction</tt><big>(</big><em>notes</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.transaction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">transaction</code><span class="sig-paren">(</span><em>notes</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a transaction context manager</p>
 <p>This class does not support transactions, so it returns a dummy object.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -691,7 +690,7 @@ implementation.</td>
 
 <dl class="method">
 <dt id="encore.storage.dict_memory_store.DictMemoryStore.update_metadata">
-<tt class="descname">update_metadata</tt><big>(</big><em>key</em>, <em>metadata</em><big>)</big><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.dict_memory_store.DictMemoryStore.update_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the metadata for a given key in the key-value store.</p>
 <p>This performs a dictionary update on the existing metadata with the
 provided metadata keys and values</p>
@@ -724,7 +723,7 @@ keys should be strings which are valid Python identifiers.</li>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -739,14 +738,14 @@ keys should be strings which are valid Python identifiers.</li>
         <li class="right" >
           <a href="utils.html" title="Utils"
              >previous</a> |</li>
-        <li><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li><a href="index.html" >Storage</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2011-2013, Enthought, Inc..
-      Last updated on Dec 08, 2014.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2011-2017, Enthought, Inc..
+      Last updated on Jan 19, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
     </div>
   </body>
 </html>
