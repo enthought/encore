@@ -5,18 +5,23 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-import urllib2
-import rfc822
+from email.utils import parsedate_tz, mktime_tz
+
+from six.moves import urllib
+
 
 from .abstract_store import Value, AuthorizationError
-from .utils import BufferIteratorIO, buffer_iterator
+from .utils import (
+    BufferIteratorIO, buffer_iterator, add_context_manager_support
+)
+
 
 class URLValue(Value):
 
     def __init__(self, url, metadata=None, opener=None):
         self._url = url
         self._metadata = metadata if metadata is not None else {}
-        self._opener = opener if opener is not None else urllib2.urlopen
+        self._opener = opener if opener is not None else urllib.request.urlopen
         self._data_stream = None
         self._size = None
         self._created = None
@@ -58,10 +63,13 @@ class URLValue(Value):
         # need to build a reqquest with a range header
         start_string = str(start) if start is not None else ''
         end_string = str(end) if end is not None else ''
-        request = urllib2.Request(self._url, headers={
+        request = urllib.request.Request(self._url, headers={
             'Range': 'bytes={0}-{1}'.format(start_string, end_string),
         })
+
         stream = self._opener.open(request)
+        add_context_manager_support(stream)
+
         if stream.getcode() == 206:
             # it worked!
             return stream
@@ -88,7 +96,9 @@ class URLValue(Value):
 
         modified = headers.get('Last-Modified', None)
         if modified is not None:
-            modified = rfc822.mktime_tz(rfc822.parsedate_tz(modified))
+            modified = mktime_tz(parsedate_tz(modified))
         self._modified = modified
+
+        self._data_stream = add_context_manager_support(self._data_stream)
 
         return self._data_stream

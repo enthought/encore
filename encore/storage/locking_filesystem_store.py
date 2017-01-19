@@ -27,13 +27,16 @@ Ex. Client A reads file1 and then reads file2, whereas client B reads file2
 """
 
 # System library imports.
-import os
-import glob
 from contextlib import contextmanager
-from functools import wraps
 import datetime
+from functools import wraps
+import glob
+import io
+import os
 import time
 import threading
+
+from six import string_types
 
 # ETS library imports.
 from .events import StoreSetEvent, StoreUpdateEvent,\
@@ -132,8 +135,8 @@ def write_log(func, event='w'):
                 id = int(text.split()[0]) + 1
             else:
                 id = 1
-            new_line = '%d %s %s %s\n'%(id, event, time, key)
-            log_file.write(new_line)
+            new_line = '%d %s %s %s\n' % (id, event, time, key)
+            log_file.write(new_line.encode('utf-8'))
             log_file.close()
 
             if id % store._logrotate_limit == 0:
@@ -293,9 +296,9 @@ class LockingFileSystemStore(FileSystemStore):
         """
         # Optimize for special cases.
         basename = os.path.basename
-        if kwargs.keys() == ['type']:
-            typ =  kwargs['type']
-            if typ in ('file','dir'):
+        if 'type' in kwargs:
+            typ = kwargs['type']
+            if typ in ('file', 'dir'):
                 pattern = '{0}.*.metadata'.format(typ)
                 for i in glob.iglob(os.path.join(self._root, pattern)):
                     yield basename(i)[:-9]
@@ -321,7 +324,7 @@ class LockingFileSystemStore(FileSystemStore):
 
         """
         timestamp = since
-        if isinstance(timestamp, basestring):
+        if isinstance(timestamp, string_types):
             ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
             timestamp = datetime.datetime.strptime(timestamp, ISO_FORMAT)
         timestamp -= self._max_time_delta
@@ -411,11 +414,12 @@ class LockingFileSystemStore(FileSystemStore):
             size = os.stat(log_path).st_size
             with open(log_path, 'rb') as f:
                 first_log = f.readline()
-                f.seek(size/2)
+                f.seek(size//2)
                 f.readline()
                 split_pos = f.tell()
                 f.seek(0)
-                with open(log_path+'.%s'%first_log.split(' ',1)[0], 'wb') as f2:
+                file_name = '{}.{}'.format(log_path, first_log.split(b' ', 1)[0].decode('ascii'))
+                with open(file_name, 'wb') as f2:
                     f2.write(f.read(split_pos))
                 new_text = f.read()
             with open(log_path, 'wb') as f:
@@ -452,31 +456,35 @@ class LockingFileSystemStore(FileSystemStore):
             with self._locking(self._log_file, recurse=True):
                 try:
                     f = open(self._log_file)
+                    size = os.stat(self._log_file).st_size
+                    f.seek(max(size - 1024, 0))
+                    text = f.read(1024)
+                    lines = text.splitlines()
+                    if lines:
+                        id = lines[-1][0]
                 except IOError:
                     return None
-                size = os.stat(self._log_file).st_size
-                f.seek(max(size-1024, 0))
-                text = f.read(1024)
-                lines = text.splitlines()
-                if lines:
-                    id = lines[-1][0]
+                finally:
+                    f.close()
         else:
             with self._locking(self._log_file, recurse=True):
                 try:
                     f = open(self._log_file)
+                    text = f.read()
+                    seek = self._search_log(id, text)
+                    if seek < 0:
+                        return None
+                    text = text[seek:]
+                    for line in text.splitlines():
+                        try:
+                            id, typ, date, time, key = line.split(' ', 4)
+                            self._emit_remote_event(id, typ, date, time, key)
+                        except ValueError:
+                            pass
                 except IOError:
                     return None
-                text = f.read()
-                seek = self._search_log(id, text)
-                if seek < 0:
-                    return None
-                text = text[seek:]
-                for line in text.splitlines():
-                    try:
-                        id, typ, date, time, key = line.split(' ', 4)
-                        self._emit_remote_event(id, typ, date, time, key)
-                    except ValueError:
-                        pass
+                finally:
+                    f.close()
         return id
 
     def _search_log(self, id, text):
@@ -511,15 +519,17 @@ class LockingFileSystemStore(FileSystemStore):
         key is the str key which is modified in the commit.
 
         """
+        ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
         try:
-            with open(self._log_file, 'rb') as log_file:
-                ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+            with io.open(self._log_file, 'r', encoding='utf-8') as log_file:
                 for line in log_file:
                     line = line.rstrip('\n')
                     id, typ, date, time, key = line.split(' ', 4)
-                    yield int(id), typ, datetime.datetime.strptime(date+' '+time,
-                                                         ISO_FORMAT), key
-        except (IOError, ValueError):
+                    tstamp = datetime.datetime.strptime(
+                        '%s %s' % (date, time), ISO_FORMAT
+                    )
+                    yield int(id), typ, tstamp, key
+        except (IOError, ValueError) as exc:
             pass
 
     def __del__(self):

@@ -6,15 +6,21 @@
 #
 
 import os
-from tempfile import mkdtemp
 from shutil import rmtree
 import sqlite3
+from tempfile import mkdtemp
 import time
+from unittest import TestCase
 
-import encore.storage.tests.abstract_test as abstract_test
+import six
+
+from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..sqlite_store import SqliteStore
 
-class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
+if six.PY3:
+    buffer = sqlite3.Binary
+
+class SqliteStoreReadTest(TestCase, StoreReadTestMixin):
 
     def setUp(self):
         """ Set up a data store for the test case
@@ -51,7 +57,7 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
 
         t = time.time()
         connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (
-            b'test1',
+            'test1',
             {
                 'a_str': 'test3',
                 'an_int': 1,
@@ -62,7 +68,7 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
             }, t, t,
             buffer(b'test2\n')))
         for i in range(10):
-            key = b'key%d'%i
+            key = 'key%d' % i
             data = buffer(b'value%d' % i)
             metadata = {'query_test1': 'value', 'query_test2': i}
             if i % 2 == 0:
@@ -81,7 +87,7 @@ class SqliteStoreReadTest(abstract_test.AbstractStoreReadTest):
         rmtree(self.path)
 
 
-class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
+class SqliteStoreWriteTest(TestCase, StoreWriteTestMixin):
 
     def setUp(self):
         """ Set up a data store for the test case
@@ -116,7 +122,7 @@ class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
 
         t = time.time()
         connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (
-            b'test1',
+            'test1',
             {
                 'a_str': 'test3',
                 'an_int': 1,
@@ -127,7 +133,7 @@ class SqliteStoreWriteTest(abstract_test.AbstractStoreWriteTest):
             }, t, t,
             buffer(b'test2\n')))
         for i in range(10):
-            key = b'existing_key%d'%i
+            key = 'existing_key%d'%i
             data = buffer(b'existing_value%d' % i)
             metadata = {'meta': True, 'meta1': -i}
             connection.execute("""insert into store values (?, ?, ?, ?, ?)""", (key, metadata, t, t, data))

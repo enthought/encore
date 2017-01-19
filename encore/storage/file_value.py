@@ -21,7 +21,7 @@ class FileValue(Value):
     @property
     def data(self):
         if self._data_stream is None:
-            self._data_stream = file(self._path, 'rb')
+            self._data_stream = open(self._path, 'rb')
         return self._data_stream
 
     @property
@@ -36,12 +36,13 @@ class FileValue(Value):
         if start is None:
             start = 0
         if self._data_stream is None:
-            self._data_stream = file(self._path, 'rb')
+            self._data_stream = open(self._path, 'rb')
         self._data_stream.seek(start)
         if end is not None:
             max_bytes = end-start
-            return BufferIteratorIO(buffer_iterator(self._data_stream,
-                                                    max_bytes=max_bytes))
+            return BufferIteratorIO(
+                buffer_iterator(self._data_stream, max_bytes=max_bytes)
+            )
         else:
             return self._data_stream
 

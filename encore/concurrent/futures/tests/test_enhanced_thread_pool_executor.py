@@ -2,13 +2,12 @@
 # subject to the PSF license. See http://docs.python.org/2/license.html.
 
 import collections
-from os.path import dirname, join
-import subprocess
-import sys
 import threading
 import time
 import unittest
 import weakref
+
+from six.moves import xrange
 
 from concurrent import futures
 from concurrent.futures._base import (
@@ -125,16 +124,17 @@ class EnhancedThreadPoolShutdownTest(EnhancedThreadPoolMixin, unittest.TestCase)
 
     def test_interpreter_shutdown(self):
         # Test the atexit hook for shutdown of worker threads and processes
-        rc, out, err = assert_python_ok('-c', """if 1:
-            from encore.concurrent.futures.enhanced_thread_pool_executor import EnhancedThreadPoolExecutor
-            from time import sleep
-            import sys
-            def sleep_and_print(t, msg):
-                sleep(t)
-                print msg
-                sys.stdout.flush()
-            t = {executor_type}(5)
-            t.submit(sleep_and_print, 1.0, "apple")
+        rc, out, err = assert_python_ok('-c', """from __future__ import print_function
+if 1:
+    from encore.concurrent.futures.enhanced_thread_pool_executor import EnhancedThreadPoolExecutor
+    from time import sleep
+    import sys
+    def sleep_and_print(t, msg):
+        sleep(t)
+        print(msg)
+        sys.stdout.flush()
+    t = {executor_type}(5)
+    t.submit(sleep_and_print, 1.0, "apple")
             """.format(executor_type=self.executor_type.__name__))
         # Errors in atexit hooks don't change the process exit code, check
         # stderr manually.
@@ -327,9 +327,10 @@ class EnhancedThreadPoolExecutorTest(EnhancedThreadPoolMixin, unittest.TestCase)
 
     def test_map_exception(self):
         i = self.executor.map(divmod, [1, 1, 1, 1], [2, 3, 0, 5])
-        self.assertEqual(i.next(), (0, 1))
-        self.assertEqual(i.next(), (0, 1))
-        self.assertRaises(ZeroDivisionError, i.next)
+        self.assertEqual(next(i), (0, 1))
+        self.assertEqual(next(i), (0, 1))
+        with self.assertRaises(ZeroDivisionError):
+            next(i)
 
     def test_map_timeout(self):
         results = []
@@ -469,11 +470,11 @@ class EnhancedThreadPoolWaitAtExit(unittest.TestCase):
 
     def test_no_wait_at_exit(self):
         rc, out, err = self._execute(False)
-        self.assertEqual(out, '')
+        self.assertEqual(out, b'')
 
     def test_wait_at_exit(self):
         rc, out, err = self._execute(True)
-        self.assertEqual(out, 'FINISHED')
+        self.assertEqual(out, b'FINISHED')
 
 
 class TestCustomFuture(unittest.TestCase):

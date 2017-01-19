@@ -5,23 +5,28 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-import os
-import threading
-from tempfile import mkdtemp
-from shutil import rmtree
 import json
-import time
-import urllib
-import SocketServer
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+import os
+from shutil import rmtree
+from tempfile import mkdtemp
+import threading
+from unittest import TestCase
 
-import encore.storage.tests.abstract_test as abstract_test
+
+from six import itertools, next
+from six.moves import urllib
+from six.moves import socketserver as SocketServer
+from six.moves.BaseHTTPServer import HTTPServer
+from six.moves.SimpleHTTPServer import SimpleHTTPRequestHandler
+
+from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..static_url_store import StaticURLStore
 
-count = 1
+port_counter = itertools.count()
 
-class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
+
+class StaticURLStoreReadTest(TestCase, StoreReadTestMixin):
+
     resolution = 'second'
 
     def setUp(self):
@@ -67,7 +72,9 @@ class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
 
         self._set_up_server()
 
-        self.store = StaticURLStore(self._get_base_url(), 'data/', 'index.json')
+        self.store = StaticURLStore(
+            self._get_base_url(), 'data/', 'index.json', poll=0
+        )
         self.store.connect()
 
     def tearDown(self):
@@ -78,7 +85,10 @@ class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
 
     def utils_large(self):
         self._write_data('test3', 'test4'*10000000)
-        metadata = json.load(open(os.path.join(self.path, 'index.json'), 'rb'))
+        metadata = json.load(
+            open(os.path.join(self.path, 'index.json'), 'rb'),
+            encoding='ascii'
+        )
         metadata['test3'] = {}
         self._write_index('index.json', json.dumps(metadata))
         self.store.update_index()
@@ -90,15 +100,16 @@ class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
         pass
 
     def _get_base_url(self):
-        return 'file:' + urllib.pathname2url(os.path.abspath(self.path)) + '/'
+        return 'file:' + urllib.request.pathname2url(os.path.abspath(self.path)) + '/'
+
 
     def _write_data(self, filename, data):
-        with file(os.path.join(self.path, 'data', filename), 'wb') as fp:
-            fp.write(data)
+        with open(os.path.join(self.path, 'data', filename), 'wb') as fp:
+            fp.write(data.encode('ascii'))
 
     def _write_index(self, filename, data):
-        with file(os.path.join(self.path, filename), 'wb') as fp:
-            fp.write(data)
+        with open(os.path.join(self.path, filename), 'wb') as fp:
+            fp.write(data.encode('ascii'))
 
 class ThreadedHTTPServer(SocketServer.ThreadingMixIn, HTTPServer):
     pass
@@ -109,19 +120,25 @@ class StaticURLStoreHTTPReadTest(StaticURLStoreReadTest):
         return 'http://localhost:%s/' % self.port
 
     def _set_up_server(self):
-        global count
-        count += 1
-        self.port = 8080+count
+        self.port = 8090 + next(port_counter)
         self._oldwd = os.getcwd()
         os.chdir(self.path)
 
-        self.server = ThreadedHTTPServer(('localhost', self.port), SimpleHTTPRequestHandler)
+        self.server = ThreadedHTTPServer(
+            ('localhost', self.port), SimpleHTTPRequestHandler
+        )
         self.server_thread = threading.Thread(target=self.server.serve_forever, args=(0.1,))
         self.server_thread.daemon = True
         self.server_thread.start()
-        time.sleep(1)
 
     def _tear_down_server(self):
         self.server.shutdown()
+        self.server_thread.join()
+        self.server.server_close()
         del self.server
         os.chdir(self._oldwd)
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()

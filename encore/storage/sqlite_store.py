@@ -18,22 +18,35 @@ This class is provided in part as a sample implementation of the API.
 
 """
 
-import cStringIO
+
 import sqlite3
-import cPickle
 import time
+
+import six
+from six import BytesIO
+from six.moves import cPickle
 
 from .abstract_store import AbstractStore
 from .string_value import StringValue
 from .events import StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent
-from .utils import buffer_iterator, SimpleTransactionContext, StoreProgressManager
+from .utils import (
+    buffer_iterator, SimpleTransactionContext, StoreProgressManager,
+    add_context_manager_support
+)
+
+if six.PY3:
+    buffer = sqlite3.Binary
 
 
 def adapt_dict(d):
     return buffer(cPickle.dumps(d, protocol=2))
 
+
 def convert_dict(s):
-    return cPickle.loads(s)
+    if six.PY3:
+        return cPickle.loads(s, encoding='ascii')
+    else:
+        return cPickle.loads(s)
 
 sqlite3.register_adapter(dict, adapt_dict)
 sqlite3.register_converter('dict', convert_dict)
@@ -92,7 +105,6 @@ class SqliteStore(AbstractStore):
                 # being paranoid here
                 self._build_index()
 
-
     def disconnect(self):
         """ Disconnect from the key-value store
 
@@ -102,7 +114,6 @@ class SqliteStore(AbstractStore):
         """
         self._connection.close()
         self._connection = None
-
 
     def is_connected(self):
         """ Whether or not the store is currently connected
@@ -114,7 +125,6 @@ class SqliteStore(AbstractStore):
 
         """
         return self._connection is not None
-
 
     def info(self):
         """ Get information about the key-value store
@@ -130,7 +140,6 @@ class SqliteStore(AbstractStore):
             'location': self.location,
             'table': self.table,
         }
-
 
     def get(self, key):
         """ Retrieve a stream of data and metdata from a given key in the key-value store.
@@ -158,9 +167,9 @@ class SqliteStore(AbstractStore):
         row = self._get_columns_by_key(key, ['metadata', 'data', 'created', 'modified'])
         if row is None:
             raise KeyError(key)
-        return StringValue(str(row['data']), row['metadata'], row['created'],
-            row['modified'])
-
+        return StringValue(
+            row['data'], row['metadata'], row['created'], row['modified']
+        )
 
     def set(self, key, value, buffer_size=1048576):
         """ Store a stream of data into a given key in the key-value store.
@@ -283,7 +292,7 @@ class SqliteStore(AbstractStore):
         row = self._get_columns_by_key(key, ['data'])
         if row is None:
             raise KeyError(key)
-        data = cStringIO.StringIO(row['data'])
+        data = add_context_manager_support(BytesIO(row['data']))
         return data
 
 

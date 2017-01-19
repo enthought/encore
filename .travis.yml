@@ -1,9 +1,10 @@
 language: python
 python:
   - 2.7
+  - 3.5
 install:
   - pip install -U nose
-  - pip install coverage coveralls requests futures sphinx
+  - pip install coverage coveralls requests futures sphinx six
   - python setup.py develop
 before_script:
   - mkdir testrunner
@@ -11,7 +12,6 @@ before_script:
   - cd testrunner
 script:
   - coverage run -m nose.core encore --exe
-  - make --directory ../docs html
 notifications:
   email:
     - travis-ci@enthought.com

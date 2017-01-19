@@ -16,9 +16,11 @@ import itertools
 import bisect
 import heapq
 import threading
-from types import MethodType
 import weakref
+from types import MethodType
 import traceback
+
+import six
 
 # Logging.
 logger = logging.getLogger(__name__)
@@ -67,15 +69,20 @@ class MethodNotifier(object):
     """
     __slots__ = ['func', 'cls', 'obj', '_notify', '_args']
     def __init__(self, meth, notify=None, args=()):
-        self.func = meth.im_func
-        self.cls = meth.im_class
-        obj = meth.im_self
+        self.func = meth.__func__
+
+        if six.PY2:
+            self.cls = meth.im_class
+        else:
+            self.cls = meth.__self__.__class__
+
+        obj = meth.__self__
         if obj is None:
             # Unbound Method.
             self.obj = None
         else:
             # Bound method.
-            self.obj = weakref.ref(meth.im_self, self.notify)
+            self.obj = weakref.ref(meth.__self__, self.notify)
         if notify:
             self._notify = notify
             self._args = args
@@ -91,13 +98,14 @@ class MethodNotifier(object):
         obj = self.obj
         if obj is None:
             # Unbound method.
-            objc = None
+            return six.create_unbound_method(self.func, self.cls)
         else:
             objc = obj()
             if objc is None:
                 # Bound method whose object has been garbage collected.
                 return
-        return MethodType(self.func, objc, self.cls)
+
+            return six.create_bound_method(self.func, objc)
 
 ###############################################################################
 # `EventInfo` Private Class.
@@ -211,13 +219,13 @@ class EventInfo(object):
     def get_id(self, func):
         """ Get an id as unique key for the function. """
         if type(func) is MethodType:
-            obj = func.im_self
+            obj = func.__self__
             if obj is None:
                 # Unbound method
-                return weakref.ref(func.im_func),weakref.ref(func.im_class)
+                return weakref.ref(func.__func__),weakref.ref(func.__self__.__class__)
             else:
                 # Bound method.
-                return weakref.ref(func.im_func),weakref.ref(func.im_self)
+                return weakref.ref(func.__func__),weakref.ref(func.__self__)
         else:
             return func
 
@@ -250,7 +258,7 @@ class EventInfo(object):
                 listener = linfo[-1]
                 id = self.get_id(listener())
                 if id in l_filter:
-                    for key, value in l_filter[id].iteritems():
+                    for key, value in l_filter[id].items():
                         attr = event
                         try:
                             # Get extended attributes of the event.

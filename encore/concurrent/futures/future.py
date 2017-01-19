@@ -14,8 +14,6 @@ class Future(_base.Future):
         Executor worker, or None if no error occurred.
 
         """
-        if self._traceback is not None:
-            return traceback.format_tb(self._traceback)
         return self._traceback_formatted
 
     def set_exception(self, exception):

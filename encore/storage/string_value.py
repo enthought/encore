@@ -5,16 +5,15 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from cStringIO import StringIO
+from six import BytesIO
 import time
 
 from .abstract_store import Value, AuthorizationError
+from .utils import add_context_manager_support
 
 class StringValue(Value):
 
-    def __init__(self, data='', metadata=None, created=None, modified=None):
-        if not isinstance(data, basestring):
-            raise ValueError(data)
+    def __init__(self, data=b'', metadata=None, created=None, modified=None):
         self._data = data
         self._data_stream = None
         self._metadata = metadata if metadata is not None else {}
@@ -25,7 +24,8 @@ class StringValue(Value):
     @property
     def data(self):
         if self._data_stream is None:
-            self._data_stream = StringIO(self._data)
+            self._data_stream = BytesIO(self._data)
+            add_context_manager_support(self._data_stream)
         return self._data_stream
 
     @property
@@ -37,4 +37,6 @@ class StringValue(Value):
         raise AuthorizationError("key not owned by user")
 
     def range(self, start=None, end=None):
-        return StringIO(self._data[slice(start, end)])
+        data_range = BytesIO(self._data[slice(start, end)])
+        add_context_manager_support(data_range)
+        return data_range

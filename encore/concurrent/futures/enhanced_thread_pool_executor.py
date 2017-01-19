@@ -37,7 +37,7 @@ import itertools
 import threading
 import weakref
 import time
-import Queue as queue
+from six.moves import queue
 
 from concurrent.futures import _base
 

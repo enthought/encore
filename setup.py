@@ -3,9 +3,15 @@
 
 import os.path
 from setuptools import setup, find_packages
+import sys
 
-d = {}
-execfile(os.path.join('encore', '__init__.py'), d)
+encore_init = os.path.join('encore', '__init__.py')
+if sys.version_info.major == 3:
+    import runpy
+    d = runpy.run_path(encore_init)
+else:
+    d = {}
+    execfile(encore_init, d)
 
 setup(
     name='encore',

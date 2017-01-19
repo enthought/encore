@@ -28,13 +28,13 @@ A typical static server might be layed out as::
 
 import threading
 import json
-import urllib2
-import urllib
+from six.moves import urllib
 import time
 
 from .abstract_store import AbstractReadOnlyStore
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 from .url_value import URLValue
+from .utils import add_context_manager_support
 
 
 def basic_auth_factory(**kwargs):
@@ -44,7 +44,7 @@ def basic_auth_factory(**kwargs):
     method of the handler.
     
     """
-    auth_handler = urllib2.HTTPBasicAuthHandler()
+    auth_handler = urllib.request.HTTPBasicAuthHandler()
     auth_handler.add_password(**kwargs)
 
 
@@ -68,14 +68,14 @@ class StaticURLStore(AbstractReadOnlyStore):
     These would have a root url of "http://www.example.com/", a data path
     of "data/" and a query path of "index.json".
     
-    All queries are performed using urllib2.urlopen, so this store can be
+    All queries are performed using urllib.urlopen, so this store can be
     implemented by an HTTP, FTP or file server which serves static files.  When
     connecting, if appropriate credentials are supplied then HTTP authentication
     will be used when connecting the remote server
    
     .. warning::
     
-        Since we use urllib2 without any further modifications, HTTPS requests
+        Since we use urllib without any further modifications, HTTPS requests
         do not validate the server's certificate.
     
     Because of the limited nature of the interface, this store implementation
@@ -116,7 +116,7 @@ class StaticURLStore(AbstractReadOnlyStore):
     def connect(self, credentials=None, proxy_handler=None, auth_handler_factory=None):
         """ Connect to the key-value store, optionally with authentication
         
-        This method creates appropriate urllib2 openers for the store.
+        This method creates appropriate urllib openers for the store.
         
         Parameters
         ----------
@@ -125,32 +125,32 @@ class StaticURLStore(AbstractReadOnlyStore):
             and optional keys 'uri' and 'realm'.  The 'uri' will default to
             the root url of the store, and 'realm' will default to
             'encore.storage'.
-        proxy_handler : urllib2.ProxyHandler
-            An optional urllib2.ProxyHandler instance.  If none is provided
-            then urllib2 will create a proxy handler from the user's environment
+        proxy_handler : urllib.ProxyHandler
+            An optional urllib.ProxyHandler instance.  If none is provided
+            then urllib will create a proxy handler from the user's environment
             if needed.
         auth_handler_factory :
-            An optional factory to build urllib2 authenticators.  The credentials
+            An optional factory to build urllib authenticators.  The credentials
             will be passed as keyword arguments to this handler's add_password
             method.
             
         """
         if credentials is not None:
             if auth_handler_factory is None:
-                auth_handler_factory = urllib2.HTTPBasicAuthHandler
+                auth_handler_factory = urllib.request.HTTPBasicAuthHandler
             args = {'uri': self.root_url, 'realm': 'encore.storage'}
             args.update(credentials)
             auth_handler = auth_handler_factory()
             auth_handler.add_password(**args)
             if proxy_handler is None:
-                self._opener = urllib2.build_opener(auth_handler)
+                self._opener = urllib.request.build_opener(auth_handler)
             else:
-                self._opener = urllib2.build_opener(proxy_handler, auth_handler)
+                self._opener = urllib.request.build_opener(proxy_handler, auth_handler)
         else:
             if proxy_handler is None:
-                self._opener = urllib2.build_opener()
+                self._opener = urllib.request.build_opener()
             else:
-                self._opener = urllib2.build_opener(auth_handler)
+                self._opener = urllib.request.build_opener(auth_handler)
         
         self.update_index()
         if self.poll > 0:
@@ -165,12 +165,12 @@ class StaticURLStore(AbstractReadOnlyStore):
         store requires.
         
         """
-        self._opener = None
-        
+
         if self._index_thread is not None:
             self._index_thread.join()
             self._index_thread = None
 
+        self._opener = None
 
     def is_connected(self):
         """ Whether or not the store is currently connected
@@ -216,7 +216,7 @@ class StaticURLStore(AbstractReadOnlyStore):
         data : file-like
             A readable file-like object that provides stream of data from the
             key-value store.  This is the same type of filelike object returned
-            by urllib2's urlopen function.
+            by urllib's urlopen function.
         metadata : dictionary
             A dictionary of metadata for the key.
         
@@ -226,7 +226,7 @@ class StaticURLStore(AbstractReadOnlyStore):
             If the key is not found in the store, a KeyError is raised.
 
         """
-        url = self.root_url + urllib.quote(self.data_path + key)
+        url = self.root_url + urllib.parse.quote(self.data_path + key)
         with self._index_lock:
             metadata = self._index[key].copy()
         return URLValue(url, metadata, self._opener)
@@ -246,7 +246,7 @@ class StaticURLStore(AbstractReadOnlyStore):
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.  This is the same type of filelike object returned
-            by urllib2's urlopen function.
+            by urllib's urlopen function.
 
         Raises
         ------
@@ -255,12 +255,13 @@ class StaticURLStore(AbstractReadOnlyStore):
 
         """
         if self.exists(key):
-            url = self.root_url + urllib.quote(self.data_path + key)
-            return self._opener.open(url)
+            url = self.root_url + urllib.parse.quote(self.data_path + key)
+            stream = self._opener.open(url)
+            add_context_manager_support(stream)
+            return stream
         else:
             raise KeyError(key)
 
-    
     def get_metadata(self, key, select=None):
         """ Retrieve the metadata for a given key in the key-value store.
         
@@ -404,7 +405,9 @@ class StaticURLStore(AbstractReadOnlyStore):
         url = self.root_url + self.query_path
         with self._index_lock:
             result = self._opener.open(url)
-            index = json.loads(result.read())
+            # Py3: http.client.HTTPResponse always returns bytes --> convert to
+            # str/unicode to make sure loads is happy
+            index = json.loads(result.read().decode('ascii'))
             old_index = self._index
             self._index = index
 

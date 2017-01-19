@@ -22,14 +22,16 @@ data values can be stored in the key-value store.
 """
 
 from abc import ABCMeta, abstractmethod, abstractproperty
-from itertools import izip
+from six.moves import zip as izip
 import fnmatch
-from cStringIO import StringIO
+from six import BytesIO
 import warnings
 
 from encore.events.api import get_event_manager
 
-from .utils import StoreProgressManager, buffer_iterator
+from .utils import (
+    StoreProgressManager, buffer_iterator, add_context_manager_support
+)
 
 class StoreError(RuntimeError):
     pass
@@ -555,11 +557,14 @@ class AbstractReadOnlyStore(object):
             with StoreProgressManager(self.event_manager, self, None,
                     "Saving key '%s' to file '%s'" % (key, path), -1,
                     key=key, metadata=metadata) as progress:
-                for buffer in buffer_iterator(data, buffer_size):
-                    fp.write(buffer)
-                    bytes_written += len(buffer)
-                    progress("Saving key '%s' to file '%s' (%d bytes written)"
-                        % (key, path, bytes_written))
+                with data:
+                    for buffer in buffer_iterator(data, buffer_size):
+                        fp.write(buffer)
+                        bytes_written += len(buffer)
+                        progress(
+                            "Saving key '%s' to file '%s' (%d bytes written)"
+                            % (key, path, bytes_written)
+                        )
 
 
     def to_bytes(self, key, buffer_size=1048576):
@@ -598,7 +603,11 @@ class AbstractReadOnlyStore(object):
             extracting the data.
 
         """
-        return b''.join(buffer_iterator(self.get_data(key), buffer_size))
+        data_fh = self.get_data(key)
+        try:
+            return b''.join(buffer_iterator(data_fh, buffer_size))
+        finally:
+            data_fh.close()
 
 
 class AbstractStore(AbstractReadOnlyStore):
@@ -1056,7 +1065,8 @@ class AbstractStore(AbstractReadOnlyStore):
             default if they need to.  The default is 1048576 bytes (1 MiB).
 
         """
-        self.set_data(key, StringIO(data), buffer_size)
+        self.set_data(key, add_context_manager_support(BytesIO(data)), buffer_size)
+
 
 class AbstractAuthorizingStore(AbstractStore):
     """ Abstract base class for Key-Value Store API with permissioning

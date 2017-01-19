@@ -15,9 +15,12 @@ metadata files with name key+'.metadata'.
 """
 
 # System library imports.
-import os
-import json
 import glob
+import io
+import json
+import os
+
+import six
 
 # ETS library imports.
 from .abstract_store import AbstractStore
@@ -42,7 +45,8 @@ def init_shared_store(path, magic_fname='.FSStore'):
     """
     magic_path = os.path.join(path, magic_fname)
     with open(magic_path, 'wb') as magic_fp:
-        magic_fp.write('__version__ = 0\n')
+        magic_fp.write(b'__version__ = 0\n')
+
 
 ################################################################################
 # SharedFSStore class.
@@ -190,7 +194,13 @@ class FileSystemStore(AbstractStore):
             data_stream = value.data
             metadata = value.metadata
             steps = value.size
-        json.dump(metadata, open(metadata_path, 'wb'))
+
+        json_string = json.dumps(metadata, ensure_ascii=False)
+        if six.PY2:
+            # convert the string to a unicode object
+            json_string = json_string.decode('utf-8')
+        with io.open(metadata_path, 'w', encoding='utf-8') as fh:
+            fh.write(json_string)
 
         with open(data_path, 'wb') as fp:
             bytes_written = 0
@@ -198,12 +208,13 @@ class FileSystemStore(AbstractStore):
                     message="Setting key '%s'" % key, key=key,
                     metadata=metadata)
             with progress:
-                for buffer in buffer_iterator(data_stream, buffer_size):
-                    fp.write(buffer)
-                    fp.flush()
-                    bytes_written += len(buffer) 
-                    progress("Setting key '%s' (%d bytes written)"
-                        % (key, bytes_written))
+                with data_stream:
+                    for buffer in buffer_iterator(data_stream, buffer_size):
+                        fp.write(buffer)
+                        fp.flush()
+                        bytes_written += len(buffer)
+                        progress("Setting key '%s' (%d bytes written)"
+                            % (key, bytes_written))
         
         if update:
             self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
@@ -365,7 +376,9 @@ class FileSystemStore(AbstractStore):
             
         """
         metadata_path = self._get_metadata_path(key)
-        json.dump(metadata, open(metadata_path, 'wb'))
+        metadata_str = json.dumps(metadata).encode('utf-8')
+        with open(metadata_path, 'wb') as fh:
+            fh.write(metadata_str)
         self._touch(key)
     
     def update_metadata(self, key, metadata):
@@ -394,7 +407,12 @@ class FileSystemStore(AbstractStore):
         metadata_path = self._get_metadata_path(key)
         new_metadata = self._get_metadata(metadata_path)
         new_metadata.update(metadata)
-        json.dump(new_metadata, open(metadata_path, 'wb'))
+        json_string = json.dumps(metadata, ensure_ascii=False)
+        if six.PY2:
+            # convert the string to a unicode object
+            json_string = json_string.decode('utf-8')
+        with io.open(metadata_path, 'w', encoding='utf-8') as fh:
+            fh.write(json_string)
         if update:
             self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
         else:
@@ -516,7 +534,9 @@ class FileSystemStore(AbstractStore):
         return os.path.normpath(path)
         
     def _get_metadata(self, path):
-        md = json.load(open(path, 'rb'))
+        with open(path, 'rb') as fh:
+            content = fh.read()
+        md = json.loads(content.decode('utf-8'))
         return md
     
     def _touch(self, key):

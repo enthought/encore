@@ -17,12 +17,15 @@ This class is provided in part as a sample implementation of the API.
 
 """
 
-from cStringIO import StringIO
+from six import BytesIO
 import time
 
 from .abstract_store import AbstractStore
 from .string_value import StringValue
-from .utils import buffer_iterator, DummyTransactionContext, StoreProgressManager
+from .utils import (
+    buffer_iterator, DummyTransactionContext, StoreProgressManager,
+    add_context_manager_support
+)
 from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 
 
@@ -246,7 +249,7 @@ class DictMemoryStore(AbstractStore):
             key-value store.
 
         """
-        return StringIO(self._store[key][0])
+        return add_context_manager_support(BytesIO(self._store[key][0]))
 
 
     def get_metadata(self, key, select=None):
@@ -344,7 +347,7 @@ class DictMemoryStore(AbstractStore):
             emitted with the key & metadata
 
         """
-        data = self._store.get(key, ('', {}))[0]
+        data = self._store.get(key, (b'', {}))[0]
         self.set(key, StringValue(data=data, metadata=metadata))
 
 
