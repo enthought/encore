@@ -35,7 +35,7 @@ class SynchronousExecutor(Executor):
 
     """
    
-    def __init__(self):
+    def __init__(self, **_):
         """ Initializes a new SynchronousExecutor instance."""
         self._shutdown = False
 
