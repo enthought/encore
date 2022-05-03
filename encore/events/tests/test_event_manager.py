@@ -7,7 +7,11 @@
 
 # Standard library imports.
 import unittest
-import unittest.mock as mock
+try:
+    import unittest.mock as mock
+except ImportError:
+    # For Python 2.x, rely on 3rd party mock library
+    import mock
 import weakref
 import threading
 
@@ -653,7 +657,7 @@ class TracingTests(unittest.TestCase):
         """ Test whether vetoing of actions works. """
         callback1 = mock.Mock()
         callback2 = mock.Mock()
-        
+
         self.evt_mgr.set_trace(self.trace_func_veto)
         self.evt_mgr.connect(BaseEvent, callback1)
         self.evt_mgr.emit(BaseEvent())
