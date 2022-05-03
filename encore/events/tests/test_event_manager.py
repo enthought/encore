@@ -7,7 +7,7 @@
 
 # Standard library imports.
 import unittest
-import mock
+import unittest.mock as mock
 import weakref
 import threading
 
