@@ -137,7 +137,7 @@ class TestSerializer(unittest.TestCase):
         """
         logger_name = 'encore.concurrent.futures.abc_work_scheduler'
         with loghandler(logger_name) as handler:
-            self.serializer.submit(operator.div, 1, 0)
+            self.serializer.submit(operator.truediv, 1, 0)
             self.serializer.wait()
 
         # We log two messages for each failure. The actual traceback
@@ -169,7 +169,7 @@ class TestSerializer(unittest.TestCase):
         # Submit a bad job
         logger_name = 'encore.concurrent.futures.abc_work_scheduler'
         with loghandler(logger_name) as handler:
-            serializer.submit(operator.div, 1, 0)
+            serializer.submit(operator.truediv, 1, 0)
             serializer.wait()
 
         # We log two messages for each failure. The actual traceback
@@ -216,7 +216,7 @@ class TestSerializer(unittest.TestCase):
 
         # Submit a bad job
         with loghandler(logger_name) as handler:
-            serializer.submit(operator.div, 1, 0)
+            serializer.submit(operator.truediv, 1, 0)
             serializer.wait()
 
         # We log two messages for each failure. The actual traceback

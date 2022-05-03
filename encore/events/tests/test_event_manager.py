@@ -7,7 +7,7 @@
 
 # Standard library imports.
 import unittest
-import mock
+import unittest.mock as mock
 import weakref
 import threading
 
@@ -396,7 +396,7 @@ class TestEventManager(unittest.TestCase):
         evt = MyEvt()
         self.evt_mgr.connect(BaseEvent, callback)
         self.evt_mgr.emit(evt)
-        self.assertEqual(call_seq, range(3))
+        self.assertEqual(call_seq, [0, 1, 2])
 
     def test_reentrant_disconnect_emit(self):
         """ Test listener is called even if it is disconnected before notify.
@@ -649,7 +649,7 @@ class TracingTests(unittest.TestCase):
         """ Test whether vetoing of actions works. """
         callback1 = mock.Mock()
         callback2 = mock.Mock()
-        
+
         self.evt_mgr.set_trace(self.trace_func_veto)
         self.evt_mgr.connect(BaseEvent, callback1)
         self.evt_mgr.emit(BaseEvent())

@@ -5,15 +5,15 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from cStringIO import StringIO
+from io import StringIO
 import time
 
 from .abstract_store import Value, AuthorizationError
 
 class StringValue(Value):
-    
+
     def __init__(self, data='', metadata=None, created=None, modified=None):
-        if not isinstance(data, basestring):
+        if not isinstance(data, str):
             raise ValueError(data)
         self._data = data
         self._data_stream = None

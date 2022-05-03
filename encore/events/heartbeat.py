@@ -13,10 +13,8 @@ import threading
 from .abstract_event_manager import BaseEvent
 from .package_globals import get_event_manager
 
-if sys.platform == 'win32':
-    accurate_time = time.clock
-else:
-    accurate_time = time.time
+accurate_time = time.monotonic
+
 
 class HeartbeatEvent(BaseEvent):
     """ Event which is emitted periodically
@@ -25,24 +23,24 @@ class HeartbeatEvent(BaseEvent):
 
 class Heartbeat(object):
     """ Service which emits an event periodically
-    
+
     Note that unless the event manager uses threaded dispatch, event listeners
     which take longer than the interval to perform will result in a slower
     heartbeat.  The heartbeat runs on its own thread, and as a result, any
     listeners will also run on that thread.
-    
+
     The heartbeat is only intended to be approximately accurate, and should not
     be used for applications which require precise timing.
-    
+
     """
-    
+
     def __init__(self, interval=1/50., event_manager=None):
         self.state = 'waiting'
         self.interval = interval
         self.frame_count = 0
         self.event_manager = (event_manager if event_manager is not None
             else get_event_manager())
-    
+
     def run(self):
         self.state = 'running'
         while self.state in ['running', 'paused']:
@@ -62,5 +60,3 @@ class Heartbeat(object):
         thread = threading.Thread(target=self.run)
         thread.daemon = True
         thread.start()
-    
-

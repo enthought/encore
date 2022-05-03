@@ -3,8 +3,8 @@ Concurrent Package
 ==================
 
 The :py:mod:`encore.concurrent.futures` package provides an enhanced
-version of the ``concurrent.futures`` package for Python 2.7 with some
-useful experimental additions.
+version of the ``concurrent.futures`` package with some useful experimental
+additions.
 
 Contents
 --------

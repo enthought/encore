@@ -131,7 +131,7 @@ class EnhancedThreadPoolShutdownTest(EnhancedThreadPoolMixin, unittest.TestCase)
             import sys
             def sleep_and_print(t, msg):
                 sleep(t)
-                print msg
+                print(msg)
                 sys.stdout.flush()
             t = {executor_type}(5)
             t.submit(sleep_and_print, 1.0, "apple")
@@ -327,9 +327,9 @@ class EnhancedThreadPoolExecutorTest(EnhancedThreadPoolMixin, unittest.TestCase)
 
     def test_map_exception(self):
         i = self.executor.map(divmod, [1, 1, 1, 1], [2, 3, 0, 5])
-        self.assertEqual(i.next(), (0, 1))
-        self.assertEqual(i.next(), (0, 1))
-        self.assertRaises(ZeroDivisionError, i.next)
+        self.assertEqual(next(i), (0, 1))
+        self.assertEqual(next(i), (0, 1))
+        self.assertRaises(ZeroDivisionError, next, i)
 
     def test_map_timeout(self):
         results = []
@@ -372,7 +372,7 @@ class EnhancedThreadPoolExecutorTest(EnhancedThreadPoolMixin, unittest.TestCase)
         executor = EnhancedThreadPoolExecutor(max_workers=5)
         with executor as e:
             # Start some threads.
-            for _ in xrange(10):
+            for _ in range(10):
                 e.submit(pow, 2, 2)
             expected_prefix = "{0}Worker-".format(type(e).__name__)
             for t in e._threads:
@@ -391,7 +391,7 @@ class EnhancedThreadPoolExecutorTest(EnhancedThreadPoolMixin, unittest.TestCase)
         with executor as e:
             self.assertEqual(e.name, "DeadParrotExecutioner")
             # Start some threads.
-            for _ in xrange(10):
+            for _ in range(10):
                 e.submit(pow, 2, 2)
             expected_prefix = "DeadParrotExecutionerWorker-"
             for t in e._threads:
@@ -469,11 +469,11 @@ class EnhancedThreadPoolWaitAtExit(unittest.TestCase):
 
     def test_no_wait_at_exit(self):
         rc, out, err = self._execute(False)
-        self.assertEqual(out, '')
+        self.assertEqual(out.decode("utf-8"), '')
 
     def test_wait_at_exit(self):
         rc, out, err = self._execute(True)
-        self.assertEqual(out, 'FINISHED')
+        self.assertEqual(out.decode("utf-8"), 'FINISHED')
 
 
 class TestCustomFuture(unittest.TestCase):

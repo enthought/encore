@@ -122,7 +122,7 @@ class FileLock(object):
                 else:
                     raise
             else:
-                os.write(fd, self._data)
+                os.write(fd, self._data.encode("utf-8"))
                 os.close(fd)
                 return True
             if 0 < self.timeout < time.time()-start_time:
@@ -141,7 +141,7 @@ class FileLock(object):
         """
         try:
             with open(self.full_path, 'rb') as f:
-                data = f.read()
+                data = f.read().decode("utf-8")
             if data != self._data:
                 raise LockError('Releasing an unacquired lock')
             else:
@@ -212,15 +212,15 @@ class FileLock(object):
                 time.sleep(self.poll_interval)
             else:
                 return True
-                
+
     def get_data(self):
         """Return the data stored in the lock file.
-        
+
         If None is returned the lock has not been acquired.
         """
         try:
             with open(self.full_path, 'rb') as f:
-                text = f.read()
+                text = f.read().decode("utf-8")
         except IOError:
             text = None
         return text

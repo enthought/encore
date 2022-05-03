@@ -186,7 +186,7 @@ class TestSerializingAsynchronizer(unittest.TestCase):
         """
         logger_name = 'encore.concurrent.futures.abc_work_scheduler'
         with loghandler(logger_name) as handler:
-            self.asynchronizer.submit(operator.div, 1, 0)
+            self.asynchronizer.submit(operator.truediv, 1, 0)
             self.asynchronizer.wait()
 
         # We log two messages for each failure. The actual traceback
@@ -218,7 +218,7 @@ class TestSerializingAsynchronizer(unittest.TestCase):
         # Submit a bad job
         logger_name = 'encore.concurrent.futures.abc_work_scheduler'
         with loghandler(logger_name) as handler:
-            asynchronizer.submit(operator.div, 1, 0)
+            asynchronizer.submit(operator.truediv, 1, 0)
             asynchronizer.wait()
 
         # We log two messages for each failure. The actual traceback
@@ -265,7 +265,7 @@ class TestSerializingAsynchronizer(unittest.TestCase):
 
         # Submit a bad job
         with loghandler(logger_name) as handler:
-            asynchronizer.submit(operator.div, 1, 0)
+            asynchronizer.submit(operator.truediv, 1, 0)
             asynchronizer.wait()
 
         # We log two messages for each failure. The actual traceback

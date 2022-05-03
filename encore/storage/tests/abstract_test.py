@@ -280,10 +280,10 @@ class AbstractStoreReadTest(TestCase):
         if self.store is None:
             self.skipTest('Abstract test case')
         self.utils_large()
-        #print list(self.store.query_keys())
-        #print list(self.store1.query_keys())
-        #print list(self.store2.query_keys())
-        #print list(self.store3.query_keys())
+        #print(list(self.store.query_keys()))
+        #print(list(self.store1.query_keys()))
+        #print(list(self.store2.query_keys()))
+        #print(list(self.store3.query_keys()))
         with temp_dir() as directory:
             filepath = os.path.join(directory, 'test')
             self.store.to_file('test3', filepath)

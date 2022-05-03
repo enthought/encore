@@ -14,7 +14,7 @@ can subscribe to events based on Event type or by filtering on event attributes.
 include UI components listening to low-level progress notifications and change notification for
 distributed resources.
 
-*Storage:* Abstract base classes and concrete implementations of a basic key-value storage API.  
+*Storage:* Abstract base classes and concrete implementations of a basic key-value storage API.
 The API is intended to be general purpose enough to support a variety of local and remote storage
 systems.
 
@@ -24,15 +24,13 @@ systems.
 
 Prerequisites
 -------------
-* Python >= 2.6 (not Python 3)
+* Python >= 3.6
 
 * Sphinx, graphviz, pydot (documentation build)
 
 * Some optional modules have dependencies on:
 
   - Requests (http://docs.python-requests.org/en/latest/)
-
-  - Futures (https://code.google.com/p/pythonfutures/)
 
 Build Status
 ------------

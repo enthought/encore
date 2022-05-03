@@ -2,10 +2,11 @@
 # All rights reserved.
 
 import os.path
+import runpy
+
 from setuptools import setup, find_packages
 
-d = {}
-execfile(os.path.join('encore', '__init__.py'), d)
+d = runpy.run_path(os.path.join('encore', '__init__.py'))
 
 setup(
     name='encore',

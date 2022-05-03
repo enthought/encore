@@ -12,9 +12,9 @@ from shutil import rmtree
 import json
 import time
 import urllib
-import SocketServer
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+import socketserver
+from http.server import HTTPServer
+from http.server import SimpleHTTPRequestHandler
 
 import encore.storage.tests.abstract_test as abstract_test
 from ..static_url_store import StaticURLStore
@@ -100,7 +100,7 @@ class StaticURLStoreReadTest(abstract_test.AbstractStoreReadTest):
         with file(os.path.join(self.path, filename), 'wb') as fp:
             fp.write(data)
 
-class ThreadedHTTPServer(SocketServer.ThreadingMixIn, HTTPServer):
+class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
     pass
 
 class StaticURLStoreHTTPReadTest(StaticURLStoreReadTest):

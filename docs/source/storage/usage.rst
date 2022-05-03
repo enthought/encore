@@ -18,7 +18,7 @@ HTTP Authentication::
 
     from encore.events.api import EventManager
     from encore.storage.static_url_store import StaticURLStore
-    
+
     event_manager = EventManager()
     store = StaticURLStore(event_manager, 'http://localhost:8080/', 'data', 'index.json')
     store.connect(credentials={'username': 'alibaba', password: 'Open Sesame'})
@@ -37,11 +37,11 @@ methods::
     value = store.get('my_document')
     datastream = value.data
     metadata = value.metadata
-    
+
 In this case datastream is a file-like object that streams bytes::
 
     data = datastream.read()
-    print data
+    print(data)
 
 More likely you will have used some sort of serialization format like XML, JSON
 or YAML to store your data in the document, so instead you can do::
@@ -66,10 +66,10 @@ The metadata stores auxilliary information about the data that is stored in the
 key.  It is a dictionary of reasonably serializable values (frequently it will
 serialize to JSON or similar format)::
 
-    print 'Document title:', metadata['title']
-    print 'Document author:', metadata['author']
-    print 'Document encoding:', metadata['encoding']
-    
+    print('Document title:', metadata['title'])
+    print('Document author:', metadata['author'])
+    print('Document encoding:', metadata['encoding'])
+
     # checksum
     import hashlib
     assert hashlib.sha1(document.read()).digest() == metadata['sha1']
@@ -106,7 +106,7 @@ key-value store API gives a simple query mechanism that permits this sort of
 matching::
 
     for key, metadata in store.query(author='alibaba', organization='40 Thieves'):
-        print key, ':', metadata['title']
+        print(key, ':', metadata['title'])
 
 This will print the key and title of all documents which have an ``author`` key
 with value ``'alibaba'`` and an ``organization`` key with value ``'40 Thieves'``.
@@ -118,19 +118,19 @@ If all the user is concerned with is which keys match, there is an alternative
 method :py:meth:`~.AbstractReadOnlyStore.query_keys`::
 
     for key in store.query_keys(author='alibaba', organization='40 Thieves'):
-        print key
+        print(key)
 
 To iterate over all the keys in a store, you can simply call :py:meth:`~.AbstractReadOnlyStore.query_keys`
 with no arguments::
 
     for key in store.query_keys():
-        print key
+        print(key)
 
 Finally, as a useful utility, you can use glob-style matching on the keys using
 the :py:meth:`~.AbstractReadOnlyStore.glob` method::
 
     for key in store.glob('*.jpg'):
-        print key
+        print(key)
 
 Writing
 -------
@@ -141,7 +141,7 @@ file-like object with a :py:meth:`~.Filelike.read` method that can do buffering,
 dictionary of metadata as arguments::
 
     from cStringIO import StringIO
-    
+
     data = StringIO("Hello World")
     metadata = {'title': "Greeting", 'author': 'alibaba'}
     store.set('hello', (data, metadata))
@@ -183,7 +183,7 @@ Transactions are re-entrant, so it is safe to do the following::
         with store.transaction('Adding keypair'):
             store.set(keypair.key1, (keypair.data1, keypair.metadata1))
             store.set(keypair.key2, (keypair.data2, keypair.metadata2))
-    
+
     def add_many_keypairs(keypairs):
         with store.transaction('Adding many keypairs'):
             for keypair in keypairs:
@@ -208,4 +208,3 @@ Events
 The various stores use the Encore event system, which is why the stores must
 be supplied with a reference to an EventManager instance.  The events which are
 emitted are referenced in the documentation for each method.
-

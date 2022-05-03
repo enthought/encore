@@ -321,7 +321,7 @@ class LockingFileSystemStore(FileSystemStore):
 
         """
         timestamp = since
-        if isinstance(timestamp, basestring):
+        if isinstance(timestamp, str):
             ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
             timestamp = datetime.datetime.strptime(timestamp, ISO_FORMAT)
         timestamp -= self._max_time_delta

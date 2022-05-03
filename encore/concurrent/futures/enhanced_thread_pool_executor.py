@@ -31,13 +31,12 @@ in future implementations of concurrent.futures.thread.
 
 """
 
-from __future__ import with_statement
 import atexit
 import itertools
+import queue
 import threading
 import weakref
 import time
-import Queue as queue
 
 from concurrent.futures import _base
 

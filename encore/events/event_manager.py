@@ -32,7 +32,7 @@ from .abstract_event_manager import BaseEvent, BaseEventManager
 ###############################################################################
 class LoggingTracer(object):
     """ A tracer object for event manager to log events.
-    
+
     Usage
     -----
     event_manager.set_trace(LoggingTracer())
@@ -67,15 +67,14 @@ class MethodNotifier(object):
     """
     __slots__ = ['func', 'cls', 'obj', '_notify', '_args']
     def __init__(self, meth, notify=None, args=()):
-        self.func = meth.im_func
-        self.cls = meth.im_class
-        obj = meth.im_self
+        self.func = meth.__func__
+        obj = meth.__self__
         if obj is None:
             # Unbound Method.
             self.obj = None
         else:
             # Bound method.
-            self.obj = weakref.ref(meth.im_self, self.notify)
+            self.obj = weakref.ref(meth.__self__, self.notify)
         if notify:
             self._notify = notify
             self._args = args
@@ -89,15 +88,11 @@ class MethodNotifier(object):
         """ Return the original listener method, or None if it no longer exists.
         """
         obj = self.obj
-        if obj is None:
-            # Unbound method.
-            objc = None
-        else:
-            objc = obj()
-            if objc is None:
-                # Bound method whose object has been garbage collected.
-                return
-        return MethodType(self.func, objc, self.cls)
+        objc = obj()
+        if objc is None:
+            # Method whose object has been garbage collected.
+            return
+        return MethodType(self.func, objc)
 
 ###############################################################################
 # `EventInfo` Private Class.
@@ -140,7 +135,7 @@ class EventInfo(object):
         filter : dict
             Filters to match for before calling the listener. The listener is
             called only when the event matches all of the filter .
-            
+
             Filter specification:
                 - key: string which is extended name of an attribute of the
                     event instance. For example string 'source.name' will be
@@ -158,7 +153,7 @@ class EventInfo(object):
 
         Note
         ----
-       
+
         Reconnecting an already connected listener will disconnect the
         old listener. This may have rammifications in changing the filters
         and the priority.
@@ -211,13 +206,8 @@ class EventInfo(object):
     def get_id(self, func):
         """ Get an id as unique key for the function. """
         if type(func) is MethodType:
-            obj = func.im_self
-            if obj is None:
-                # Unbound method
-                return weakref.ref(func.im_func),weakref.ref(func.im_class)
-            else:
-                # Bound method.
-                return weakref.ref(func.im_func),weakref.ref(func.im_self)
+            obj = func.__self__
+            return weakref.ref(func.__func__),weakref.ref(func.__self__)
         else:
             return func
 
@@ -250,7 +240,7 @@ class EventInfo(object):
                 listener = linfo[-1]
                 id = self.get_id(listener())
                 if id in l_filter:
-                    for key, value in l_filter[id].iteritems():
+                    for key, value in l_filter[id].items():
                         attr = event
                         try:
                             # Get extended attributes of the event.
@@ -334,7 +324,7 @@ class EventManager(BaseEventManager):
         filter : dict
             Filters to match for before calling the listener. The listener is
             called only when the event matches all of the filter .
-            
+
             Filter specification:
                 - key: string which is name of an attribute of the event instance.
                 - value: the value of the specified attribute.
@@ -345,7 +335,7 @@ class EventManager(BaseEventManager):
 
         Note
         ----
-       
+
         Reconnecting an already connected listener will disconnect the
         old listener. This may have rammifications in changing the filters
         and the priority.
@@ -378,7 +368,7 @@ class EventManager(BaseEventManager):
         ------
         KeyError :
             if `func` is not already connected.
-            
+
         """
         if self._trace_func is not None:
             if self._trace_func('disconnect', self.disconnect,
@@ -401,7 +391,7 @@ class EventManager(BaseEventManager):
 
         Note
         ----
-        
+
         Listeners of superclasses of the event are also called.
         Eg. a :py:class:`BaseEvent` listener will also be notified about any
         derived class events.
@@ -433,11 +423,11 @@ class EventManager(BaseEventManager):
                         continue
                 listener(event)
             except Exception as e:
-                logger.warn('Exception {0} occurred in listener: {1} for '
+                logger.warning('Exception {0} occurred in listener: {1} for '
                     'event: {2}:\n{3}'.format(e, listener, event,
                                               traceback.format_exc()))
             if event._handled:
-                # Only enable when debugging -- very slow even if it doesn't get emitted because 
+                # Only enable when debugging -- very slow even if it doesn't get emitted because
                 # it must still do the string formatting.
                 #logger.debug('Event: {0} handled by listener: {1}'.format(
                 #                                        event, listener))
@@ -451,15 +441,15 @@ class EventManager(BaseEventManager):
         Parameters
         ----------
         cls : class
-            The class of the event we want the ``EventInfo`` for.        
+            The class of the event we want the ``EventInfo`` for.
             If ``cls`` is ``None``, then all known event types are returned.
-        
+
         Returns
         -------
         event_info :
             An ``EventInfo`` instance for the class, or a dictionary mapping
             classes to ``EventInfo`` instances.
-        
+
         """
         if cls is None:
             return self.event_map
@@ -468,25 +458,25 @@ class EventManager(BaseEventManager):
 
     def get_listeners(self, event, cls=None):
         """ Return listeners which will be called on specified event.
-        
+
         Parameters
         ----------
-        
+
         event : event instance or class
             The event we want to get the listeners for.
             If ``event`` is an instance of BaseEvent(), the listeners which will
             be called for the event are returned (satisfying any filters on the
             listeners).
-            
+
             If ``event`` is BaseEvent subclass, all listeners for specified event
             class are returned (but no filtering is performed).
-        
+
         cls : BaseEvent subclass
             ``cls`` argument is generally not needed, it is for internal use.
             If ``cls`` is specified as a subclass of ``BaseEvent``, then only
             listeners for the specified event class and superclasses are
             returned.
-        
+
         """
         evt_map = self.event_map
         if cls is None:
@@ -543,7 +533,7 @@ class EventManager(BaseEventManager):
 
     def get_event_hierarchy(self, cls):
         """ The the sequence of event classes which are notified for given cls.
-        
+
         """
         return cls.__mro__[:self.bmro_clip]
 

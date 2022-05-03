@@ -517,31 +517,31 @@ class SimpleAuthStore(AbstractStore):
 
     def check_permissions(self, key=None):
         """ Return permissions that the user has for the provided key
-        
+
         The default behaviour gives all authenticated users full access to all
         keys.  Subclasses may implement finer-grained controls based on user
         groups or other permissioning systems.
-        
+
         Parameters
         ----------
         key : str or None
             The key which the permissions are being requested for, or the global
             permissions if the key is None.
-        
+
         Returns
         -------
         permissions : set
             A set of strings chosen from 'connect', 'exists', 'get', 'set', and/or
             'delete' which express the permissions that the user has on that
             particular key.
-        
+
         """
         if self._username:
             user_key = self.user_key_path + self._username
-            print user_key
+            print(user_key)
             try:
                 token = self.user_key_store.get_data(user_key).read()
-                print 'token', token
+                print('token', token)
             except KeyError:
                 return set()
             if self._token == token:
