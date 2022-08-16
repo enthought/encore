@@ -22,9 +22,8 @@ data values can be stored in the key-value store.
 """
 
 from abc import ABCMeta, abstractmethod, abstractproperty
-from six.moves import zip as izip
 import fnmatch
-from six import BytesIO
+from io import BytesIO
 import warnings
 
 from encore.events.api import get_event_manager
@@ -843,7 +842,7 @@ class AbstractStore(AbstractReadOnlyStore):
 
         """
         with self.transaction('Setting '+', '.join('"%s"' % key for key in keys)):
-            for key, value in izip(keys, values):
+            for key, value in zip(keys, values):
                 self.set(key, value, buffer_size)
 
 
@@ -886,7 +885,7 @@ class AbstractStore(AbstractReadOnlyStore):
 
         """
         with self.transaction('Setting data for '+', '.join('"%s"' % key for key in keys)):
-            for key, data in izip(keys, datas):
+            for key, data in zip(keys, datas):
                 self.set_data(key, data, buffer_size)
 
 
@@ -916,7 +915,7 @@ class AbstractStore(AbstractReadOnlyStore):
 
         """
         with self.transaction('Setting metadata for '+', '.join('"%s"' % key for key in keys)):
-            for key, metadata in izip(keys, metadatas):
+            for key, metadata in zip(keys, metadatas):
                 self.set_metadata(key, metadata)
 
 
@@ -946,7 +945,7 @@ class AbstractStore(AbstractReadOnlyStore):
 
         """
         with self.transaction('Updating metadata for '+', '.join('"%s"' % key for key in keys)):
-            for key, metadata in izip(keys, metadatas):
+            for key, metadata in zip(keys, metadatas):
                 self.update_metadata(key, metadata)
 
 

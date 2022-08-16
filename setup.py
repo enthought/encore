@@ -3,15 +3,10 @@
 
 import os.path
 from setuptools import setup, find_packages
-import sys
 
 encore_init = os.path.join('encore', '__init__.py')
-if sys.version_info.major == 3:
-    import runpy
-    d = runpy.run_path(encore_init)
-else:
-    d = {}
-    execfile(encore_init, d)
+import runpy
+d = runpy.run_path(encore_init)
 
 setup(
     name='encore',
@@ -24,4 +19,5 @@ setup(
     long_description=open('README.rst').read(),
     packages=find_packages(),
     requires=[],
+    python_requires=">=3.6",
 )

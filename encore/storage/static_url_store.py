@@ -28,7 +28,7 @@ A typical static server might be layed out as::
 
 import threading
 import json
-from six.moves import urllib
+import urllib
 import time
 
 from .abstract_store import AbstractReadOnlyStore
@@ -39,10 +39,10 @@ from .utils import add_context_manager_support
 
 def basic_auth_factory(**kwargs):
     """ A factory that creates a :py:class:`~.HTTPBasicAuthHandler` instance
-    
+
     The arguments are passed directly through to the :py:meth:`add_password`
     method of the handler.
-    
+
     """
     auth_handler = urllib.request.HTTPBasicAuthHandler()
     auth_handler.add_password(**kwargs)
@@ -50,40 +50,40 @@ def basic_auth_factory(**kwargs):
 
 class StaticURLStore(AbstractReadOnlyStore):
     """ A read-only key-value store that is a front end for data served via URLs
-    
+
     All data is assumed to be served from some root url.  In addition
-    the store requires knowledge of two paths: a data prefix URL which is a 
+    the store requires knowledge of two paths: a data prefix URL which is a
     partial URL to which the keys will be appended when requesting data, and a
     query URL which is a single URL which provides all metadata as a json
     encoded file.
-    
+
     For example, an HTTP server may store data at URLs of the form::
-    
+
         http://www.example.com/data/<key>
-    
+
     and may store the metadata at::
-    
+
         http://www.example.com/index.json
-    
+
     These would have a root url of "http://www.example.com/", a data path
     of "data/" and a query path of "index.json".
-    
+
     All queries are performed using urllib.urlopen, so this store can be
     implemented by an HTTP, FTP or file server which serves static files.  When
     connecting, if appropriate credentials are supplied then HTTP authentication
     will be used when connecting the remote server
-   
+
     .. warning::
-    
+
         Since we use urllib without any further modifications, HTTPS requests
         do not validate the server's certificate.
-    
+
     Because of the limited nature of the interface, this store implementation
     is read only, and handles updates via periodic polling of the query prefix
     URL.  This guarantees that the viewed data is always consistent, it just may
     not be current. Most of the work of querying is done on the client side
     using the cached metadata.
-     
+
     Parameters
     ----------
     event_manager :
@@ -97,8 +97,8 @@ class StaticURLStore(AbstractReadOnlyStore):
         The URL that the metadata is served from.
     poll : float
         The polling frequency for the polling thread.  Polls every 5 min by default.
-    
-        
+
+
     """
     def __init__(self, root_url, data_path, query_path, poll=300):
         super(StaticURLStore, self).__init__()
@@ -106,18 +106,18 @@ class StaticURLStore(AbstractReadOnlyStore):
         self.data_path = data_path
         self.query_path = query_path
         self.poll = poll
-        
+
         self._opener = None
         self._index = None
         self._index_lock = threading.Lock()
         self._index_thread = None
 
-                
+
     def connect(self, credentials=None, proxy_handler=None, auth_handler_factory=None):
         """ Connect to the key-value store, optionally with authentication
-        
+
         This method creates appropriate urllib openers for the store.
-        
+
         Parameters
         ----------
         credentials : dict
@@ -133,7 +133,7 @@ class StaticURLStore(AbstractReadOnlyStore):
             An optional factory to build urllib authenticators.  The credentials
             will be passed as keyword arguments to this handler's add_password
             method.
-            
+
         """
         if credentials is not None:
             if auth_handler_factory is None:
@@ -151,19 +151,19 @@ class StaticURLStore(AbstractReadOnlyStore):
                 self._opener = urllib.request.build_opener()
             else:
                 self._opener = urllib.request.build_opener(auth_handler)
-        
+
         self.update_index()
         if self.poll > 0:
             self._index_thread = threading.Thread(target=self._poll)
             self._index_thread.start()
 
-        
+
     def disconnect(self):
         """ Disconnect from the key-value store
-        
+
         This method disposes or disconnects to any long-lived resources that the
         store requires.
-        
+
         """
 
         if self._index_thread is not None:
@@ -174,7 +174,7 @@ class StaticURLStore(AbstractReadOnlyStore):
 
     def is_connected(self):
         """ Whether or not the store is currently connected
-        
+
         Returns
         -------
         connected : bool
@@ -183,10 +183,10 @@ class StaticURLStore(AbstractReadOnlyStore):
         """
         return self._opener is not None
 
-    
+
     def info(self):
         """ Get information about the key-value store
-        
+
         Returns
         -------
         metadata : dict
@@ -196,21 +196,21 @@ class StaticURLStore(AbstractReadOnlyStore):
             'readonly': True
         }
 
-        
+
     ##########################################################################
     # Basic Create/Read/Update/Delete Methods
     ##########################################################################
-    
-    
+
+
     def get(self, key):
         """ Retrieve a stream of data and metdata from a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         data : file-like
@@ -219,7 +219,7 @@ class StaticURLStore(AbstractReadOnlyStore):
             by urllib's urlopen function.
         metadata : dictionary
             A dictionary of metadata for the key.
-        
+
         Raises
         ------
         KeyError :
@@ -231,16 +231,16 @@ class StaticURLStore(AbstractReadOnlyStore):
             metadata = self._index[key].copy()
         return URLValue(url, metadata, self._opener)
 
-    
+
     def get_data(self, key):
         """ Retrieve a stream from a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         data : file-like
@@ -264,7 +264,7 @@ class StaticURLStore(AbstractReadOnlyStore):
 
     def get_metadata(self, key, select=None):
         """ Retrieve the metadata for a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -273,7 +273,7 @@ class StaticURLStore(AbstractReadOnlyStore):
         select : iterable of strings or None
             Which metadata keys to populate in the result.  If unspecified, then
             return the entire metadata dictionary.
-        
+
         Returns
         -------
         metadata : dict
@@ -281,7 +281,7 @@ class StaticURLStore(AbstractReadOnlyStore):
             has keys as specified by the select argument.  If a key specified in
             select is not present in the metadata, then it will not be present
             in the returned value.
-        
+
         Raises
         ------
         KeyError :
@@ -294,44 +294,44 @@ class StaticURLStore(AbstractReadOnlyStore):
             else:
                 metadata = self._index[key]
                 return dict((s, metadata[s]) for s in select if s in metadata)
-        
-                
+
+
     def exists(self, key):
         """ Test whether or not a key exists in the key-value store
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         exists : bool
             Whether or not the key exists in the key-value store.
-        
+
         """
         with self._index_lock:
             return key in self._index
 
-        
+
     ##########################################################################
     # Querying Methods
     ##########################################################################
-    
+
     def query(self, select=None, **kwargs):
         """ Query for keys and metadata matching metadata provided as keyword arguments
-        
+
         This provides a very simple querying interface that returns precise
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of metadata for the key-value store.
-        
+
         Parameters
         ----------
         select : iterable of strings or None
             An optional list of metadata keys to return.  If this is not None,
             then the metadata dictionaries will only have values for the specified
-            keys populated.        
+            keys populated.
         kwargs :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
@@ -355,17 +355,17 @@ class StaticURLStore(AbstractReadOnlyStore):
                     if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                         yield key, metadata.copy()
 
-    
+
     def query_keys(self, **kwargs):
         """ Query for keys matching metadata provided as keyword arguments
-        
+
         This provides a very simple querying interface that returns precise
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of keys for the key-value store.
-        
+
         This is equivalent to ``self.query(**kwargs).keys()``, but potentially
         more efficiently implemented.
-        
+
         Parameters
         ----------
         kwargs :
@@ -377,30 +377,30 @@ class StaticURLStore(AbstractReadOnlyStore):
         result : iterable
             An iterable of key-value store keys whose metadata matches all the
             specified values for the specified metadata keywords.
-        
+
         """
         with self._index_lock:
             for key, metadata in self._index.items():
                 if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                     yield key
 
-    
+
     ##########################################################################
     # Utility Methods
     ##########################################################################
 
     def update_index(self):
         """ Request the most recent version of the metadata
-        
+
         This downloads the json file at the query_path location, and updates
         the local metadata cache with this information.  It then emits events
         that represent the difference between the old metadata and the new
         metadata.
-        
+
         This method is normally called from the polling thread, but can be called
         by other code when needed.  It locks the metadata index whilst performing
         the update.
-        
+
         """
         url = self.root_url + self.query_path
         with self._index_lock:
@@ -424,11 +424,11 @@ class StaticURLStore(AbstractReadOnlyStore):
                 if old_index[key] != index[key]:
                     self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=index[key]))
 
-        
+
     ##########################################################################
     # Private Methods
     ##########################################################################
-    
+
     def _poll(self):
         t = time.time()
         while self._opener is not None:
@@ -437,4 +437,3 @@ class StaticURLStore(AbstractReadOnlyStore):
                 t = time.time()
             # tick
             time.sleep(0.5)
-

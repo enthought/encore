@@ -5,7 +5,7 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
-from six import BytesIO
+from io import BytesIO
 import time
 
 from .abstract_store import Value, AuthorizationError

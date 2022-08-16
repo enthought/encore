@@ -22,9 +22,8 @@ This class is provided in part as a sample implementation of the API.
 import sqlite3
 import time
 
-import six
-from six import BytesIO
-from six.moves import cPickle
+from io import BytesIO
+import pickle
 
 from .abstract_store import AbstractStore
 from .string_value import StringValue
@@ -34,19 +33,15 @@ from .utils import (
     add_context_manager_support
 )
 
-if six.PY3:
-    buffer = sqlite3.Binary
+buffer = sqlite3.Binary
 
 
 def adapt_dict(d):
-    return buffer(cPickle.dumps(d, protocol=2))
+    return buffer(pickle.dumps(d, protocol=2))
 
 
 def convert_dict(s):
-    if six.PY3:
-        return cPickle.loads(s, encoding='ascii')
-    else:
-        return cPickle.loads(s)
+    return pickle.loads(s, encoding='ascii')
 
 sqlite3.register_adapter(dict, adapt_dict)
 sqlite3.register_converter('dict', convert_dict)
@@ -481,7 +476,7 @@ class SqliteStore(AbstractStore):
                     ' and '.join('"'+column+'"=?' for column in columns))
             else:
                 query = 'select key, metadata from "%s"' % (self.table,)
-            rows = self._connection.execute(query, [buffer(cPickle.dumps(kwargs[column], protocol=2))
+            rows = self._connection.execute(query, [buffer(pickle.dumps(kwargs[column], protocol=2))
                 for column in columns])
         else:
             unindexed_columns = set(kwargs)
@@ -537,7 +532,7 @@ class SqliteStore(AbstractStore):
                         ' and '.join('"'+column+'"=?' for column in columns))
                 else:
                     query = 'select key from "%s"' % (self.table,)
-            rows = self._connection.execute(query, [buffer(cPickle.dumps(kwargs[column], protocol=2))
+            rows = self._connection.execute(query, [buffer(pickle.dumps(kwargs[column], protocol=2))
                 for column in columns])
         else:
             unindexed_columns = set(kwargs)
@@ -694,7 +689,7 @@ class SqliteStore(AbstractStore):
             self.index_columns |= missing_columns
 
         columns = [column for column in metadata if column in self.index_columns]
-        values = [buffer(cPickle.dumps(metadata[column], protocol=2)) for column in columns]
+        values = [buffer(pickle.dumps(metadata[column], protocol=2)) for column in columns]
         if columns:
             self._update_columns(key, columns, values)
 

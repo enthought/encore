@@ -20,8 +20,6 @@ import io
 import json
 import os
 
-import six
-
 # ETS library imports.
 from .abstract_store import AbstractStore
 from .file_value import FileValue
@@ -35,7 +33,7 @@ class FileSystemStoreError(Exception):
 def init_shared_store(path, magic_fname='.FSStore'):
     """Create the magic file for the shared store.  Useful to initialize
     the store for the first time.
-    
+
     Parameters
     ----------
     path :
@@ -56,10 +54,10 @@ class FileSystemStore(AbstractStore):
     A store that uses a Shared file system to store the data/metadata.
     """
     def __init__(self, path, magic_fname='.FSStore'):
-        """Initializes the store given a path to a store. 
-        
+        """Initializes the store given a path to a store.
+
         Parameters
-        ----------        
+        ----------
         path : str:
             A path to the root of the file system store.
         magic_fname :
@@ -69,36 +67,36 @@ class FileSystemStore(AbstractStore):
         super(FileSystemStore, self).__init__()
         self._root = path
         self._magic_fname = magic_fname
-        
+
         if not os.path.exists(path):
             raise FileSystemStoreError('Unable to find path %s'%path)
         # The path should have a .FSStore file.
         if not (os.path.exists(os.path.join(path, self._magic_fname))):
             raise FileSystemStoreError('Path %s is not a valid store'%path)
-    
+
     def connect(self, credentials=None):
         """ Connect to the key-value store.
-        
+
         Parameters
         ----------
-        credentials : 
+        credentials :
             These are not used by default.
-            
+
         """
         self._connected = True
-                
+
     def disconnect(self):
         """ Disconnect from the key-value store
-        
+
         This store does not authenticate, and has no external resources, so this
         does nothing
 
         """
         self._connected = False
-    
+
     def is_connected(self):
         """ Whether or not the store is currently connected
-        
+
         Returns
         -------
         connected : bool
@@ -106,30 +104,30 @@ class FileSystemStore(AbstractStore):
 
         """
         return self._connected
-    
+
     def info(self):
         """ Get information about the key-value store
-        
+
         Returns
         -------
-        
+
         metadata : dict
             A dictionary of metadata giving information about the key-value store.
         """
         return {'type': 'FileSystemStore', 'version': 0}
-    
+
     ##########################################################################
     # Basic Create/Read/Update/Delete Methods
     ##########################################################################
     def get(self, key):
         """ Retrieve a stream of data and metdata from a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         data : file-like
@@ -137,7 +135,7 @@ class FileSystemStore(AbstractStore):
             key-value store
         metadata : dictionary
             A dictionary of metadata for the key.
-        
+
         Raises
         ------
         KeyError :
@@ -147,13 +145,13 @@ class FileSystemStore(AbstractStore):
         data_path = self._get_data_path(key)
         metadata = self.get_metadata(key)
         return FileValue(data_path, metadata)
-    
+
     def set(self, key, value, buffer_size=1048576):
         """ Store a stream of data into a given key in the key-value store.
-        
+
         This may be left unimplemented by subclasses that represent a read-only
         key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -167,7 +165,7 @@ class FileSystemStore(AbstractStore):
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
             default if they need to.  The default is 1048576 bytes (1 MiB).
-        
+
         Events
         ------
         StoreProgressStartEvent :
@@ -182,7 +180,7 @@ class FileSystemStore(AbstractStore):
         StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
-        
+
         """
         update = self.exists(key)
         metadata_path = self._get_metadata_path(key)
@@ -196,9 +194,6 @@ class FileSystemStore(AbstractStore):
             steps = value.size
 
         json_string = json.dumps(metadata, ensure_ascii=False)
-        if six.PY2:
-            # convert the string to a unicode object
-            json_string = json_string.decode('utf-8')
         with io.open(metadata_path, 'w', encoding='utf-8') as fh:
             fh.write(json_string)
 
@@ -215,30 +210,30 @@ class FileSystemStore(AbstractStore):
                         bytes_written += len(buffer)
                         progress("Setting key '%s' (%d bytes written)"
                             % (key, bytes_written))
-        
+
         if update:
             self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
         else:
             self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
-    
+
     def delete(self, key):
         """ Delete a key from the repsository.
-        
+
         This may be left unimplemented by subclasses that represent a read-only
         key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Events
         ------
         StoreDeleteEvent :
             On successful completion of a transaction, a StoreDeleteEvent should
             be emitted with the key.
-            
+
         """
         metadata = self.get_metadata(key)
         metadata_path = self._get_metadata_path(key)
@@ -248,22 +243,22 @@ class FileSystemStore(AbstractStore):
         if os.path.exists(data_path):
             os.remove(data_path)
         self.event_manager.emit(StoreDeleteEvent(self, key=key, metadata=metadata))
-    
+
     def get_data(self, key):
         """ Retrieve a stream from a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         data : file-like
             A readable file-like object the that provides stream of data from the
             key-value store.
-        
+
         Raises
         ------
         KeyError :
@@ -275,10 +270,10 @@ class FileSystemStore(AbstractStore):
             raise KeyError('Key %s does not exist in store!'%key)
         else:
             return open(data_path, 'rb')
-    
+
     def get_metadata(self, key, select=None):
         """ Retrieve the metadata for a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -287,7 +282,7 @@ class FileSystemStore(AbstractStore):
         select : iterable of strings or None
             Which metadata keys to populate in the result.  If unspecified, then
             return the entire metadata dictionary.
-        
+
         Returns
         -------
         metadata : dict
@@ -295,7 +290,7 @@ class FileSystemStore(AbstractStore):
             has keys as specified by the select argument.  If a key specified in
             select is not present in the metadata, then it will not be present
             in the returned value.
-        
+
         Raises
         ------
         KeyError :
@@ -314,7 +309,7 @@ class FileSystemStore(AbstractStore):
 
     def set_data(self, key, data, buffer_size=1048576):
         """ Replace the data for a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -351,14 +346,14 @@ class FileSystemStore(AbstractStore):
         else:
             metadata = self._get_metadata(metadata_path)
         self.set(key, (data, metadata), buffer_size)
-    
-    
+
+
     def set_metadata(self, key, metadata):
         """ Set new metadata for a given key in the key-value store.
-        
+
         This replaces the existing metadata set for the key with a new set of
         metadata.
-        
+
         Parameters
         ----------
         key : string
@@ -373,20 +368,20 @@ class FileSystemStore(AbstractStore):
         StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
-            
+
         """
         metadata_path = self._get_metadata_path(key)
         metadata_str = json.dumps(metadata).encode('utf-8')
         with open(metadata_path, 'wb') as fh:
             fh.write(metadata_str)
         self._touch(key)
-    
+
     def update_metadata(self, key, metadata):
         """ Update the metadata for a given key in the key-value store.
-        
+
         This performs a dictionary update on the existing metadata with the
         provided metadata keys and values
-        
+
         Parameters
         ----------
         key : string
@@ -401,37 +396,34 @@ class FileSystemStore(AbstractStore):
         StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
-        
+
         """
         update = self.exists(key)
         metadata_path = self._get_metadata_path(key)
         new_metadata = self._get_metadata(metadata_path)
         new_metadata.update(metadata)
         json_string = json.dumps(metadata, ensure_ascii=False)
-        if six.PY2:
-            # convert the string to a unicode object
-            json_string = json_string.decode('utf-8')
         with io.open(metadata_path, 'w', encoding='utf-8') as fh:
             fh.write(json_string)
         if update:
             self.event_manager.emit(StoreUpdateEvent(self, key=key, metadata=metadata))
         else:
             self.event_manager.emit(StoreSetEvent(self, key=key, metadata=metadata))
-    
+
     def exists(self, key):
         """ Test whether or not a key exists in the key-value store
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         exists : bool
             Whether or not the key exists in the key-value store.
-            
+
         """
         metadata_path = self._get_metadata_path(key)
         if os.path.exists(metadata_path):
@@ -441,7 +433,7 @@ class FileSystemStore(AbstractStore):
 
     def transaction(self, notes):
         """ Provide a transaction context manager
-        
+
         This class does not support transactions, so it returns a dummy object.
 
         """
@@ -450,17 +442,17 @@ class FileSystemStore(AbstractStore):
 
     def query(self, select=None, **kwargs):
         """ Query for keys and metadata matching metadata provided as keyword arguments
-        
+
         This provides a very simple querying interface that returns precise
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of metadata for the key-value store.
-        
+
         Parameters
         ----------
         select : iterable of strings or None
             An optional list of metadata keys to return.  If this is not None,
             then the metadata dictionaries will only have values for the specified
-            keys populated.        
+            keys populated.
         kwargs :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
@@ -472,7 +464,7 @@ class FileSystemStore(AbstractStore):
             all the specified values for the specified metadata keywords.
             If a key specified in select is not present in the metadata of a
             particular key, then it will not be present in the returned value.
-        
+
         """
         all_metadata = glob.glob(os.path.join(self._root, '*.metadata'))
         items = [(os.path.splitext(os.path.basename(x))[0], x) for x in all_metadata]
@@ -487,17 +479,17 @@ class FileSystemStore(AbstractStore):
                 metadata = self._get_metadata(path)
                 if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                     yield key, metadata.copy()
-    
+
     def query_keys(self, **kwargs):
         """ Query for keys matching metadata provided as keyword arguments
-        
+
         This provides a very simple querying interface that returns precise
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of keys for the key-value store.
-        
+
         This is equivalent to ``self.query(**kwargs).keys()``, but potentially
         more efficiently implemented.
-        
+
         Parameters
         ----------
         kwargs :
@@ -509,7 +501,7 @@ class FileSystemStore(AbstractStore):
         result : iterable
             An iterable of key-value store keys whose metadata matches all the
             specified values for the specified metadata keywords.
-        
+
         """
         all_metadata = glob.glob(os.path.join(self._root, '*.metadata'))
         if kwargs:
@@ -532,13 +524,13 @@ class FileSystemStore(AbstractStore):
     def _get_data_path(self, key):
         path = os.path.join(self._root, key + '.data')
         return os.path.normpath(path)
-        
+
     def _get_metadata(self, path):
         with open(path, 'rb') as fh:
             content = fh.read()
         md = json.loads(content.decode('utf-8'))
         return md
-    
+
     def _touch(self, key):
         path = self._get_data_path(key)
         if os.path.exists(path):

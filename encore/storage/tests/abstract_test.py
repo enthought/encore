@@ -12,7 +12,7 @@ from tempfile import mkdtemp
 import time
 from unittest import skip
 
-from six import BytesIO
+from io import BytesIO
 
 from ..utils import add_context_manager_support
 

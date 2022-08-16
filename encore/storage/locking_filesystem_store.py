@@ -36,8 +36,6 @@ import os
 import time
 import threading
 
-from six import string_types
-
 # ETS library imports.
 from .events import StoreSetEvent, StoreUpdateEvent,\
     StoreDeleteEvent, StoreKeyEvent
@@ -50,7 +48,7 @@ def transact(function, on_commit=True):
     """ Wrap a store method to add command to transaction instead of executing
     it immediately if within a transaction context. If not in a transaction
     context, the command is executed immediately.
-    
+
     Parameters
     ----------
     function - callable
@@ -157,12 +155,12 @@ class LockingFileSystemStore(FileSystemStore):
                  magic_fname='.FSStore',
                  remote_event_poll_interval=5.0,
                  max_time_delta=datetime.timedelta(minutes=1)):
-        """Initializes the store given a path to a store. 
-        
+        """Initializes the store given a path to a store.
+
         Parameters
-        ----------        
+        ----------
         event_manager : Event Manager instance
-            This is used to emit suitable events.        
+            This is used to emit suitable events.
         path : str:
             A path to the root of the file system store.
         force_lock_timeout: float
@@ -177,7 +175,7 @@ class LockingFileSystemStore(FileSystemStore):
             The maximum permissible timedelta between different clients.
             This value is used to return the keys in a query_key when the
             parameters are ``last_modified__gte=timedelta`` , in this case the
-            max_time_delta is subtracted from the given query timedelta. 
+            max_time_delta is subtracted from the given query timedelta.
 
         """
         super(LockingFileSystemStore, self).__init__(path, magic_fname)
@@ -231,17 +229,17 @@ class LockingFileSystemStore(FileSystemStore):
 
     def query(self, select=None, **kwargs):
         """ Query for keys and metadata matching metadata provided as keyword arguments
-        
+
         This provides a very simple querying interface that returns precise
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of metadata for the key-value store.
-        
+
         Parameters
         ----------
         select : iterable of strings or None
             An optional list of metadata keys to return.  If this is not None,
             then the metadata dictionaries will only have values for the specified
-            keys populated.        
+            keys populated.
         kwargs :
             Arguments where the keywords are metadata keys, and values are
             possible values for that metadata item.
@@ -253,7 +251,7 @@ class LockingFileSystemStore(FileSystemStore):
             all the specified values for the specified metadata keywords.
             If a key specified in select is not present in the metadata of a
             particular key, then it will not be present in the returned value.
-        
+
         """
         all_metadata = glob.glob(os.path.join(self._root, '*.metadata'))
         items = [(os.path.splitext(os.path.basename(x))[0], x) for x in all_metadata]
@@ -270,17 +268,17 @@ class LockingFileSystemStore(FileSystemStore):
                 metadata = self._get_metadata(path)
                 if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                     yield key, metadata.copy()
-    
+
     def query_keys(self, **kwargs):
         """ Query for keys matching metadata provided as keyword arguments
-        
+
         This provides a very simple querying interface that returns precise
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of keys for the key-value store.
-        
+
         This is equivalent to ``self.query(**kwargs).keys()``, but potentially
         more efficiently implemented.
-        
+
         Parameters
         ----------
         kwargs :
@@ -292,7 +290,7 @@ class LockingFileSystemStore(FileSystemStore):
         result : iterable
             An iterable of key-value store keys whose metadata matches all the
             specified values for the specified metadata keywords.
-        
+
         """
         # Optimize for special cases.
         basename = os.path.basename
@@ -324,7 +322,7 @@ class LockingFileSystemStore(FileSystemStore):
 
         """
         timestamp = since
-        if isinstance(timestamp, string_types):
+        if isinstance(timestamp, str):
             ISO_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
             timestamp = datetime.datetime.strptime(timestamp, ISO_FORMAT)
         timestamp -= self._max_time_delta
@@ -534,4 +532,3 @@ class LockingFileSystemStore(FileSystemStore):
 
     def __del__(self):
         self._remote_poll_thread = None
-
