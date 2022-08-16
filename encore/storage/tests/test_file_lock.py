@@ -31,14 +31,14 @@ def cleanup_files():
 class FileLockTest(unittest.TestCase):
 
     def setUp(self):
-        _, self.path = tempfile.mkstemp(
+        self.fd, self.path = tempfile.mkstemp(
             suffix='share', dir=tempfile.gettempdir()
         )
         self.lock = FileLock(self.path)
 
     def tearDown(self):
-        if os.path.exists(self.path):
-            os.remove(self.path)
+        os.close(self.fd)
+        os.remove(self.path)
 
     # This is needed to clean up stray lock file in case of killing a test run.
     # Note: tempnam seems buggy on Windows msys system; existing filenames are
@@ -85,7 +85,7 @@ class FileLockTest(unittest.TestCase):
         self.assertTrue(self.lock.locked())
         lock2.release()
         self.assertFalse(self.lock.locked())
-        
+
     def test_data(self):
         self.lock = FileLock(self.path, data=b"%i\n" % os.getpid())
         self.lock.acquire()
