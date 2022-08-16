@@ -2,10 +2,10 @@
 # All rights reserved.
 
 import os.path
+import runpy
 from setuptools import setup, find_packages
 
 encore_init = os.path.join('encore', '__init__.py')
-import runpy
 d = runpy.run_path(encore_init)
 
 setup(
