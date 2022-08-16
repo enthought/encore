@@ -17,7 +17,7 @@ This class is provided in part as a sample implementation of the API.
 
 """
 
-from six import BytesIO
+from io import BytesIO
 import time
 
 from .abstract_store import AbstractStore
@@ -31,28 +31,28 @@ from .events import StoreUpdateEvent, StoreSetEvent, StoreDeleteEvent
 
 class DictMemoryStore(AbstractStore):
     """ Dictionary-based in-memory Store
-    
+
     This is a simple implementation of the key-value store API that lives entirely
     in memory.  This uses a dictionary of StringValue objects to store all
     relevant information about an object - data and metadata are stored in
     private attributes.
 
     The streams returned by data methods are cStringIO.StringIO objects.
-    
+
     Parameters
     ----------
     event_manager :
         An object which implements the :py:class:`~.abstract_event_manager.BaseEventManager` API.
 
     """
-    
+
     def __init__(self):
         super(DictMemoryStore, self).__init__()
         self._store = {}
-    
+
     def connect(self, credentials=None):
         """ Connect to the key-value store
-        
+
         Parameters
         ----------
         credentials : None
@@ -61,11 +61,11 @@ class DictMemoryStore(AbstractStore):
 
         """
         self._connected = True
-    
-    
+
+
     def disconnect(self):
         """ Disconnect from the key-value store
-        
+
         This store does not authenticate, and has no external resources, so this
         does nothing
 
@@ -75,7 +75,7 @@ class DictMemoryStore(AbstractStore):
 
     def is_connected(self):
         """ Whether or not the store is currently connected
-        
+
         Returns
         -------
         connected : bool
@@ -84,10 +84,10 @@ class DictMemoryStore(AbstractStore):
         """
         return self._connected
 
-    
+
     def info(self):
         """ Get information about the key-value store
-        
+
         Returns
         -------
         metadata : dict
@@ -97,17 +97,17 @@ class DictMemoryStore(AbstractStore):
         return {
             'readonly': False
         }
-    
-    
+
+
     def get(self, key):
         """ Retrieve a stream of data and metdata from a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         data : file-like
@@ -115,7 +115,7 @@ class DictMemoryStore(AbstractStore):
             key-value store
         metadata : dictionary
             A dictionary of metadata for the key.
-        
+
         Raises
         ------
         KeyError :
@@ -123,14 +123,14 @@ class DictMemoryStore(AbstractStore):
 
         """
         return StringValue(*self._store[key])
-    
-    
+
+
     def set(self, key, value, buffer_size=1048576):
         """ Store a stream of data into a given key in the key-value store.
-        
+
         This may be left unimplemented by subclasses that represent a read-only
         key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -144,7 +144,7 @@ class DictMemoryStore(AbstractStore):
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
             default if they need to.  The default is 1048576 bytes (1 MiB).
-        
+
         Events
         ------
         StoreProgressStartEvent :
@@ -159,7 +159,7 @@ class DictMemoryStore(AbstractStore):
         StoreSetEvent :
             On successful completion of a transaction, a StoreSetEvent should be
             emitted with the key & metadata
-     
+
         """
         if isinstance(value, tuple):
             data_stream, metadata = value
@@ -173,7 +173,7 @@ class DictMemoryStore(AbstractStore):
         progress = StoreProgressManager(source=self, steps=steps,
                 message="Setting data into '%s'" % (key,), key=key,
                 metadata=metadata)
-                
+
         with progress:
             chunks = buffer_iterator(data_stream, buffer_size, progress)
             data = b''.join(chunks)
@@ -184,7 +184,7 @@ class DictMemoryStore(AbstractStore):
             else:
                 created = modified = time.time()
             self._store[key] = (data, metadata, created, modified)
-        
+
         if update:
             self.event_manager.emit(StoreUpdateEvent(self, key=key,
                 metadata=metadata))
@@ -195,53 +195,53 @@ class DictMemoryStore(AbstractStore):
 
     def delete(self, key):
         """ Delete a key from the repsository.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Events
         ------
         StoreDeleteEvent :
             On successful completion of a transaction, a StoreDeleteEvent should
             be emitted with the key.
-        
+
         """
         metadata = self._store[key][1]
         del self._store[key]
         self.event_manager.emit(StoreDeleteEvent(self, key=key,
             metadata=metadata))
-    
-    
+
+
     def exists(self, key):
         """ Test whether or not a key exists in the key-value store
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         exists : bool
             Whether or not the key exists in the key-value store.
-        
+
         """
         return key in self._store
 
 
     def get_data(self, key):
         """ Retrieve a stream from a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         data : file-like
@@ -254,7 +254,7 @@ class DictMemoryStore(AbstractStore):
 
     def get_metadata(self, key, select=None):
         """ Retrieve the metadata for a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -263,13 +263,13 @@ class DictMemoryStore(AbstractStore):
         select : iterable of strings or None
             Which metadata keys to populate in the result.  If unspecified, then
             return the entire metadata dictionary.
-        
+
         Returns
         -------
         metadata : dict
             A dictionary of metadata associated with the key.  The dictionary
             has keys as specified by the metadata_keys argument.
-        
+
         Raises
         ------
         KeyError :
@@ -283,14 +283,14 @@ class DictMemoryStore(AbstractStore):
             return dict((metadata_key, metadata[metadata_key])
                 for metadata_key in select if metadata_key in metadata)
         return metadata.copy()
-    
-    
+
+
     def set_data(self, key, data, buffer_size=1048576):
         """ Replace the data for a given key in the key-value store.
-        
+
         If the key does not already exist, it tacitly creates an empty metadata
         object.
-        
+
         Parameters
         ----------
         key : string
@@ -323,14 +323,14 @@ class DictMemoryStore(AbstractStore):
         metadata = self._store.get(key, (None, {}))[1]
         self.set(key, (data, metadata))
 
-        
+
     def set_metadata(self, key, metadata):
         """ Set new metadata for a given key in the key-value store.
-        
+
         This replaces the existing metadata set for the key with a new set of
         metadata.  If the key does not already exist, it tacitly creates an
         empty data object.
-        
+
         Parameters
         ----------
         key : string
@@ -353,10 +353,10 @@ class DictMemoryStore(AbstractStore):
 
     def update_metadata(self, key, metadata):
         """ Update the metadata for a given key in the key-value store.
-        
+
         This performs a dictionary update on the existing metadata with the
         provided metadata keys and values
-        
+
         Parameters
         ----------
         key : string
@@ -374,13 +374,13 @@ class DictMemoryStore(AbstractStore):
 
         """
         self._store[key][1].update(metadata)
-   
-      
+
+
     def transaction(self, notes):
         """ Provide a transaction context manager
-        
+
         This class does not support transactions, so it returns a dummy object.
-        
+
         Parameters
         ----------
         notes : string
@@ -393,11 +393,11 @@ class DictMemoryStore(AbstractStore):
 
     def query(self, select=None, **kwargs):
         """ Query for keys and metadata matching metadata provided as keyword arguments
-        
+
         This provides a very simple querying interface that returns precise
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of metadata for the key-value store.
-        
+
         Parameters
         ----------
         select : iterable of strings or None
@@ -413,7 +413,7 @@ class DictMemoryStore(AbstractStore):
         result : iterable
             An iterable of keys, metadata tuples where metadata matches
             all the specified values for the specified metadata keywords.
-        
+
         """
         if select is not None:
             for key, value in self._store.items():
@@ -426,18 +426,18 @@ class DictMemoryStore(AbstractStore):
                 metadata = value[1]
                 if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                     yield key, metadata.copy()
-    
-    
+
+
     def query_keys(self, **kwargs):
         """ Query for keys matching metadata provided as keyword arguments
-        
+
         This provides a very simple querying interface that returns precise
         matches with the metadata.  If no arguments are supplied, the query
         will return the complete set of keys for the key-value store.
-        
+
         This is equivalent to ``self.query(**kwargs).keys()``, but potentially
         more efficiently implemented.
-        
+
         Parameters
         ----------
         kwargs :
@@ -449,17 +449,17 @@ class DictMemoryStore(AbstractStore):
         result : iterable
             An iterable of key-value store keys whose metadata matches all the
             specified values for the specified metadata keywords.
-        
+
         """
         for key, value in self._store.items():
             metadata = value[1]
             if all(metadata.get(arg) == value for arg, value in kwargs.items()):
                 yield key
 
-        
+
     def to_file(self, key, path, buffer_size=1048576):
         """ Efficiently store the data associated with a key into a file.
-        
+
         Parameters
         ----------
         key : string
@@ -469,17 +469,17 @@ class DictMemoryStore(AbstractStore):
             A file system path to store the data to.
         buffer_size : int
             This is ignored.
-        
+
         """
         with open(path, 'wb') as fp:
             fp.write(self._store[key][0])
-    
-    
+
+
     def from_file(self, key, path, buffer_size=1048576):
         """ Efficiently read data from a file into a key in the key-value store.
-        
+
         This makes no attempt to set metadata.
-                
+
         Parameters
         ----------
         key : string
@@ -489,14 +489,14 @@ class DictMemoryStore(AbstractStore):
             A file system path to read the data from.
         buffer_size : int
             This is ignored.
-        
+
         """
         with open(path, 'rb') as fp:
             self.set(key, StringValue(fp.read()))
 
     def to_bytes(self, key, buffer_size=1048576):
         """ Efficiently store the data associated with a key into a bytes object.
-        
+
         Parameters
         ----------
         key : string
@@ -504,15 +504,15 @@ class DictMemoryStore(AbstractStore):
             identifier for the resource within the key-value store.
         buffer_size : int
             This is ignored.
-        
+
         """
         return self._store[key][0]
-        
+
     def from_bytes(self, key, data, buffer_size=1048576):
         """ Efficiently read data from a bytes object into a key in the key-value store.
-        
+
         This makes no attempt to set metadata.
-                
+
         Parameters
         ----------
         key : string
@@ -522,6 +522,6 @@ class DictMemoryStore(AbstractStore):
             The data as a bytes object.
         buffer_size : int
             This is ignored.
-        
+
         """
         self.set(key, StringValue(data))

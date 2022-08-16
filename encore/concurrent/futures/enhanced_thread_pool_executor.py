@@ -32,13 +32,12 @@ in future implementations of concurrent.futures.thread.
 
 """
 
-from __future__ import with_statement
 import atexit
 import itertools
+import queue
 import threading
 import weakref
 import time
-from six.moves import queue
 
 from concurrent.futures import _base
 
@@ -238,9 +237,9 @@ class EnhancedThreadPoolExecutor(_base.Executor):
         Raises:
             TimeoutError: If the entire result iterator could not be generated
                 before the given timeout.
-                
+
             Exception: If fn(\*args) raises for any values.
-            
+
         """
         timeout = kwargs.get('timeout')
         if timeout is not None:

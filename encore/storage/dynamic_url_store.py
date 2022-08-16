@@ -22,7 +22,7 @@ HTTP operations.
 from email.utils import parsedate_tz, mktime_tz
 import json
 
-from six.moves.urllib.parse import quote
+from urllib.parse import quote
 
 import requests
 

@@ -15,9 +15,7 @@ Utilities for key-value stores.
 
 import sys
 import itertools
-
-import six
-from six import create_bound_method
+from types import MethodType
 
 from encore.events.api import ProgressManager
 from .events import (StoreTransactionStartEvent, StoreTransactionEndEvent,
@@ -42,9 +40,9 @@ def add_context_manager_support(obj):
         pass
 
     if not hasattr(obj, '__enter__'):
-        obj.__enter__ = create_bound_method(__enter__, obj)
+        obj.__enter__ = MethodType(__enter__, obj)
     if not hasattr(obj, '__exit__'):
-        obj.__exit__ = create_bound_method(__exit__, obj)
+        obj.__exit__ = MethodType(__exit__, obj)
 
     return obj
 

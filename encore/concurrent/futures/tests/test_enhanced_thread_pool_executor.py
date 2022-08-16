@@ -7,8 +7,6 @@ import time
 import unittest
 import weakref
 
-from six.moves import xrange
-
 from concurrent import futures
 from concurrent.futures._base import (
     PENDING, RUNNING, CANCELLED, CANCELLED_AND_NOTIFIED, FINISHED, Future)
@@ -124,7 +122,7 @@ class EnhancedThreadPoolShutdownTest(EnhancedThreadPoolMixin, unittest.TestCase)
 
     def test_interpreter_shutdown(self):
         # Test the atexit hook for shutdown of worker threads and processes
-        rc, out, err = assert_python_ok('-c', """from __future__ import print_function
+        rc, out, err = assert_python_ok('-c', """\
 if 1:
     from encore.concurrent.futures.enhanced_thread_pool_executor import EnhancedThreadPoolExecutor
     from time import sleep
@@ -373,7 +371,7 @@ class EnhancedThreadPoolExecutorTest(EnhancedThreadPoolMixin, unittest.TestCase)
         executor = EnhancedThreadPoolExecutor(max_workers=5)
         with executor as e:
             # Start some threads.
-            for _ in xrange(10):
+            for _ in range(10):
                 e.submit(pow, 2, 2)
             expected_prefix = "{0}Worker-".format(type(e).__name__)
             for t in e._threads:
@@ -392,7 +390,7 @@ class EnhancedThreadPoolExecutorTest(EnhancedThreadPoolMixin, unittest.TestCase)
         with executor as e:
             self.assertEqual(e.name, "DeadParrotExecutioner")
             # Start some threads.
-            for _ in xrange(10):
+            for _ in range(10):
                 e.submit(pow, 2, 2)
             expected_prefix = "DeadParrotExecutionerWorker-"
             for t in e._threads:

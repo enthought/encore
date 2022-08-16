@@ -12,13 +12,10 @@ from tempfile import mkdtemp
 import time
 from unittest import TestCase
 
-import six
-
 from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..sqlite_store import SqliteStore
 
-if six.PY3:
-    buffer = sqlite3.Binary
+buffer = sqlite3.Binary
 
 class SqliteStoreReadTest(TestCase, StoreReadTestMixin):
 

@@ -5,19 +5,16 @@
 # This file is open source software distributed according to the terms in LICENSE.txt
 #
 
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+import itertools
 import json
 import os
 from shutil import rmtree
+import socketserver
 from tempfile import mkdtemp
 import threading
 from unittest import TestCase
-
-
-from six import itertools, next
-from six.moves import urllib
-from six.moves import socketserver as SocketServer
-from six.moves.BaseHTTPServer import HTTPServer
-from six.moves.SimpleHTTPServer import SimpleHTTPRequestHandler
+import urllib
 
 from .abstract_test import StoreReadTestMixin, StoreWriteTestMixin
 from ..static_url_store import StaticURLStore
@@ -111,7 +108,7 @@ class StaticURLStoreReadTest(TestCase, StoreReadTestMixin):
         with open(os.path.join(self.path, filename), 'wb') as fp:
             fp.write(data.encode('ascii'))
 
-class ThreadedHTTPServer(SocketServer.ThreadingMixIn, HTTPServer):
+class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
     pass
 
 class StaticURLStoreHTTPReadTest(StaticURLStoreReadTest):

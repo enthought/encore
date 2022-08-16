@@ -7,7 +7,7 @@
 
 from email.utils import parsedate_tz, mktime_tz
 
-from six.moves import urllib
+import urllib
 
 
 from .abstract_store import Value, AuthorizationError
