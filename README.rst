@@ -1,14 +1,6 @@
 ====================================================
-EnCore - A collection of core-level utility modules
+Encore - A collection of core-level utility modules
 ====================================================
-
-.. image:: https://api.travis-ci.org/enthought/encore.png?branch=master
-   :target: https://travis-ci.org/enthought/encore
-   :alt: Build status
-
-.. image:: https://coveralls.io/repos/enthought/encore/badge.png?branch=master
-   :target: https://coveralls.io/r/enthought/encore
-   :alt: Coverage status
 
 This package consists of a collection of core utility packages useful for
 building Python applications.  This package is intended to be at the
@@ -34,15 +26,11 @@ systems.
 Prerequisites
 -------------
 
-* Python >= 2.7 or Python >= 3.4
+* Python >= 3.6
 
-* Sphinx, graphviz, pydot (documentation build)
+* Sphinx, graphviz, sphinx_copybutton, enthought_sphinx_theme
+  (documentation build)
 
 * Some optional modules have dependencies on:
 
-  - Requests (http://docs.python-requests.org/en/latest/)
-
-  - Futures (https://code.google.com/p/pythonfutures/)
-
-
-.. |build_status| image:: https://travis-ci.org/enthought/encore.png
+  - Requests (https://requests.readthedocs.io/en/latest/)
