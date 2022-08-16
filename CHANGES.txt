@@ -17,6 +17,7 @@ Changes
 * Migrated CI from Travis CI and Appveyor to GitHub Actions. (#115)
 * Updated copyright headers. (#116)
 * Modernised build machinery. (#117)
+* Updated documentation to use the Enthought Sphinx Theme. (#119)
 
 0.7.0
 -----
