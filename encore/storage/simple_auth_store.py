@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2012 Enthought, Inc., Austin, TX
+# (C) Copyright 2011-2022 Enthought, Inc., Austin, TX
 # All right reserved.
 #
 # This file is open source software distributed according to the terms in LICENSE.txt
@@ -37,7 +37,7 @@ def sha1_hasher(s):
 
 def make_encoder(salt, hasher=None):
     """ Create a moderately secure salted encoder
-    
+
     Parameters
     ----------
     salt : bytes
@@ -61,13 +61,13 @@ def make_encoder(salt, hasher=None):
 
 class SimpleAuthStore(AbstractStore):
     """ A key-value store that wraps another store and implements simple authentication
-    
+
     This wraps an existing store with no notion of authentication and provides
     simple username/password authentication, storing a hash of the password in
     the wrapped store.
-    
-    The base implementation has all-or-nothing 
-    
+
+    The base implementation has all-or-nothing
+
     Parameters
     ----------
     event_manager :
@@ -83,7 +83,7 @@ class SimpleAuthStore(AbstractStore):
         the user's password.
     user_key_store : AbstractStore instance
         The store to store the user keys in.  Defaults to the wrapped store.
-        
+
     """
     def __init__(self, store, encoder, user_key_path='.user_', user_key_store=None):
         super(SimpleAuthStore, self).__init__()
@@ -91,39 +91,39 @@ class SimpleAuthStore(AbstractStore):
         self.encoder = encoder
         self.user_key_path = user_key_path
         self.user_key_store = store if user_key_store is None else user_key_store
-        
+
         self._username = None
         self._token = None
         self._connected = False
 
-                                
+
     def connect(self, credentials=None):
         """ Connect to the key-value store, optionally with authentication
-        
+
         This method creates or connects to any long-lived resources that the
         store requires.
-        
+
         Parameters
         ----------
         credentials :
             A dictionary with keys 'username' and 'password'.
-            
+
         """
         self._username = credentials['username']
         # We only support utf-8 encoded byte strings for the encoding
         self._token = self.encoder(credentials['password'].encode('utf-8'))
-        
+
         if 'connect' not in self.check_permissions():
             raise AuthenticationError('User "%s" is not authenticated for connection' % self._username)
         self._connected = True
-        
-        
+
+
     def disconnect(self):
         """ Disconnect from the key-value store
-        
+
         This method disposes or disconnects to any long-lived resources that the
         store requires.
-        
+
         """
         self._connected = False
         self._token = None
@@ -132,7 +132,7 @@ class SimpleAuthStore(AbstractStore):
 
     def is_connected(self):
         """ Whether or not the store is currently connected
-        
+
         Returns
         -------
         connected : bool
@@ -141,10 +141,10 @@ class SimpleAuthStore(AbstractStore):
         """
         return self._connected
 
-    
+
     def info(self):
         """ Get information about the key-value store
-        
+
         Returns
         -------
         metadata : dict
@@ -154,20 +154,20 @@ class SimpleAuthStore(AbstractStore):
             'readonly': self.store.info.get('readonly', True),
         }
 
-        
+
     ##########################################################################
     # Basic Create/Read/Update/Delete Methods
     ##########################################################################
 
     def get(self, key):
         """ Retrieve a stream of data and metdata from a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         data : file-like
@@ -175,7 +175,7 @@ class SimpleAuthStore(AbstractStore):
             key-value store
         metadata : dictionary
             A dictionary of metadata for the key.
-        
+
         Raises
         ------
         KeyError :
@@ -194,13 +194,13 @@ class SimpleAuthStore(AbstractStore):
         else:
             raise KeyError(key)
 
-    
+
     def set(self, key, value, buffer_size=1048576):
         """ Store a stream of data into a given key in the key-value store.
-        
+
         This may be left unimplemented by subclasses that represent a read-only
         key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -214,7 +214,7 @@ class SimpleAuthStore(AbstractStore):
             An optional indicator of the number of bytes to read at a time.
             Implementations are free to ignore this hint or use a different
             default if they need to.  The default is 1048576 bytes (1 MiB).
-        
+
         Events
         ------
         StoreProgressStartEvent :
@@ -234,7 +234,7 @@ class SimpleAuthStore(AbstractStore):
         ------
         AuthenticationError :
             If the user has no rights to set the key, then an Authentication error is raised.
-        
+
         """
         permissions = self.check_permissions(key)
         if 'exists' in permissions:
@@ -245,30 +245,30 @@ class SimpleAuthStore(AbstractStore):
         else:
             raise KeyError(key)
 
-    
+
     def delete(self, key):
         """ Delete a key from the repsository.
-        
+
         This may be left unimplemented by subclasses that represent a read-only
         key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Events
         ------
         StoreDeleteEvent :
             On successful completion of a transaction, a StoreDeleteEvent should
             be emitted with the key.
-        
+
         Raises
         ------
         AuthenticationError :
             If the user has no rights to delete the key, then an Authentication error is raised.
-        
+
         """
         permissions = self.check_permissions(key)
         if 'exists' in permissions:
@@ -279,16 +279,16 @@ class SimpleAuthStore(AbstractStore):
         else:
             raise KeyError(key)
 
-    
+
     def get_data(self, key):
         """ Retrieve a stream from a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         data : file-like
@@ -301,7 +301,7 @@ class SimpleAuthStore(AbstractStore):
             This will raise a key error if the key is not present in the store.
         AuthenticationError :
             If the user has no rights to get the key, then an Authentication error is raised.
-        
+
 
         """
         permissions = self.check_permissions(key)
@@ -313,10 +313,10 @@ class SimpleAuthStore(AbstractStore):
         else:
             raise KeyError(key)
 
-    
+
     def get_metadata(self, key, select=None):
         """ Retrieve the metadata for a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -325,7 +325,7 @@ class SimpleAuthStore(AbstractStore):
         select : iterable of strings or None
             Which metadata keys to populate in the result.  If unspecified, then
             return the entire metadata dictionary.
-        
+
         Returns
         -------
         metadata : dict
@@ -333,14 +333,14 @@ class SimpleAuthStore(AbstractStore):
             has keys as specified by the select argument.  If a key specified in
             select is not present in the metadata, then it will not be present
             in the returned value.
-        
+
         Raises
         ------
         KeyError :
             This will raise a key error if the key is not present in the store.
         AuthenticationError :
             If the user has no rights to get the key, then an Authentication error is raised.
-        
+
         """
         permissions = self.check_permissions(key)
         if 'exists' in permissions:
@@ -350,12 +350,12 @@ class SimpleAuthStore(AbstractStore):
                 raise AuthenticationError('User "%s" is not permitted to get "%s"' % (self._username, key))
         else:
             raise KeyError(key)
-            
 
-    
+
+
     def set_data(self, key, data, buffer_size=1048576):
         """ Replace the data for a given key in the key-value store.
-        
+
         Parameters
         ----------
         key : string
@@ -388,7 +388,7 @@ class SimpleAuthStore(AbstractStore):
         ------
         AuthenticationError :
             If the user has no rights to set the key, then an Authentication error is raised.
-        
+
         """
         permissions = self.check_permissions(key)
         if 'exists' in permissions:
@@ -399,13 +399,13 @@ class SimpleAuthStore(AbstractStore):
         else:
             raise KeyError(key)
 
-    
+
     def set_metadata(self, key, metadata):
         """ Set new metadata for a given key in the key-value store.
-        
+
         This replaces the existing metadata set for the key with a new set of
         metadata.
-        
+
         Parameters
         ----------
         key : string
@@ -425,7 +425,7 @@ class SimpleAuthStore(AbstractStore):
         ------
         AuthenticationError :
             If the user has no rights to set the key, then an Authentication error is raised.
-        
+
         """
         permissions = self.check_permissions(key)
         if 'exists' in permissions:
@@ -436,13 +436,13 @@ class SimpleAuthStore(AbstractStore):
         else:
             raise KeyError(key)
 
-    
+
     def update_metadata(self, key, metadata):
         """ Update the metadata for a given key in the key-value store.
-        
+
         This performs a dictionary update on the existing metadata with the
         provided metadata keys and values
-        
+
         Parameters
         ----------
         key : string
@@ -462,7 +462,7 @@ class SimpleAuthStore(AbstractStore):
         ------
         AuthenticationError :
             If the user has no rights to set the key, then an Authentication error is raised.
-        
+
         """
         permissions = self.check_permissions(key)
         if 'exists' in permissions:
@@ -472,25 +472,25 @@ class SimpleAuthStore(AbstractStore):
                 raise AuthenticationError('User "%s" is not permitted to set "%s"' % (self._username, key))
         else:
             raise KeyError(key)
-            
-    
+
+
     def exists(self, key):
         """ Test whether or not a key exists in the key-value store
-        
+
         If a user does not have 'exists' permissions for this key, then it will
         return ``False``, even if the key exists in the underlying store.
-        
+
         Parameters
         ----------
         key : string
             The key for the resource in the key-value store.  They key is a unique
             identifier for the resource within the key-value store.
-        
+
         Returns
         -------
         exists : bool
             Whether or not the key exists in the key-value store.
-        
+
         """
         permissions = self.check_permissions(key)
         if 'exists' in permissions:
@@ -518,24 +518,24 @@ class SimpleAuthStore(AbstractStore):
 
     def check_permissions(self, key=None):
         """ Return permissions that the user has for the provided key
-        
+
         The default behaviour gives all authenticated users full access to all
         keys.  Subclasses may implement finer-grained controls based on user
         groups or other permissioning systems.
-        
+
         Parameters
         ----------
         key : str or None
             The key which the permissions are being requested for, or the global
             permissions if the key is None.
-        
+
         Returns
         -------
         permissions : set
             A set of strings chosen from 'connect', 'exists', 'get', 'set', and/or
             'delete' which express the permissions that the user has on that
             particular key.
-        
+
         """
         if self._username:
             user_key = self.user_key_path + self._username
