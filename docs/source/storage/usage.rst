@@ -41,7 +41,7 @@ methods::
 In this case datastream is a file-like object that streams bytes::
 
     data = datastream.read()
-    print data
+    print(data)
 
 More likely you will have used some sort of serialization format like XML, JSON
 or YAML to store your data in the document, so instead you can do::
@@ -70,9 +70,9 @@ The metadata stores auxilliary information about the data that is stored in the
 key.  It is a dictionary of reasonably serializable values (frequently it will
 serialize to JSON or similar format)::
 
-    print 'Document title:', metadata['title']
-    print 'Document author:', metadata['author']
-    print 'Document encoding:', metadata['encoding']
+    print('Document title:', metadata['title'])
+    print('Document author:', metadata['author'])
+    print('Document encoding:', metadata['encoding'])
 
     # checksum
     import hashlib
@@ -110,7 +110,7 @@ key-value store API gives a simple query mechanism that permits this sort of
 matching::
 
     for key, metadata in store.query(author='alibaba', organization='40 Thieves'):
-        print key, ':', metadata['title']
+        print(key, ':', metadata['title'])
 
 This will print the key and title of all documents which have an ``author`` key
 with value ``'alibaba'`` and an ``organization`` key with value ``'40 Thieves'``.
@@ -122,19 +122,19 @@ If all the user is concerned with is which keys match, there is an alternative
 method :py:meth:`~.AbstractReadOnlyStore.query_keys`::
 
     for key in store.query_keys(author='alibaba', organization='40 Thieves'):
-        print key
+        print(key)
 
 To iterate over all the keys in a store, you can simply call :py:meth:`~.AbstractReadOnlyStore.query_keys`
 with no arguments::
 
     for key in store.query_keys():
-        print key
+        print(key)
 
 Finally, as a useful utility, you can use glob-style matching on the keys using
 the :py:meth:`~.AbstractReadOnlyStore.glob` method::
 
     for key in store.glob('*.jpg'):
-        print key
+        print(key)
 
 Writing
 -------
