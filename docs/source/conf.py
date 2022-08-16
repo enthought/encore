@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Encore'
-copyright = '2011-2017, Enthought, Inc.'
+copyright = '2011-2022, Enthought, Inc.'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
