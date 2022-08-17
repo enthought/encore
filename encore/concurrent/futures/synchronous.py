@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2012 Enthought, Inc., Austin, TX
+# (C) Copyright 2011-2022 Enthought, Inc., Austin, TX
 # All right reserved.
 #
 # This file is open source software distributed according to the terms in
@@ -34,7 +34,7 @@ class SynchronousExecutor(Executor):
     the call is complete.  No cancellation of submitted tasks is possible.
 
     """
-   
+
     def __init__(self):
         """ Initializes a new SynchronousExecutor instance."""
         self._shutdown = False
@@ -51,5 +51,3 @@ class SynchronousExecutor(Executor):
     def shutdown(self, wait=True):
         self._shutdown = True
     shutdown.__doc__ = Executor.shutdown.__doc__
-
-    

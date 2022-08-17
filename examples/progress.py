@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2012 Enthought, Inc., Austin, TX
+# (C) Copyright 2011-2022 Enthought, Inc., Austin, TX
 # All right reserved.
 #
 # This file is open source software distributed according to the terms in
@@ -19,17 +19,17 @@ class CosmicRayError(Exception):
 
 class ProgressApplication(object):
     """ A simple application that demonstrates ProgressManagers and ProgressDisplays """
-    
+
     def __init__(self):
         self.display = ProgressDisplay()
-    
+
     def run(self):
         # create some dummy progress bars
         for j in range(10):
             steps = random.randint(0,600)
             known = random.randint(0,4)
             fail_point = random.randint(0, 2400)
-            
+
             # create a progress manager
             progress = ProgressManager(source=self,
                 steps=steps if known else -1,
@@ -48,7 +48,7 @@ class ProgressApplication(object):
 def main():
     app = ProgressApplication()
     app.run()
-    
+
 
 if __name__ == '__main__':
     main()

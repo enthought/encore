@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2012 Enthought, Inc., Austin, TX
+# (C) Copyright 2011-2022 Enthought, Inc., Austin, TX
 # All right reserved.
 #
 # This file is open source software distributed according to the terms in LICENSE.txt
@@ -67,10 +67,10 @@ class FileLock(object):
             have a different lock. If the uid is None, then the id of the
             lock instance is used, which means every lock instance is unique.
         data - str or None
-            The data to add to the lock file that can be used to obtain 
+            The data to add to the lock file that can be used to obtain
             details about the locking process.  If set to None, this adds
             a default set of values as the hostname, pid, username and given
-            uid to the lock file.  This data is also used to check if 
+            uid to the lock file.  This data is also used to check if
             a different process is releasing the lock.
 
         Notes
@@ -94,7 +94,7 @@ class FileLock(object):
         self._open_mode = os.O_CREAT | os.O_EXCL | os.O_RDWR
         if hasattr(os, 'O_BINARY'):
             self._open_mode |= os.O_BINARY
-            
+
         if data is None:
             self._data = b'%s\n%i\n%s\n%i\n%s' % (
                 socket.gethostname().encode('ascii'), os.getpid(),
@@ -214,10 +214,10 @@ class FileLock(object):
                 time.sleep(self.poll_interval)
             else:
                 return True
-                
+
     def get_data(self):
         """Return the data stored in the lock file.
-        
+
         If None is returned the lock has not been acquired.
         """
         try:
@@ -371,4 +371,3 @@ class SharedFileLock(object):
                 else:
                     return False
         return True
-

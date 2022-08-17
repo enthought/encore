@@ -2,7 +2,7 @@
 #  file: refactor_doc.py
 #  License: LICENSE.TXT
 #
-#  Copyright (c) 2011, Enthought, Inc.
+#  Copyright (c) 2011-2022, Enthought, Inc.
 #  All rights reserved.
 #------------------------------------------------------------------------------
 """
@@ -512,7 +512,7 @@ class FunctionDocstring(BaseDocstring):
         if headers is None:
             headers = {'Returns': 'returns', 'Arguments': 'arguments',
                        'Parameters': 'arguments', 'Raises': 'raises',
-                       'Yields': 'returns', 'Notes':'notes', 'Events': 
+                       'Yields': 'returns', 'Notes':'notes', 'Events':
                        'events'}
 
         super(FunctionDocstring, self).__init__(lines, headers, verbose)
