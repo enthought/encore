@@ -1,6 +1,6 @@
 #
 #
-# (C) Copyright 2011 Enthought, Inc., Austin, TX
+# (C) Copyright 2011-2022 Enthought, Inc., Austin, TX
 # All right reserved.
 #
 # This file is open source software distributed according to the terms in LICENSE.txt
@@ -24,24 +24,24 @@ from abc import ABCMeta, abstractmethod
 ###############################################################################
 class BaseEvent(object):
     """ Base class for all events.
-    
+
     Parameters
     ----------
     source : object
         The object which generated the Event.
     kwargs : dict
         Additional Event attributes which will be added to the Event object.
-    
+
     """
 
     def __init__(self, source=None, **kwargs):
         # The source of the event.
         kwargs['source'] = [] if source is None else source
         self.__dict__.update(**kwargs)
-        
+
         # Whether the event has been handled by a listener.
         self._handled = False
-    
+
     def mark_as_handled(self):
         """ Mark the event as handled so subsequent listeners are not notified.
         """
@@ -86,7 +86,7 @@ class BaseEventManager(object):
         filter : dict
             Filters to match for before calling the listener. The listener is
             called only when the event matches all of the filter .
-            
+
             Filter specification:
                 - key: string which is extended (`.` separated) name of an
                        attribute of the event instance.
@@ -101,7 +101,7 @@ class BaseEventManager(object):
 
         Note
         ----
-       
+
         The filtering is added so that future optimizations can be done
         on specific events with large number of handlers. For example there
         should be a fast way to filter key events to specific listeners rather
@@ -124,7 +124,7 @@ class BaseEventManager(object):
         ------
         KeyError :
             if `func` is not already connected.
-            
+
         """
         raise NotImplementedError
 
@@ -144,11 +144,11 @@ class BaseEventManager(object):
 
         Note
         ----
-        
+
         Listeners of superclasses of the event are also called.
         Eg. a :py:class:`BaseEvent` listener will also be notified about any
         derived class events.
-        
+
         """
         raise NotImplementedError
 

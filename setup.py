@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2013 by Enthought, Inc.
+# Copyright (c) 2011-2022 by Enthought, Inc.
 # All rights reserved.
 
 import os.path
