@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# (C) Copyright 2012 Enthought, Inc., Austin, TX
+# (C) Copyright 2011-2022 Enthought, Inc., Austin, TX
 # All right reserved.
 #
 # This file is open source software distributed according to the terms in
@@ -29,7 +29,7 @@ from todo_list import ToDoView, ToDoList
 
 def parsedate(datestring):
     """ Parse a string into a date
-    
+
     This tries to use the parsedatetime package (http://pypi.python.org/pypi/parsedatetime)
     if it is installed, otherwise if falls back to the simple strptime format
     %m/%d/%y.
@@ -51,7 +51,7 @@ def parsedate(datestring):
 
 def parsetime(timestring):
     """ Parse a string into a time
-    
+
     This tries to use the parsedatetime package (http://pypi.python.org/pypi/parsedatetime)
     if it is installed, otherwise if falls back to the simple strptime format
     %H:%M.
@@ -70,41 +70,41 @@ def parsetime(timestring):
         if result in [0, 1]:
             raise ValueError("could not parse '%s' as a date" % timestring)
         return datetime.time(*time_struct[3:6])
-        
+
 
 def _common_arguments(parser):
     """ Setup common arguments that we want all commands to parse """
     parser.add_argument('--store', choices=['file', 'sqlite'], action='store')
     parser.add_argument('--location', action='store')
     parser.add_argument('--date', type=parsedate, default=datetime.date.today(), action='store')
-    
+
 def parse():
     """ Parse commandline arguments """
     parser = argparse.ArgumentParser()
     subparser = parser.add_subparsers()
-    
+
     show_parser = subparser.add_parser('show')
     _common_arguments(show_parser)
     show_parser.set_defaults(func=show)
-    
+
     add_parser = subparser.add_parser('add')
     _common_arguments(add_parser)
     add_parser.add_argument('--time', metavar='TIME', type=parsetime, default=datetime.datetime.now().time(), action='store')
     add_parser.add_argument('--who', type=str, action='store')
     add_parser.add_argument('--where', type=str, action='store')
     add_parser.set_defaults(func=add)
-    
+
     remove_parser = subparser.add_parser('remove')
     _common_arguments(remove_parser)
     remove_parser.add_argument('--time', metavar='TIME', type=parsetime, default=datetime.datetime.now().time(), action='store')
     remove_parser.add_argument('--who', type=str, action='store')
     remove_parser.set_defaults(func=remove)
-        
+
     test_parser = subparser.add_parser('test')
     _common_arguments(test_parser)
     test_parser.set_defaults(func=test)
 
-    return parser.parse_args()    
+    return parser.parse_args()
 
 def main():
     """ Main entrypoint """
