@@ -1,6 +1,24 @@
 Encore Change Log
 =================
 
+0.8.0
+-----
+
+Release date: 2022-08-19
+
+This release brings build and distribution machinery up to date, adds support
+for more recent Python 3 versions, and drops support for Python 2. We no longer
+support Python versions older than 3.6.
+
+Changes
+~~~~~~~
+
+* Removed Python 2 compatibility code. (#115)
+* Migrated CI from Travis CI and Appveyor to GitHub Actions. (#115)
+* Updated copyright headers. (#116)
+* Modernised build machinery. (#117)
+* Updated documentation to use the Enthought Sphinx Theme. (#119)
+
 0.7.0
 -----
 
