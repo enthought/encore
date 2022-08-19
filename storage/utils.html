@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Utils &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../genindex.html" >
+    <link rel="search" title="Search" href="../search.html" >
+    <link rel="top" title="Encore Documentation" href="../index.html" >
+    <link rel="up" title="Storage" href="index.html" >
+    <link rel="next" title="Memory Store" href="dict_memory_store.html" >
+    <link rel="prev" title="Events" href="events.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="index.html" accesskey="U">Storage</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+      <li class="active">
+        <a href="dict_memory_store.html" title="Memory Store"
+           accesskey="N">next</a>
+      </li>
+      <li class="active">
+        <a href="events.html" title="Events"
+           accesskey="P">previous</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <span class="target" id="module-encore.storage.utils"></span><section id="utils">
+<h1>Utils<a class="headerlink" href="#utils" title="Permalink to this heading">¶</a></h1>
+<p>Utilities for key-value stores.</p>
+<section id="file-like-interface-utilities">
+<h2>File-like Interface Utilities<a class="headerlink" href="#file-like-interface-utilities" title="Permalink to this heading">¶</a></h2>
+<p>These utilities help with the management of file-like objects.  In
+particular <a class="reference internal" href="#encore.storage.utils.buffer_iterator" title="encore.storage.utils.buffer_iterator"><code class="xref py py-func docutils literal notranslate"><span class="pre">buffer_iterator()</span></code></a> is of particular use, as it produces
+an iterator which generates chunks of bytes in the file-like object which
+permits memory-efficient streaming of the data.  This is preferred over
+reading in all the data and then processing it if the data is even
+moderately big.</p>
+<p>The <a class="reference internal" href="#encore.storage.utils.BufferIteratorIO" title="encore.storage.utils.BufferIteratorIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferIteratorIO</span></code></a> class is a class whick provides a
+file-like API around a buffer iterator.  This is particularly useful for
+Stores which wrap another store and implementing streaming filters on the
+data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.utils.BufferIteratorIO">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.utils.</span></span><span class="sig-name descname"><span class="pre">BufferIteratorIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterator</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#BufferIteratorIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.BufferIteratorIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>A file-like object based on an iterable of buffers</p>
+<p>This takes an iterator of bytes objects, such as produced by the
+buffer_iterator function, and wraps it in a file-like interface which
+is usable with the store API.</p>
+<p>This uses less memory than a StringIO, at the cost of some flexibility.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>iterator</strong> (<em>iterator of bytes objects</em>) – An iterator that produces a bytes object on each iteration.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.utils.BufferIteratorIO.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#BufferIteratorIO.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.BufferIteratorIO.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read at most buffer_size bytes, returned as a string.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="encore.storage.utils.buffer_iterator">
+<span class="sig-prename descclassname"><span class="pre">encore.storage.utils.</span></span><span class="sig-name descname"><span class="pre">buffer_iterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bytes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#buffer_iterator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.buffer_iterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterator of byte buffers</p>
+<p>The buffers of bytes default to the provided buffer_size.  This is a useful
+method when copying one data stream to another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filelike</strong> (<em>a file-like object</em>) – An object which implements the <code class="xref py py-meth docutils literal notranslate"><span class="pre">read(buffer_size)()</span></code> method.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The number of bytes to read at a time.</p></li>
+<li><p><strong>progress</strong> (<em>callable</em>) – A callback for progress indication.  A StoreProgressManager instance
+inside a <code class="docutils literal notranslate"><span class="pre">with</span></code> block would be appropriate, but anthing that takes a
+<cite>step</cite> parameter which is the total number of bytes read so far will
+work.</p></li>
+<li><p><strong>max_bytes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The maximum number of bytes to return.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="encore.storage.utils.tee">
+<span class="sig-prename descclassname"><span class="pre">encore.storage.utils.</span></span><span class="sig-name descname"><span class="pre">tee</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#tee"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.tee" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clone a filelike stream into n parallel streams</p>
+<p>This uses itertools.tee and buffer iterators, with the corresponding
+cautions about memory usage.  In general it should be more memory efficient
+than pulling everything into memory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filelike</strong> (<em>a file-like object</em>) – An object which implements the <code class="xref py py-meth docutils literal notranslate"><span class="pre">read(buffer_size)()</span></code> method.</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The number of filelike streams to produce.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The number of bytes to read at a time.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="transaction-support">
+<h2>Transaction Support<a class="headerlink" href="#transaction-support" title="Permalink to this heading">¶</a></h2>
+<p>These are two simple context managers for transactions.  The
+<a class="reference internal" href="#encore.storage.utils.DummyTransactionContext" title="encore.storage.utils.DummyTransactionContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">DummyTransactionContext</span></code></a> should be used by Store implementations
+which have no notion of a transaction.  The
+<a class="reference internal" href="#encore.storage.utils.SimpleTransactionContext" title="encore.storage.utils.SimpleTransactionContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleTransactionContext</span></code></a> is a complete transaction manager
+for implementations with begin/commit/rollback semantics.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.utils.DummyTransactionContext">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.utils.</span></span><span class="sig-name descname"><span class="pre">DummyTransactionContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#DummyTransactionContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.DummyTransactionContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dummy class that can be returned by stores which don’t support transactions</p>
+<p>This class guarantees that there is only one transaction object for each
+store instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>store</strong> (<em>key-value store instance</em>) – The store that this transaction context is associated with.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.utils.SimpleTransactionContext">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.utils.</span></span><span class="sig-name descname"><span class="pre">SimpleTransactionContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#SimpleTransactionContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.SimpleTransactionContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple class that adds support for simple transactions</p>
+<p>This is a base class that ensures transactions are appropriately handled in
+terms of nesting and event generation.  Subclasses should override the
+start, commit and rollback methods to perform appropriate implementation-specific
+actions.</p>
+<p>This class correctly handles nested transactions by ensuring that each store
+has precisely one active transaction context and by tracking the number of
+times the context has been entered and exited.  The transaction is only
+committed once the top-level context has exited.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>store</strong> (<em>key-value store instance</em>) – The store that this transaction context is associated with.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.utils.SimpleTransactionContext.begin">
+<span class="sig-name descname"><span class="pre">begin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#SimpleTransactionContext.begin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.SimpleTransactionContext.begin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begin a transaction</p>
+<p>By default, this calls the store’s <code class="docutils literal notranslate"><span class="pre">_begin_transaction</span></code> method.
+Override in subclasses if you need different behaviour.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.utils.SimpleTransactionContext.commit">
+<span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#SimpleTransactionContext.commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.SimpleTransactionContext.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit a transaction</p>
+<p>By default, this calls the store’s <code class="docutils literal notranslate"><span class="pre">_commit_transaction</span></code> method.
+Override in subclasses if you need different behaviour.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.utils.SimpleTransactionContext.rollback">
+<span class="sig-name descname"><span class="pre">rollback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#SimpleTransactionContext.rollback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.SimpleTransactionContext.rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Roll back a transaction</p>
+<p>By default, this calls the store’s <code class="docutils literal notranslate"><span class="pre">_rollback_transaction</span></code> method.
+Override in subclasses if you need different behaviour.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="event-support">
+<h2>Event Support<a class="headerlink" href="#event-support" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.utils.StoreProgressManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.utils.</span></span><span class="sig-name descname"><span class="pre">StoreProgressManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Performing</span> <span class="pre">operation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/utils.html#StoreProgressManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.utils.StoreProgressManager" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../events/progress_events.html#encore.events.progress_events.ProgressManager" title="encore.events.progress_events.ProgressManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">encore.events.progress_events.ProgressManager</span></code></a> subclass that
+generates <a class="reference internal" href="events.html#encore.storage.events.StoreProgressEvent" title="encore.storage.events.StoreProgressEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">encore.storage.events.StoreProgressEvent</span></code></a>
+instances</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.utils.StoreProgressManager.EndEventType">
+<span class="sig-name descname"><span class="pre">EndEventType</span></span><a class="headerlink" href="#encore.storage.utils.StoreProgressManager.EndEventType" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="events.html#encore.storage.events.StoreProgressEndEvent" title="encore.storage.events.StoreProgressEndEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">StoreProgressEndEvent</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.utils.StoreProgressManager.StartEventType">
+<span class="sig-name descname"><span class="pre">StartEventType</span></span><a class="headerlink" href="#encore.storage.utils.StoreProgressManager.StartEventType" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="events.html#encore.storage.events.StoreProgressStartEvent" title="encore.storage.events.StoreProgressStartEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">StoreProgressStartEvent</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.utils.StoreProgressManager.StepEventType">
+<span class="sig-name descname"><span class="pre">StepEventType</span></span><a class="headerlink" href="#encore.storage.utils.StoreProgressManager.StepEventType" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="events.html#encore.storage.events.StoreProgressStepEvent" title="encore.storage.events.StoreProgressStepEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">StoreProgressStepEvent</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Utils</a><ul>
+<li><a class="reference internal" href="#file-like-interface-utilities">File-like Interface Utilities</a></li>
+<li><a class="reference internal" href="#transaction-support">Transaction Support</a></li>
+<li><a class="reference internal" href="#event-support">Event Support</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="events.html"
+                          title="previous chapter">Events</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dict_memory_store.html"
+                          title="next chapter">Memory Store</a></p>
+  </div>
+  <h3>This Page</h3>
+  <div>
+    <a href="../_sources/storage/utils.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

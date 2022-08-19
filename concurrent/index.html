@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Concurrent Package &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../genindex.html" >
+    <link rel="search" title="Search" href="../search.html" >
+    <link rel="top" title="Encore Documentation" href="../index.html" >
+    <link rel="next" title="encore.concurrent Package" href="encore.concurrent.html" >
+    <link rel="prev" title="Simple Authenticating Store" href="../storage/simple_auth_store.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../index.html">Encore Documentation</a></li>
+	 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+      <li class="active">
+        <a href="encore.concurrent.html" title="encore.concurrent Package"
+           accesskey="N">next</a>
+      </li>
+      <li class="active">
+        <a href="../storage/simple_auth_store.html" title="Simple Authenticating Store"
+           accesskey="P">previous</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <section id="concurrent-package">
+<h1>Concurrent Package<a class="headerlink" href="#concurrent-package" title="Permalink to this heading">¶</a></h1>
+<p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">encore.concurrent</span></code> module provides utilities and libraries to
+assist with threaded and other parallel code.</p>
+<p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">encore.concurrent.futures</span></code> subpackage provides an enhanced
+version of the <code class="docutils literal notranslate"><span class="pre">concurrent.futures</span></code> package from the standard library
+with some useful experimental additions.</p>
+<p>The <a class="reference internal" href="encore.concurrent.html#module-encore.concurrent.threadtools" title="encore.concurrent.threadtools"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encore.concurrent.threadtools</span></code></a> module provides some utilities
+that encapsulate useful patterns in threaded code.</p>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="encore.concurrent.html">encore.concurrent Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.html#module-encore.concurrent.threadtools"><code class="xref py py-mod docutils literal notranslate"><span class="pre">threadtools</span></code> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="encore.concurrent.futures.html">encore.concurrent.futures Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#threadpool-executors">ThreadPool Executors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.enhanced_thread_pool_executor"><code class="xref py py-mod docutils literal notranslate"><span class="pre">enhanced_thread_pool_executor</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.synchronous"><code class="xref py py-mod docutils literal notranslate"><span class="pre">synchronous</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.future"><code class="xref py py-mod docutils literal notranslate"><span class="pre">future</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.abc_work_scheduler"><code class="xref py py-mod docutils literal notranslate"><span class="pre">abc_work_scheduler</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.asynchronizer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asynchronizer</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.serializer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">serializer</span></code> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encore.concurrent.futures.html#module-encore.concurrent.futures.serializing_asynchronizer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">serializing_asynchronizer</span></code> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="../py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="../search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h2>
+<p>This software is OSI Certified Open Source Software.
+OSI Certified is a certification mark of the Open Source Initiative.</p>
+<p>Unless otherwise noted:</p>
+<p>Copyright (c) 2011-2022, Enthought, Inc.
+All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.</p></li>
+<li><p>Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.</p></li>
+<li><p>Neither the name of Enthought, Inc. nor the names of its contributors may
+be used to endorse or promote products derived from this software without
+specific prior written permission.</p></li>
+</ul>
+</div></blockquote>
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+</section>
+<section id="util-human-date-module">
+<h2>util.human_date module<a class="headerlink" href="#util-human-date-module" title="Permalink to this heading">¶</a></h2>
+<p>Copyright 2009 Jai Vikram Singh Verma (jaivikram[dot]verma[at]gmail[dot]com)
+Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+“AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied.
+See the License for the specific language governing permissions
+and limitations under the License.</p>
+</section>
+<section id="concurrent-futures-enhanced-thread-pool-executor">
+<h2>concurrent.futures.enhanced_thread_pool_executor<a class="headerlink" href="#concurrent-futures-enhanced-thread-pool-executor" title="Permalink to this heading">¶</a></h2>
+<p>Copyright 2009 Brian Quinlan. All Rights Reserved.
+Licensed to PSF under a Contributor Agreement.</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Concurrent Package</a><ul>
+<li><a class="reference internal" href="#contents">Contents</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#util-human-date-module">util.human_date module</a></li>
+<li><a class="reference internal" href="#concurrent-futures-enhanced-thread-pool-executor">concurrent.futures.enhanced_thread_pool_executor</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../storage/simple_auth_store.html"
+                          title="previous chapter">Simple Authenticating Store</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="encore.concurrent.html"
+                          title="next chapter">encore.concurrent Package</a></p>
+  </div>
+  <h3>This Page</h3>
+  <div>
+    <a href="../_sources/concurrent/index.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

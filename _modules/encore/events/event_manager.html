@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>encore.events.event_manager &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../../../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../../../genindex.html" >
+    <link rel="search" title="Search" href="../../../search.html" >
+    <link rel="top" title="Encore Documentation" href="../../../index.html" >
+    <link rel="up" title="Module code" href="../../index.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../../../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="../../index.html" accesskey="U">Module code</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../../../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../../../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <h1>Source code for encore.events.event_manager</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># (C) Copyright 2011-2022 Enthought, Inc., Austin, TX</span>
+<span class="c1"># All right reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is open source software distributed according to the terms in LICENSE.txt</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot; This module defines an event registry, notification and filtering class.</span>
+
+<span class="sd">The main class of the module is the `EventManager`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Standard library imports.</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">bisect</span>
+<span class="kn">import</span> <span class="nn">heapq</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">MethodType</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="c1"># Logging.</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Local imports</span>
+<span class="kn">from</span> <span class="nn">.abstract_event_manager</span> <span class="kn">import</span> <span class="n">BaseEvent</span><span class="p">,</span> <span class="n">BaseEventManager</span>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Logging Trace Function.</span>
+<span class="c1">###############################################################################</span>
+<span class="k">class</span> <span class="nc">LoggingTracer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A tracer object for event manager to log events.</span>
+
+<span class="sd">    Usage</span>
+<span class="sd">    -----</span>
+<span class="sd">    event_manager.set_trace(LoggingTracer())</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_level</span> <span class="o">=</span> <span class="n">level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_level</span><span class="p">,</span>
+                         <span class="s1">&#39;event_log: </span><span class="si">%s</span><span class="s1">, function: </span><span class="si">%s</span><span class="s1">,</span><span class="se">\n</span><span class="s1">args=</span><span class="si">%s</span><span class="s1">,</span><span class="se">\n</span><span class="s1">kwds=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                         <span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwds</span><span class="p">)</span>
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Notifier classes for callables: lightweight weakref substitutes.</span>
+<span class="c1">###############################################################################</span>
+<span class="k">class</span> <span class="nc">CallableNotifier</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Notifier for general callables, whose strong reference is stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the original listener callable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span>
+
+<span class="k">class</span> <span class="nc">MethodNotifier</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Notifiers for methods, for which weak refs of object is stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">,</span> <span class="s1">&#39;cls&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;_notify&#39;</span><span class="p">,</span> <span class="s1">&#39;_args&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meth</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">meth</span><span class="o">.</span><span class="vm">__func__</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="o">=</span> <span class="n">meth</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">meth</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">notify</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_notify</span> <span class="o">=</span> <span class="n">notify</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_args</span> <span class="o">=</span> <span class="n">args</span>
+
+    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Notify the garbage collection listeners.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_notify</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the original listener method, or None if it no longer exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="n">objc</span> <span class="o">=</span> <span class="n">obj</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">objc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Bound method whose object has been garbage collected.</span>
+            <span class="k">return</span>
+
+        <span class="k">return</span> <span class="n">MethodType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">objc</span><span class="p">)</span>
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># `EventInfo` Private Class.</span>
+<span class="c1">###############################################################################</span>
+<span class="k">class</span> <span class="nc">EventInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A class which manages handling of a single event.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Constructor.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        cls : class</span>
+<span class="sd">            Class of the event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="o">=</span> <span class="bp">cls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_priority_list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># sorted priority list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_priority_info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_listener_filters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filter_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> <span class="c1"># to precompute filters on event emit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disable</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_priority_list_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a listener for the event.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cls : class</span>
+<span class="sd">            The class of events for which the listener is registered.</span>
+
+<span class="sd">        func : callable</span>
+<span class="sd">            A callable to be called when the event is emitted.  The function</span>
+<span class="sd">            should expect one argument which is the event instance which was</span>
+<span class="sd">            emitted.</span>
+
+<span class="sd">        filter : dict</span>
+<span class="sd">            Filters to match for before calling the listener. The listener is</span>
+<span class="sd">            called only when the event matches all of the filter .</span>
+
+<span class="sd">            Filter specification:</span>
+<span class="sd">                - key: string which is extended name of an attribute of the</span>
+<span class="sd">                    event instance. For example string &#39;source.name&#39; will be</span>
+<span class="sd">                    the attribute `event.source.name`</span>
+<span class="sd">                - value: the value of the specified attribute.</span>
+
+<span class="sd">        priority : int</span>
+<span class="sd">            The priority of the listener. Higher priority listeners are called</span>
+<span class="sd">            before lower priority listeners.</span>
+
+<span class="sd">        count : int</span>
+<span class="sd">            A unique integer to break a tie in priority. This is generally</span>
+<span class="sd">            an incremental number assigned by EventManager in order of</span>
+<span class="sd">            registration.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+
+<span class="sd">        Reconnecting an already connected listener will disconnect the</span>
+<span class="sd">        old listener. This may have rammifications in changing the filters</span>
+<span class="sd">        and the priority.</span>
+
+<span class="sd">        The filtering is added so that future optimizations can be done</span>
+<span class="sd">        on specific events with large number of handlers. For example there</span>
+<span class="sd">        should be a fast way to filter key events to specific listeners rather</span>
+<span class="sd">        than iterating through all listeners.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_info</span><span class="p">:</span>
+            <span class="c1"># Ensure a function is connected only once.</span>
+            <span class="c1"># Reconnecting will update its sequence and filters.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_disconnect</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_list_lock</span><span class="p">:</span>
+            <span class="n">sub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_notifier</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listener_deleted</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">filter</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_listener_filters</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">filter</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_filter_keys</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">priority</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">sub</span><span class="p">)</span>
+            <span class="n">bisect</span><span class="o">.</span><span class="n">insort_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_priority_list</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_priority_info</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+
+    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Disconnects a listener from being notified about the event&#39;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        func : callable</span>
+<span class="sd">            The callable which was registered.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">(</span><span class="n">func</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_listener_deleted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_info</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_disconnect</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_list_lock</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_info</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_priority_list</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_info</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_list</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listener_filters</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listener_filters</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get an id as unique key for the function. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MethodType</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__self__</span>
+            <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Unbound method</span>
+                <span class="k">return</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__func__</span><span class="p">),</span><span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Bound method.</span>
+                <span class="k">return</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__func__</span><span class="p">),</span><span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">func</span>
+
+    <span class="k">def</span> <span class="nf">_get_notifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Notify is callable to be called when the bound func&#39;s object</span>
+<span class="sd">        is garbage collected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MethodType</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">notify</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">(</span><span class="n">func</span><span class="p">),)</span>
+            <span class="k">return</span> <span class="n">MethodNotifier</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CallableNotifier</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">notify</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_listeners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return listeners which will be called on specified event.</span>
+
+<span class="sd">        If ``event`` is None, all listeners are returned.</span>
+<span class="sd">        If ``event`` is an event, only listeners which will be called for the</span>
+<span class="sd">        event are returned (satisfying any filters on the listeners).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_list_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">event</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listener_filters</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_list</span><span class="p">[:]</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">l_filter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listener_filters</span>
+            <span class="k">for</span> <span class="n">linfo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_list</span><span class="p">:</span>
+                <span class="n">listener</span> <span class="o">=</span> <span class="n">linfo</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">(</span><span class="n">listener</span><span class="p">())</span>
+                <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">l_filter</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">l_filter</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">attr</span> <span class="o">=</span> <span class="n">event</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="c1"># Get extended attributes of the event.</span>
+                            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+                                <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">part</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Error filtering listener: </span><span class="si">%s</span><span class="s1">; </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                                        <span class="n">linfo</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                            <span class="k">break</span>
+                        <span class="k">if</span> <span class="n">attr</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                            <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">linfo</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">linfo</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span> <span class="nf">disable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Disable the event from generating notifications.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disable</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">enable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Enable the event again to generate notifications.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_disable</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">is_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check if the event is enabled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_disable</span>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># `EventManager` Class.</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="EventManager"><a class="viewcode-back" href="../../../events/event_manager.html#encore.events.event_manager.EventManager">[docs]</a><span class="k">class</span> <span class="nc">EventManager</span><span class="p">(</span><span class="n">BaseEventManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A single registry point for all application events.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># store the length of the BaseEvent&#39;s __mro__</span>
+    <span class="n">bmro_clip</span> <span class="o">=</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">BaseEvent</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trace_func</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1">###########################################################################</span>
+    <span class="c1"># `EventManager` Interface</span>
+    <span class="c1">###########################################################################</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Register an event with the event manager.</span>
+
+<span class="sd">        Calling this is not generally nececssary. An event is automatically</span>
+<span class="sd">        registered the first time a listener connects to it.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        cls : str</span>
+<span class="sd">            The ``class`` of the event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Event </span><span class="si">{0}</span><span class="s1"> already registered&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">EventInfo</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EventManager.connect"><a class="viewcode-back" href="../../../events/event_manager.html#encore.events.event_manager.EventManager.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add a listener for the event.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cls : class</span>
+<span class="sd">            The class of events for which the listener is registered.</span>
+
+<span class="sd">        func : callable</span>
+<span class="sd">            A callable to be called when the event is emitted.  The function</span>
+<span class="sd">            should expect one argument which is the event instance which was</span>
+<span class="sd">            emitted.</span>
+
+<span class="sd">        filter : dict</span>
+<span class="sd">            Filters to match for before calling the listener. The listener is</span>
+<span class="sd">            called only when the event matches all of the filter .</span>
+
+<span class="sd">            Filter specification:</span>
+<span class="sd">                - key: string which is name of an attribute of the event instance.</span>
+<span class="sd">                - value: the value of the specified attribute.</span>
+
+<span class="sd">        priority : int</span>
+<span class="sd">            The priority of the listener. Higher priority listeners are called</span>
+<span class="sd">            before lower priority listeners.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+
+<span class="sd">        Reconnecting an already connected listener will disconnect the</span>
+<span class="sd">        old listener. This may have rammifications in changing the filters</span>
+<span class="sd">        and the priority.</span>
+
+<span class="sd">        The filtering is added so that future optimizations can be done</span>
+<span class="sd">        on specific events with large number of handlers. For example there</span>
+<span class="sd">        should be a fast way to filter key events to specific listeners rather</span>
+<span class="sd">        than iterating through all listeners.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_func</span><span class="p">(</span><span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">,</span>
+                                <span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">priority</span><span class="p">)):</span>
+                <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">priority</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="EventManager.disconnect"><a class="viewcode-back" href="../../../events/event_manager.html#encore.events.event_manager.EventManager.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Disconnects a listener from being notified about the event&#39;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cls : class</span>
+<span class="sd">            The class of events for which the listener is registered.</span>
+<span class="sd">        func : callable</span>
+<span class="sd">            The callable which was registered for that class.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            if `func` is not already connected.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_func</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">,</span>
+                                <span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">)):</span>
+                <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">func</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EventManager.emit"><a class="viewcode-back" href="../../../events/event_manager.html#encore.events.event_manager.EventManager.emit">[docs]</a>    <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Notifies all listeners about the event with the specified arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : instance of :py:class:`BaseEvent`</span>
+<span class="sd">            The :py:class:`BaseEvent` instance to emit.</span>
+<span class="sd">        block : bool</span>
+<span class="sd">            Whether to block the call until the event handling is finished.</span>
+<span class="sd">            If block is False, the event will be emitted in a separate thread</span>
+<span class="sd">            and the thread will be returned, so you can later query its status</span>
+<span class="sd">            or do ``wait()`` on the thread.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+
+<span class="sd">        Listeners of superclasses of the event are also called.</span>
+<span class="sd">        Eg. a :py:class:`BaseEvent` listener will also be notified about any</span>
+<span class="sd">        derived class events.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">block</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                                 <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Event emit: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">event</span><span class="p">))</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">t</span>
+
+        <span class="n">trace_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_func</span>
+        <span class="k">if</span> <span class="n">trace_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">trace_func</span><span class="p">(</span><span class="s1">&#39;emit&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">,</span> <span class="p">(</span><span class="n">event</span><span class="p">,)):</span>
+                <span class="k">return</span>
+
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="n">listeners</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_listeners</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
+
+        <span class="n">event</span><span class="o">.</span><span class="n">pre_emit</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">listener</span> <span class="ow">in</span> <span class="n">listeners</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">trace_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">trace_func</span><span class="p">(</span><span class="s1">&#39;listen&#39;</span><span class="p">,</span> <span class="n">listener</span><span class="p">,</span> <span class="p">(</span><span class="n">event</span><span class="p">,)):</span>
+                        <span class="k">continue</span>
+                <span class="n">listener</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Exception </span><span class="si">{0}</span><span class="s1"> occurred in listener: </span><span class="si">{1}</span><span class="s1"> for &#39;</span>
+                    <span class="s1">&#39;event: </span><span class="si">{2}</span><span class="s1">:</span><span class="se">\n</span><span class="si">{3}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">listener</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span>
+                                              <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">_handled</span><span class="p">:</span>
+                <span class="c1"># Only enable when debugging -- very slow even if it doesn&#39;t get emitted because</span>
+                <span class="c1"># it must still do the string formatting.</span>
+                <span class="c1">#logger.debug(&#39;Event: {0} handled by listener: {1}&#39;.format(</span>
+                <span class="c1">#                                        event, listener))</span>
+                <span class="k">break</span>
+
+        <span class="n">event</span><span class="o">.</span><span class="n">post_emit</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">get_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns an ``EventInfo`` instance for the event.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cls : class</span>
+<span class="sd">            The class of the event we want the ``EventInfo`` for.</span>
+<span class="sd">            If ``cls`` is ``None``, then all known event types are returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        event_info :</span>
+<span class="sd">            An ``EventInfo`` instance for the class, or a dictionary mapping</span>
+<span class="sd">            classes to ``EventInfo`` instances.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_listeners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return listeners which will be called on specified event.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        event : event instance or class</span>
+<span class="sd">            The event we want to get the listeners for.</span>
+<span class="sd">            If ``event`` is an instance of BaseEvent(), the listeners which will</span>
+<span class="sd">            be called for the event are returned (satisfying any filters on the</span>
+<span class="sd">            listeners).</span>
+
+<span class="sd">            If ``event`` is BaseEvent subclass, all listeners for specified event</span>
+<span class="sd">            class are returned (but no filtering is performed).</span>
+
+<span class="sd">        cls : BaseEvent subclass</span>
+<span class="sd">            ``cls`` argument is generally not needed, it is for internal use.</span>
+<span class="sd">            If ``cls`` is specified as a subclass of ``BaseEvent``, then only</span>
+<span class="sd">            listeners for the specified event class and superclasses are</span>
+<span class="sd">            returned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">evt_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span>
+        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">BaseEvent</span><span class="p">):</span>
+                <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">cls</span> <span class="o">=</span> <span class="n">event</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_event_hierarchy</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">listeners</span> <span class="o">=</span> <span class="n">heapq</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">evt_map</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span><span class="o">.</span><span class="n">get_listeners</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+                                    <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">classes</span> <span class="k">if</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">evt_map</span><span class="p">])</span>
+        <span class="n">listeners</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">listeners</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">listeners</span>
+
+<div class="viewcode-block" id="EventManager.disable"><a class="viewcode-back" href="../../../events/event_manager.html#encore.events.event_manager.EventManager.disable">[docs]</a>    <span class="k">def</span> <span class="nf">disable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Disable the event from generating notifications.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cls : class</span>
+<span class="sd">            The class of events which we want to disable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span><span class="o">.</span><span class="n">disable</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EventManager.enable"><a class="viewcode-back" href="../../../events/event_manager.html#encore.events.event_manager.EventManager.enable">[docs]</a>    <span class="k">def</span> <span class="nf">enable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Enable the event again to generate notifications.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cls : class</span>
+<span class="sd">            The class of events which we want to enable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EventManager.is_enabled"><a class="viewcode-back" href="../../../events/event_manager.html#encore.events.event_manager.EventManager.is_enabled">[docs]</a>    <span class="k">def</span> <span class="nf">is_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check if the event is enabled.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cls : class</span>
+<span class="sd">            The class of events which we want check the status of.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_event_hierarchy</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_map</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">get_event_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The the sequence of event classes which are notified for given cls.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">bmro_clip</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">set_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set a trace method for various actions performed.</span>
+
+<span class="sd">        func is a callable which takes three arguments:</span>
+<span class="sd">            name, method and args</span>
+
+<span class="sd">        name - str</span>
+<span class="sd">            An identifiable name of the method being called</span>
+<span class="sd">            Either of &#39;connect&#39;, &#39;disconnect&#39;, &#39;emit&#39; or &#39;listen&#39;</span>
+<span class="sd">            The subsequent arguments depend on this value.</span>
+<span class="sd">        method - callable</span>
+<span class="sd">            The method which would be called as a consequence of the action</span>
+<span class="sd">            If name==&#39;listen&#39;, this is the listener which would be called.</span>
+<span class="sd">        args - tuple</span>
+<span class="sd">            The arguments specific to each method name are specified below:</span>
+<span class="sd">                connect - cls, func, filter, priority</span>
+<span class="sd">                disconnect - cls, func</span>
+<span class="sd">                emit - event</span>
+<span class="sd">                listen - event</span>
+
+<span class="sd">        If the trace function returns a True-like value: the corresponding</span>
+<span class="sd">        action is not performed. For listen action, the corresponding listener</span>
+<span class="sd">        is not called, but subsequent ones are called (depending on return</span>
+<span class="sd">        value for their trace function calls).</span>
+
+<span class="sd">        Note: Calling set_trace with None as the callable argument removes</span>
+<span class="sd">        existing trace function set. Also, only a single trace method can be</span>
+<span class="sd">        active at a time, calling set_trace removes the existing trace function.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trace_func</span> <span class="o">=</span> <span class="n">func</span></div>
+</pre></div>
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

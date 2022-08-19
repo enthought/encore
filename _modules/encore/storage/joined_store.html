@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>encore.storage.joined_store &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../../../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../../../genindex.html" >
+    <link rel="search" title="Search" href="../../../search.html" >
+    <link rel="top" title="Encore Documentation" href="../../../index.html" >
+    <link rel="up" title="Module code" href="../../index.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../../../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="../../index.html" accesskey="U">Module code</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../../../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../../../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <h1>Source code for encore.storage.joined_store</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># (C) Copyright 2011-2022 Enthought, Inc., Austin, TX</span>
+<span class="c1"># All right reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is open source software distributed according to the terms in LICENSE.txt</span>
+<span class="c1">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Joined Store</span>
+<span class="sd">============</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">.abstract_store</span> <span class="kn">import</span> <span class="n">AbstractAuthorizingStore</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">DummyTransactionContext</span>
+
+<div class="viewcode-block" id="JoinedStore"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore">[docs]</a><span class="k">class</span> <span class="nc">JoinedStore</span><span class="p">(</span><span class="n">AbstractAuthorizingStore</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A key-value store that joins together several other Key-Value Stores</span>
+
+<span class="sd">    A joined store is a composite store which takes a list of stores and</span>
+<span class="sd">    presents a set of keys that is the union of all the keys that are available</span>
+<span class="sd">    in all the stores.  When a key is available in multiple stores, then the</span>
+<span class="sd">    store which comes first in the list has priority.</span>
+
+<span class="sd">    All writes are performed into the first store in the list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    event_manager :</span>
+<span class="sd">        An event_manager which implements the :py:class:`~.abstract_event_manager.BaseEventManager`</span>
+<span class="sd">        API.</span>
+
+<span class="sd">    stores : list of stores</span>
+<span class="sd">        The stores that are joined together by this store.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="JoinedStore.__init__"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stores</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">JoinedStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stores</span> <span class="o">=</span> <span class="n">stores</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.connect"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Connect to the key-value store, optionally with authentication</span>
+
+<span class="sd">        This method creates or connects to any long-lived resources that the</span>
+<span class="sd">        store requires.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        credentials :</span>
+<span class="sd">            An object that can supply appropriate credentials to to authenticate</span>
+<span class="sd">            the use of any required resources.  The exact form of the credentials</span>
+<span class="sd">            is implementation-specific, but may be as simple as a</span>
+<span class="sd">            ``(username, password)`` tuple.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">store</span><span class="o">.</span><span class="n">is_connected</span><span class="p">():</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.disconnect"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Disconnect from the key-value store</span>
+
+<span class="sd">        This method disposes or disconnects to any long-lived resources that the</span>
+<span class="sd">        store requires.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stores</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.is_connected"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Whether or not the store is currently connected</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        connected : bool</span>
+<span class="sd">            Whether or not the store is currently connected.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span></div>
+
+
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get information about the key-value store</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata giving information about the key-value store.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;readonly&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">user_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">user_tag</span><span class="p">()</span>
+
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Basic Create/Read/Update/Delete Methods</span>
+    <span class="c1">##########################################################################</span>
+
+
+<div class="viewcode-block" id="JoinedStore.get"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve a stream of data and metdata from a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : file-like</span>
+<span class="sd">            A readable file-like object that provides stream of data from the</span>
+<span class="sd">            key-value store</span>
+<span class="sd">        metadata : dictionary</span>
+<span class="sd">            A dictionary of metadata for the key.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            If the key is not found in the store, a KeyError is raised.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="JoinedStore.set"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Store a stream of data into a given key in the key-value store.</span>
+
+<span class="sd">        This may be left unimplemented by subclasses that represent a read-only</span>
+<span class="sd">        key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        value : tuple of file-like, dict</span>
+<span class="sd">            A pair of objects, the first being a readable file-like object that</span>
+<span class="sd">            provides stream of data from the key-value store.  The second is a</span>
+<span class="sd">            dictionary of metadata for the key.</span>
+<span class="sd">        buffer_size :  int</span>
+<span class="sd">            An optional indicator of the number of bytes to read at a time.</span>
+<span class="sd">            Implementations are free to ignore this hint or use a different</span>
+<span class="sd">            default if they need to.  The default is 1048576 bytes (1 MiB).</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreProgressStartEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted prior to</span>
+<span class="sd">            writing any data to the underlying store.</span>
+<span class="sd">        StoreProgressStepEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted</span>
+<span class="sd">            periodically as data is written to the underlying store.</span>
+<span class="sd">        StoreProgressEndEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted after</span>
+<span class="sd">            finishing writing to the underlying store.</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s1">&#39;Setting key &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="JoinedStore.delete"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Delete a key from the repsository.</span>
+
+<span class="sd">        This may be left unimplemented by subclasses that represent a read-only</span>
+<span class="sd">        key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreDeleteEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreDeleteEvent should</span>
+<span class="sd">            be emitted with the key.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.get_data"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve a stream from a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : file-like</span>
+<span class="sd">            A readable file-like object the that provides stream of data from the</span>
+<span class="sd">            key-value store.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">store</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.get_metadata"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve the metadata for a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        select : iterable of strings or None</span>
+<span class="sd">            Which metadata keys to populate in the result.  If unspecified, then</span>
+<span class="sd">            return the entire metadata dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata associated with the key.  The dictionary</span>
+<span class="sd">            has keys as specified by the select argument.  If a key specified in</span>
+<span class="sd">            select is not present in the metadata, then it will not be present</span>
+<span class="sd">            in the returned value.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">store</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">select</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the set of permissions the user has</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key for the resource which you want to know the permissions.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        permissions : dict of str: set of str</span>
+<span class="sd">            A dictionary whose keys are the permissions and values are sets of</span>
+<span class="sd">            tags which have that permission.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This error will be raised if the key does not exist or the user is</span>
+<span class="sd">            not authorized to see it.</span>
+
+<span class="sd">        AuthorizationError :</span>
+<span class="sd">            This error will be raised if user is authorized to see the key, but</span>
+<span class="sd">            is not an owner.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">store</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="JoinedStore.set_data"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Replace the data for a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        data : file-like</span>
+<span class="sd">            A readable file-like object the that provides stream of data from the</span>
+<span class="sd">            key-value store.</span>
+<span class="sd">        buffer_size :  int</span>
+<span class="sd">            An optional indicator of the number of bytes to read at a time.</span>
+<span class="sd">            Implementations are free to ignore this hint or use a different</span>
+<span class="sd">            default if they need to.  The default is 1048576 bytes (1 MiB).</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreProgressStartEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted prior to</span>
+<span class="sd">            writing any data to the underlying store.</span>
+<span class="sd">        StoreProgressStepEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted</span>
+<span class="sd">            periodically as data is written to the underlying store.</span>
+<span class="sd">        StoreProgressEndEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted after</span>
+<span class="sd">            finishing writing to the underlying store.</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Tries to set data on first store that will allow for it (eg spaces).</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.set_metadata"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set new metadata for a given key in the key-value store.</span>
+
+<span class="sd">        This replaces the existing metadata set for the key with a new set of</span>
+<span class="sd">        metadata.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata to associate with the key.  The dictionary</span>
+<span class="sd">            keys should be strings which are valid Python identifiers.</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">set_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">permissions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the permissions on a key the user owns</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key for the resource which you want to know the permissions.</span>
+
+<span class="sd">        permissions : dict of str: set of str</span>
+<span class="sd">            A dictionary whose keys are the permissions and values are sets of</span>
+<span class="sd">            tags which have that permission.  There must be an &#39;owned&#39;</span>
+<span class="sd">            permission with at least one tag.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This error will be raised if the key does not exist or the user is</span>
+<span class="sd">            not authorized to see it.</span>
+
+<span class="sd">        AuthorizationError :</span>
+<span class="sd">            This error will be raised if user is authorized to see the key, but</span>
+<span class="sd">            is not an owner.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">set_permissions</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">permissions</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="JoinedStore.update_metadata"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.update_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">update_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update the metadata for a given key in the key-value store.</span>
+
+<span class="sd">        This performs a dictionary update on the existing metadata with the</span>
+<span class="sd">        provided metadata keys and values</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata to associate with the key.  The dictionary</span>
+<span class="sd">            keys should be strings which are valid Python identifiers.</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="n">current_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">current_metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">current_metadata</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">update_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">permissions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add permissions on a key the user owns</span>
+
+<span class="sd">        The tags provided in the permissions dictionary will be added to the</span>
+<span class="sd">        existing set of tags for each permission.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key for the resource which you want to know the permissions.</span>
+
+<span class="sd">        permissions : dict of str: set of str</span>
+<span class="sd">            A dictionary whose keys are the permissions and values are sets of</span>
+<span class="sd">            tags which have that permission.</span>
+
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This error will be raised if the key does not exist or the user is</span>
+<span class="sd">            not authorized to see it.</span>
+
+<span class="sd">        AuthorizationError :</span>
+<span class="sd">            This error will be raised if user is authorized to see the key, but</span>
+<span class="sd">            is not an owner.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">update_permissions</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">permissions</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="JoinedStore.exists"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Test whether or not a key exists in the key-value store</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        exists : bool</span>
+<span class="sd">            Whether or not the key exists in the key-value store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">store</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Multiple-key Methods</span>
+    <span class="c1">##########################################################################</span>
+
+<div class="viewcode-block" id="JoinedStore.multiset"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.multiset">[docs]</a>    <span class="k">def</span> <span class="nf">multiset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the data and metadata for a collection of keys.</span>
+
+<span class="sd">        Where supported by an implementation, this should perform the whole</span>
+<span class="sd">        collection of sets as a single transaction.</span>
+
+<span class="sd">        Like zip() if keys and values have different lengths, then any excess</span>
+<span class="sd">        values in the longer list should be silently ignored.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        keys : iterable of strings</span>
+<span class="sd">            The keys for the resources in the key-value store.  Each key is a</span>
+<span class="sd">            unique identifier for a resource within the key-value store.</span>
+<span class="sd">        values : iterable of (file-like, dict) tuples</span>
+<span class="sd">            An iterator that provides the (data, metadata) pairs for the</span>
+<span class="sd">            corresponding keys.</span>
+<span class="sd">        buffer_size : int</span>
+<span class="sd">            An optional indicator of the number of bytes to read at a time.</span>
+<span class="sd">            Implementations are free to ignore this hint or use a different</span>
+<span class="sd">            default if they need to.  The default is 1048576 bytes (1 MiB).</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreProgressStartEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted prior to</span>
+<span class="sd">            writing any data to the underlying store.</span>
+<span class="sd">        StoreProgressStepEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted</span>
+<span class="sd">            periodically as data is written to the underlying store.</span>
+<span class="sd">        StoreProgressEndEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted after</span>
+<span class="sd">            finishing writing to the underlying store.</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata for each key that was set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiset</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.multiset_data"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.multiset_data">[docs]</a>    <span class="k">def</span> <span class="nf">multiset_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">datas</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the data for a collection of keys.</span>
+
+<span class="sd">        Where supported by an implementation, this should perform the whole</span>
+<span class="sd">        collection of sets as a single transaction.</span>
+
+<span class="sd">        Like zip() if keys and datas have different lengths, then any excess</span>
+<span class="sd">        values in the longer list should be silently ignored.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        keys : iterable of strings</span>
+<span class="sd">            The keys for the resources in the key-value store.  Each key is a</span>
+<span class="sd">            unique identifier for a resource within the key-value store.</span>
+<span class="sd">        datas : iterable of file-like objects</span>
+<span class="sd">            An iterator that provides the data file-like objects for the</span>
+<span class="sd">            corresponding keys.</span>
+<span class="sd">        buffer_size : int</span>
+<span class="sd">            An optional indicator of the number of bytes to read at a time.</span>
+<span class="sd">            Implementations are free to ignore this hint or use a different</span>
+<span class="sd">            default if they need to.  The default is 1048576 bytes (1 MiB).</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreProgressStartEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted prior to</span>
+<span class="sd">            writing any data to the underlying store.</span>
+<span class="sd">        StoreProgressStepEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted</span>
+<span class="sd">            periodically as data is written to the underlying store.</span>
+<span class="sd">        StoreProgressEndEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted after</span>
+<span class="sd">            finishing writing to the underlying store.</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata for each key that was set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiset_data</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">datas</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.multiset_metadata"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.multiset_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">multiset_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">metadatas</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the metadata for a collection of keys.</span>
+
+<span class="sd">        Where supported by an implementation, this should perform the whole</span>
+<span class="sd">        collection of sets as a single transaction.</span>
+
+<span class="sd">        Like zip() if keys and metadatas have different lengths, then any excess</span>
+<span class="sd">        values in the longer list should be silently ignored.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        keys : iterable of strings</span>
+<span class="sd">            The keys for the resources in the key-value store.  Each key is a</span>
+<span class="sd">            unique identifier for a resource within the key-value store.</span>
+<span class="sd">        metadatas : iterable of dicts</span>
+<span class="sd">            An iterator that provides the metadata dictionaries for the</span>
+<span class="sd">            corresponding keys.</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata for each key that was set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiset_metadata</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">metadatas</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.multiupdate_metadata"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.multiupdate_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">multiupdate_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">metadatas</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update the metadata for a collection of keys.</span>
+
+<span class="sd">        Where supported by an implementation, this should perform the whole</span>
+<span class="sd">        collection of sets as a single transaction.</span>
+
+<span class="sd">        Like zip() if keys and metadatas have different lengths, then any excess</span>
+<span class="sd">        values in the longer list should be silently ignored.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        keys : iterable of strings</span>
+<span class="sd">            The keys for the resources in the key-value store.  Each key is a</span>
+<span class="sd">            unique identifier for a resource within the key-value store.</span>
+<span class="sd">        metadatas : iterable of dicts</span>
+<span class="sd">            An iterator that provides the metadata dictionaries for the</span>
+<span class="sd">            corresponding keys.</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata for each key that was set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiupdate_metadata</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">metadatas</span><span class="p">)</span></div>
+
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Transaction Methods</span>
+    <span class="c1">##########################################################################</span>
+
+<div class="viewcode-block" id="JoinedStore.transaction"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.transaction">[docs]</a>    <span class="k">def</span> <span class="nf">transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Provide a transaction context manager</span>
+
+<span class="sd">        Implementations which have no native notion of transactions may choose</span>
+<span class="sd">        not to implement this.</span>
+
+<span class="sd">        This method provides a context manager which creates a data store</span>
+<span class="sd">        transaction in its __enter__() method, and commits it in its __exit__()</span>
+<span class="sd">        method if no errors occur.  Intended usage is::</span>
+
+<span class="sd">            with repo.transaction(&quot;Writing data...&quot;):</span>
+<span class="sd">                # everything written in this block is part of the transaction</span>
+<span class="sd">                ...</span>
+
+<span class="sd">        If the block exits without error, the transaction commits, otherwise</span>
+<span class="sd">        the transaction should roll back the state of the underlying data store</span>
+<span class="sd">        to the start of the transaction.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        notes : string</span>
+<span class="sd">            Some information about the transaction, which may or may not be used</span>
+<span class="sd">            by the implementation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        transaction : context manager</span>
+<span class="sd">            A context manager for the transaction.</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreTransactionStartEvent :</span>
+<span class="sd">            This event should be emitted on entry into the transaction.</span>
+<span class="sd">        StoreProgressStartEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted prior to</span>
+<span class="sd">            writing any data to the underlying store.</span>
+<span class="sd">        StoreProgressStepEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted</span>
+<span class="sd">            periodically as data is written to the underlying store.</span>
+<span class="sd">        StoreProgressEndEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted after</span>
+<span class="sd">            finishing writing to the underlying store.</span>
+<span class="sd">        StoreTransactionEndEvent :</span>
+<span class="sd">            This event should be emitted on successful conclusion of the</span>
+<span class="sd">            transaction, before any Set or Delete events are emitted.</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata for each key that was set during the</span>
+<span class="sd">            transaction.</span>
+<span class="sd">        StoreDeleteEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreDeleteEvent should</span>
+<span class="sd">            be emitted with the key for all deleted keys.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DummyTransactionContext</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Querying Methods</span>
+    <span class="c1">##########################################################################</span>
+
+
+<div class="viewcode-block" id="JoinedStore.query"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Query for keys and metadata matching metadata provided as keyword arguments</span>
+
+<span class="sd">        This provides a very simple querying interface that returns precise</span>
+<span class="sd">        matches with the metadata.  If no arguments are supplied, the query</span>
+<span class="sd">        will return the complete set of metadata for the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        select : iterable of strings or None</span>
+<span class="sd">            An optional list of metadata keys to return.  If this is not None,</span>
+<span class="sd">            then the metadata dictionaries will only have values for the specified</span>
+<span class="sd">            keys populated.</span>
+<span class="sd">        kwargs :</span>
+<span class="sd">            Arguments where the keywords are metadata keys, and values are</span>
+<span class="sd">            possible values for that metadata item.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : iterable</span>
+<span class="sd">            An iterable of (key, metadata) tuples where metadata matches</span>
+<span class="sd">            all the specified values for the specified metadata keywords.</span>
+<span class="sd">            If a key specified in select is not present in the metadata of a</span>
+<span class="sd">            particular key, then it will not be present in the returned value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">store</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">select</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">[:</span><span class="n">i</span><span class="p">]):</span>
+                    <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="JoinedStore.query_keys"><a class="viewcode-back" href="../../../storage/joined_store.html#encore.storage.joined_store.JoinedStore.query_keys">[docs]</a>    <span class="k">def</span> <span class="nf">query_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Query for keys matching metadata provided as keyword arguments</span>
+
+<span class="sd">        This provides a very simple querying interface that returns precise</span>
+<span class="sd">        matches with the metadata.  If no arguments are supplied, the query</span>
+<span class="sd">        will return the complete set of keys for the key-value store.</span>
+
+<span class="sd">        This is equivalent to ``self.query(**kwargs).keys()``, but potentially</span>
+<span class="sd">        more efficiently implemented.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs :</span>
+<span class="sd">            Arguments where the keywords are metadata keys, and values are</span>
+<span class="sd">            possible values for that metadata item.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : iterable</span>
+<span class="sd">            An iterable of key-value store keys whose metadata matches all the</span>
+<span class="sd">            specified values for the specified metadata keywords.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">store</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">query_keys</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stores</span><span class="p">[:</span><span class="n">i</span><span class="p">]):</span>
+                    <span class="k">yield</span> <span class="n">key</span></div></div>
+
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Utility Methods</span>
+    <span class="c1">##########################################################################</span>
+
+    <span class="c1"># superclass methods are fine</span>
+</pre></div>
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

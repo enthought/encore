@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>encore.storage.utils &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../../../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../../../genindex.html" >
+    <link rel="search" title="Search" href="../../../search.html" >
+    <link rel="top" title="Encore Documentation" href="../../../index.html" >
+    <link rel="up" title="Module code" href="../../index.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../../../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="../../index.html" accesskey="U">Module code</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../../../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../../../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <h1>Source code for encore.storage.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># (C) Copyright 2011-2022 Enthought, Inc., Austin, TX</span>
+<span class="c1"># All right reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is open source software distributed according to the terms in LICENSE.txt</span>
+<span class="c1">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utils</span>
+<span class="sd">=====</span>
+
+<span class="sd">Utilities for key-value stores.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">MethodType</span>
+
+<span class="kn">from</span> <span class="nn">encore.events.api</span> <span class="kn">import</span> <span class="n">ProgressManager</span>
+<span class="kn">from</span> <span class="nn">.events</span> <span class="kn">import</span> <span class="p">(</span><span class="n">StoreTransactionStartEvent</span><span class="p">,</span> <span class="n">StoreTransactionEndEvent</span><span class="p">,</span>
+    <span class="n">StoreProgressStartEvent</span><span class="p">,</span> <span class="n">StoreProgressStepEvent</span><span class="p">,</span> <span class="n">StoreProgressEndEvent</span><span class="p">,</span>
+    <span class="n">StoreModificationEvent</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">add_context_manager_support</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Add empty __enter__ and __exit__ methods on a given object.</span>
+
+<span class="sd">    This function is required to be called on any object used by the data()</span>
+<span class="sd">    methods on the stores. They are supposed to be file-like byte streams.</span>
+<span class="sd">    Adding the support for using them as context managers allows us to make</span>
+<span class="sd">    sure we clean the resources when a proper __exit__ method is available.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;__enter__&#39;</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="fm">__enter__</span> <span class="o">=</span> <span class="n">MethodType</span><span class="p">(</span><span class="fm">__enter__</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;__exit__&#39;</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="fm">__exit__</span> <span class="o">=</span> <span class="n">MethodType</span><span class="p">(</span><span class="fm">__exit__</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">obj</span>
+
+<div class="viewcode-block" id="StoreProgressManager"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.StoreProgressManager">[docs]</a><span class="k">class</span> <span class="nc">StoreProgressManager</span><span class="p">(</span><span class="n">ProgressManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; :py:class:`encore.events.progress_events.ProgressManager` subclass that</span>
+<span class="sd">    generates :py:class:`encore.storage.events.StoreProgressEvent`</span>
+<span class="sd">    instances</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">StartEventType</span> <span class="o">=</span> <span class="n">StoreProgressStartEvent</span>
+    <span class="n">StepEventType</span> <span class="o">=</span> <span class="n">StoreProgressStepEvent</span>
+    <span class="n">EndEventType</span> <span class="o">=</span> <span class="n">StoreProgressEndEvent</span></div>
+
+
+<div class="viewcode-block" id="DummyTransactionContext"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.DummyTransactionContext">[docs]</a><span class="k">class</span> <span class="nc">DummyTransactionContext</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A dummy class that can be returned by stores which don&#39;t support transactions</span>
+
+<span class="sd">    This class guarantees that there is only one transaction object for each</span>
+<span class="sd">    store instance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    store : key-value store instance</span>
+<span class="sd">        The store that this transaction context is associated with.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;_transaction&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">_transaction</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">store</span><span class="o">.</span><span class="n">_transaction</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SimpleTransactionContext"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.SimpleTransactionContext">[docs]</a><span class="k">class</span> <span class="nc">SimpleTransactionContext</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A simple class that adds support for simple transactions</span>
+
+<span class="sd">    This is a base class that ensures transactions are appropriately handled in</span>
+<span class="sd">    terms of nesting and event generation.  Subclasses should override the</span>
+<span class="sd">    start, commit and rollback methods to perform appropriate implementation-specific</span>
+<span class="sd">    actions.</span>
+
+<span class="sd">    This class correctly handles nested transactions by ensuring that each store</span>
+<span class="sd">    has precisely one active transaction context and by tracking the number of</span>
+<span class="sd">    times the context has been entered and exited.  The transaction is only</span>
+<span class="sd">    committed once the top-level context has exited.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    store : key-value store instance</span>
+<span class="sd">        The store that this transaction context is associated with.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;_transaction&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">_context_depth</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">_events</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">_transaction</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">store</span><span class="o">.</span><span class="n">_transaction</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_context_depth</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context_depth</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreTransactionStartEvent</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">))</span>
+            <span class="c1"># grab Set &amp; veto events for later emission</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">StoreModificationEvent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event</span><span class="p">,</span>
+                <span class="p">{</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">},</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">mark_as_handled</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_context_depth</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_context_depth</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exc_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;done&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;failed&#39;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreTransactionEndEvent</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">StoreModificationEvent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">_transaction</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">exc_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">:</span>
+                    <span class="n">event</span><span class="o">.</span><span class="n">_handled</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Yikes!</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="SimpleTransactionContext.begin"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.SimpleTransactionContext.begin">[docs]</a>    <span class="k">def</span> <span class="nf">begin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Begin a transaction</span>
+
+<span class="sd">        By default, this calls the store&#39;s ``_begin_transaction`` method.</span>
+<span class="sd">        Override in subclasses if you need different behaviour.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;_begin_transaction&#39;</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)()</span></div>
+
+<div class="viewcode-block" id="SimpleTransactionContext.commit"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.SimpleTransactionContext.commit">[docs]</a>    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Commit a transaction</span>
+
+<span class="sd">        By default, this calls the store&#39;s ``_commit_transaction`` method.</span>
+<span class="sd">        Override in subclasses if you need different behaviour.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;_commit_transaction&#39;</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)()</span></div>
+
+<div class="viewcode-block" id="SimpleTransactionContext.rollback"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.SimpleTransactionContext.rollback">[docs]</a>    <span class="k">def</span> <span class="nf">rollback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Roll back a transaction</span>
+
+<span class="sd">        By default, this calls the store&#39;s ``_rollback_transaction`` method.</span>
+<span class="sd">        Override in subclasses if you need different behaviour.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;_rollback_transaction&#39;</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)()</span></div></div>
+
+
+<div class="viewcode-block" id="BufferIteratorIO"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.BufferIteratorIO">[docs]</a><span class="k">class</span> <span class="nc">BufferIteratorIO</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A file-like object based on an iterable of buffers</span>
+
+<span class="sd">    This takes an iterator of bytes objects, such as produced by the</span>
+<span class="sd">    buffer_iterator function, and wraps it in a file-like interface which</span>
+<span class="sd">    is usable with the store API.</span>
+
+<span class="sd">    This uses less memory than a StringIO, at the cost of some flexibility.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    iterator : iterator of bytes objects</span>
+<span class="sd">        An iterator that produces a bytes object on each iteration.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterator</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="n">iterator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+
+<div class="viewcode-block" id="BufferIteratorIO.read"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.BufferIteratorIO.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read at most buffer_size bytes, returned as a string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">buffer_size</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">+=</span> <span class="n">data</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[:</span><span class="n">buffer_size</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="n">buffer_size</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="buffer_iterator"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.buffer_iterator">[docs]</a><span class="k">def</span> <span class="nf">buffer_iterator</span><span class="p">(</span><span class="n">filelike</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_bytes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Return an iterator of byte buffers</span>
+
+<span class="sd">    The buffers of bytes default to the provided buffer_size.  This is a useful</span>
+<span class="sd">    method when copying one data stream to another.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filelike : a file-like object</span>
+<span class="sd">        An object which implements the :py:meth:`read(buffer_size)` method.</span>
+<span class="sd">    buffer_size : int</span>
+<span class="sd">        The number of bytes to read at a time.</span>
+<span class="sd">    progress : callable</span>
+<span class="sd">        A callback for progress indication.  A StoreProgressManager instance</span>
+<span class="sd">        inside a ``with`` block would be appropriate, but anthing that takes a</span>
+<span class="sd">        `step` parameter which is the total number of bytes read so far will</span>
+<span class="sd">        work.</span>
+<span class="sd">    max_bytes : int</span>
+<span class="sd">        The maximum number of bytes to return.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">progress</span> <span class="k">if</span> <span class="n">progress</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="kc">None</span>
+    <span class="n">bytes_iterated</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">max_bytes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bytes_iterated</span> <span class="o">&lt;</span> <span class="n">max_bytes</span><span class="p">:</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">filelike</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_bytes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_bytes</span> <span class="o">-</span> <span class="n">bytes_iterated</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[:</span><span class="n">max_bytes</span> <span class="o">-</span> <span class="n">bytes_iterated</span><span class="p">]</span>
+        <span class="n">bytes_iterated</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="n">progress</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">bytes_iterated</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">yield</span> <span class="n">chunk</span></div>
+
+
+<div class="viewcode-block" id="tee"><a class="viewcode-back" href="../../../storage/utils.html#encore.storage.utils.tee">[docs]</a><span class="k">def</span> <span class="nf">tee</span><span class="p">(</span><span class="n">filelike</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Clone a filelike stream into n parallel streams</span>
+
+<span class="sd">    This uses itertools.tee and buffer iterators, with the corresponding</span>
+<span class="sd">    cautions about memory usage.  In general it should be more memory efficient</span>
+<span class="sd">    than pulling everything into memory.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filelike : a file-like object</span>
+<span class="sd">        An object which implements the :py:meth:`read(buffer_size)` method.</span>
+<span class="sd">    n : int</span>
+<span class="sd">        The number of filelike streams to produce.</span>
+<span class="sd">    buffer_size : int</span>
+<span class="sd">        The number of bytes to read at a time.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">iters</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">tee</span><span class="p">(</span><span class="n">buffer_iterator</span><span class="p">(</span><span class="n">filelike</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">BufferIteratorIO</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span> <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="n">iters</span><span class="p">]</span></div>
+
+
+<span class="k">class</span> <span class="nc">hashing_file</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; File-like wrapper which produces a hash as it is read</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filelike</span><span class="p">,</span> <span class="nb">hash</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filelike</span> <span class="o">=</span> <span class="n">filelike</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="nb">hash</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbytes</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filelike</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">nbytes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">len</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filelike</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filelike</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

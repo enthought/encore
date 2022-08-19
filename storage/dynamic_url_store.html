@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Dynamic URL Store &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../genindex.html" >
+    <link rel="search" title="Search" href="../search.html" >
+    <link rel="top" title="Encore Documentation" href="../index.html" >
+    <link rel="up" title="Storage" href="index.html" >
+    <link rel="next" title="Joined Store" href="joined_store.html" >
+    <link rel="prev" title="Static URL Store" href="static_url_store.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="index.html" accesskey="U">Storage</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+      <li class="active">
+        <a href="joined_store.html" title="Joined Store"
+           accesskey="N">next</a>
+      </li>
+      <li class="active">
+        <a href="static_url_store.html" title="Static URL Store"
+           accesskey="P">previous</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <span class="target" id="module-encore.storage.dynamic_url_store"></span><section id="dynamic-url-store">
+<h1>Dynamic URL Store<a class="headerlink" href="#dynamic-url-store" title="Permalink to this heading">¶</a></h1>
+<p>This module contains the <a class="reference internal" href="#encore.storage.dynamic_url_store.DynamicURLStore" title="encore.storage.dynamic_url_store.DynamicURLStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">DynamicURLStore</span></code></a> store that communicates
+with a remote HTTP server which provides the actual data storage.  This is a
+store which implements the basic operations via HTTP GET, POST, PUT and DELETE
+commands as described in the class documentation.</p>
+<p>The implementation relies on the third-party <cite>requests</cite> library to handle the
+HTTP operations.</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.dynamic_url_store.</span></span><span class="sig-name descname"><span class="pre">DynamicURLStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{base}/{key}/{part}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_format_no_part</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{base}/{key}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'data':</span> <span class="pre">'data',</span> <span class="pre">'metadata':</span> <span class="pre">'metadata',</span> <span class="pre">'permissions':</span> <span class="pre">'auth'}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store implementation which gets and sets from a web server</p>
+<p>This store expects a server which exposes URLs for each key.  By default
+these URLs are of the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">base</span><span class="o">&gt;/&lt;</span><span class="n">key</span><span class="o">&gt;/&lt;</span><span class="n">part</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Where <cite>&lt;base&gt;</cite> is a common prefix, <cite>&lt;key&gt;</cite> is the key of interest, and
+<cite>&lt;part&gt;</cite> is one of “data”, “metadata” or “auth”.  If the store does not
+follow this format, you can provide a differnt <code class="docutils literal notranslate"><span class="pre">url_format</span></code> argument
+and a different mapping of <cite>&lt;part&gt;</cite> to aspects of the key.</p>
+<p>The server is expected to respond to queries against these URLS in the
+following ways:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><cite>GET &lt;base&gt;/&lt;key&gt;/data</cite></dt><dd><p>return the bytes in the body of the response</p>
+</dd>
+<dt><cite>PUT &lt;base&gt;/&lt;key&gt;/data</cite></dt><dd><p>accept the data bytes from the body of the request</p>
+</dd>
+<dt><cite>GET &lt;base&gt;/&lt;key&gt;/metadata</cite></dt><dd><p>return metadata as JSON</p>
+</dd>
+<dt><cite>PUT &lt;base&gt;/&lt;key&gt;/metadata</cite></dt><dd><p>set the metadata based on JSON contained in the body of the request</p>
+</dd>
+<dt><cite>POST &lt;base&gt;/&lt;key&gt;/metadata</cite></dt><dd><p>update the metadata based on JSON contained in the body of the
+request (as <cite>dict.update()</cite>)</p>
+</dd>
+<dt><cite>GET &lt;base&gt;/&lt;key&gt;/auth</cite></dt><dd><p>return permissions information as JSON</p>
+</dd>
+<dt><cite>PUT &lt;base&gt;/&lt;key&gt;/auth</cite></dt><dd><p>set the permissions based on JSON contained in the body of the
+request</p>
+</dd>
+<dt><cite>POST &lt;base&gt;/&lt;key&gt;/metadata</cite></dt><dd><p>update the permissions based on JSON contained in the body of the
+request</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>In addition, a DELETE request to a URL of the form <cite>&lt;base&gt;/&lt;key&gt;</cite> should
+remove the key from the remote store.  This pattern is configurable via
+the <code class="docutils literal notranslate"><span class="pre">url_format_no_part</span></code> argument to the constructor.</p>
+<p>In addition, the server should have a query URL which accepts GET reuqests
+containing a JSON data structure of metadata key, value pairs to filter
+with, and should return a list of macthing keys, one per line.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.connect">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to a DynamicURLStore</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>credentials</strong> (<em>(</em><em>user_tag</em><em>, </em><em>requests.Session</em><em>)</em>) – The credentials are a tuple containing ther user’s permission tag
+and a requests Session initialized with appropriate authentication.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a key from the repsository.</p>
+<p>This may be left unimplemented by subclasses that represent a read-only
+key-value store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreDeleteEvent</strong> – On successful completion of a transaction, a StoreDeleteEvent should
+be emitted with the key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.disconnect">
+<span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.disconnect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the key-value store</p>
+<p>This method disposes or disconnects to any long-lived resources that the
+store requires.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>value</strong> – An instance of a Value subclass which holds references to the data,
+metadata and other information about the key.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>instance of Value</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – If the key is not found in the store, a KeyError is raised.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a stream from a given key in the key-value store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> – A readable file-like object the that provides stream of data from the
+key-value store.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>file-like</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – This will raise a key error if the key is not present in the store.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.get_metadata">
+<span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the metadata for a given key in the key-value store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>select</strong> (<em>iterable of strings</em><em> or </em><em>None</em>) – Which metadata keys to populate in the result.  If unspecified, then
+return the entire metadata dictionary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>metadata</strong> – A dictionary of metadata associated with the key.  The dictionary
+has keys as specified by the select argument.  If a key specified in
+select is not present in the metadata, then it will not be present
+in the returned value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – This will raise a key error if the key is not present in the store.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.get_permissions">
+<span class="sig-name descname"><span class="pre">get_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.get_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.get_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the set of permissions the user has</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The key for the resource which you want to know the permissions.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>permissions</strong> – A dictionary whose keys are the permissions and values are sets of
+tags which have that permission.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of str: set of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError :</strong> – This error will be raised if the key does not exist or the user is
+    not authorized to see it.</p></li>
+<li><p><strong>AuthorizationError :</strong> – This error will be raised if user is authorized to see the key, but
+    is not an owner.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the key-value store</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metadata</strong> – A dictionary of metadata giving information about the key-value store.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.is_connected">
+<span class="sig-name descname"><span class="pre">is_connected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.is_connected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether or not the store is currently connected</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>connected</strong> – Whether or not the store is currently connected.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query for keys and metadata matching metadata provided as keyword arguments</p>
+<p>This provides a very simple querying interface that returns precise
+matches with the metadata.  If no arguments are supplied, the query
+will return the complete set of metadata for the key-value store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>select</strong> (<em>iterable of strings</em><em> or </em><em>None</em>) – An optional list of metadata keys to return.  If this is not None,
+then the metadata dictionaries will only have values for the specified
+keys populated.</p></li>
+<li><p><strong>kwargs</strong> – Arguments where the keywords are metadata keys, and values are
+possible values for that metadata item.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – An iterable of (key, metadata) tuples where metadata matches
+all the specified values for the specified metadata keywords.
+If a key specified in select is not present in the metadata of a
+particular key, then it will not be present in the returned value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.query_keys">
+<span class="sig-name descname"><span class="pre">query_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.query_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.query_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query for keys matching metadata provided as keyword arguments</p>
+<p>This provides a very simple querying interface that returns precise
+matches with the metadata.  If no arguments are supplied, the query
+will return the complete set of keys for the key-value store.</p>
+<p>This is equivalent to <code class="docutils literal notranslate"><span class="pre">self.query(**kwargs).keys()</span></code>, but potentially
+more efficiently implemented.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – Arguments where the keywords are metadata keys, and values are
+possible values for that metadata item.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – An iterable of key-value store keys whose metadata matches all the
+specified values for the specified metadata keywords.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a stream of data into a given key in the key-value store.</p>
+<p>This may be left unimplemented by subclasses that represent a read-only
+key-value store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>value</strong> (<em>instance of Value</em>) – An instance of a Value subclass.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreProgressStartEvent</strong> – For buffering implementations, this event should be emitted prior to
+writing any data to the underlying store.</p></li>
+<li><p><strong>StoreProgressStepEvent</strong> – For buffering implementations, this event should be emitted
+periodically as data is written to the underlying store.</p></li>
+<li><p><strong>StoreProgressEndEvent</strong> – For buffering implementations, this event should be emitted after
+finishing writing to the underlying store.</p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.set_data">
+<span class="sig-name descname"><span class="pre">set_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.set_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the data for a given key in the key-value store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>data</strong> (<em>file-like</em>) – A readable file-like object the that provides stream of data from the
+key-value store.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
+Implementations are free to ignore this hint or use a different
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreProgressStartEvent</strong> – For buffering implementations, this event should be emitted prior to
+writing any data to the underlying store.</p></li>
+<li><p><strong>StoreProgressStepEvent</strong> – For buffering implementations, this event should be emitted
+periodically as data is written to the underlying store.</p></li>
+<li><p><strong>StoreProgressEndEvent</strong> – For buffering implementations, this event should be emitted after
+finishing writing to the underlying store.</p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.set_metadata">
+<span class="sig-name descname"><span class="pre">set_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.set_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set new metadata for a given key in the key-value store.</p>
+<p>This replaces the existing metadata set for the key with a new set of
+metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.set_permissions">
+<span class="sig-name descname"><span class="pre">set_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permissions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.set_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.set_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the permissions on a key the user owns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The key for the resource which you want to know the permissions.</p></li>
+<li><p><strong>permissions</strong> (<em>dict of str: set of str</em>) – A dictionary whose keys are the permissions and values are sets of
+tags which have that permission.  There must be an ‘owned’
+permission with at least one tag.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError :</strong> – This error will be raised if the key does not exist or the user is
+    not authorized to see it.</p></li>
+<li><p><strong>AuthorizationError :</strong> – This error will be raised if user is authorized to see the key, but
+    is not an owner.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.transaction">
+<span class="sig-name descname"><span class="pre">transaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.transaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a transaction context manager</p>
+<p>This class does not support transactions, so it returns a dummy object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.update_metadata">
+<span class="sig-name descname"><span class="pre">update_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.update_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the metadata for a given key in the key-value store.</p>
+<p>This performs a dictionary update on the existing metadata with the
+provided metadata keys and values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.update_permissions">
+<span class="sig-name descname"><span class="pre">update_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permissions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.update_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.update_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add permissions on a key the user owns</p>
+<p>The tags provided in the permissions dictionary will be added to the
+existing set of tags for each permission.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The key for the resource which you want to know the permissions.</p></li>
+<li><p><strong>permissions</strong> (<em>dict of str: set of str</em>) – A dictionary whose keys are the permissions and values are sets of
+tags which have that permission.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError :</strong> – This error will be raised if the key does not exist or the user is
+    not authorized to see it.</p></li>
+<li><p><strong>AuthorizationError :</strong> – This error will be raised if user is authorized to see the key, but
+    is not an owner.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.dynamic_url_store.DynamicURLStore.user_tag">
+<span class="sig-name descname"><span class="pre">user_tag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/dynamic_url_store.html#DynamicURLStore.user_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.dynamic_url_store.DynamicURLStore.user_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tag that represents the user</p>
+</dd></dl>
+
+</dd></dl>
+
+
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="static_url_store.html"
+                          title="previous chapter">Static URL Store</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="joined_store.html"
+                          title="next chapter">Joined Store</a></p>
+  </div>
+  <h3>This Page</h3>
+  <div>
+    <a href="../_sources/storage/dynamic_url_store.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>
