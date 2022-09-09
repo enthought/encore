@@ -1,92 +1,101 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Key-Value Store API &mdash; Encore Documentation</title>
     
-    <title>Key-Value Store API &mdash; Encore 0.6.0 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" >
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.6.0',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
-    <link rel="up" title="Storage" href="index.html" />
-    <link rel="next" title="Events" href="events.html" />
-    <link rel="prev" title="Usage" href="usage.html" /> 
+    <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../genindex.html" >
+    <link rel="search" title="Search" href="../search.html" >
+    <link rel="top" title="Encore Documentation" href="../index.html" >
+    <link rel="up" title="Storage" href="index.html" >
+    <link rel="next" title="Events" href="events.html" >
+    <link rel="prev" title="Usage" href="usage.html" > 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="events.html" title="Events"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="usage.html" title="Usage"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
-      </ul>
+  <body>
+  <div class="container">
+    <div class="header">
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-            <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
-            </a></p>
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="usage.html"
-                        title="previous chapter">Usage</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="events.html"
-                        title="next chapter">Events</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/storage/abstract_store.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  </div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="index.html" accesskey="U">Storage</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+      <li class="active">
+        <a href="events.html" title="Events"
+           accesskey="N">next</a>
+      </li>
+      <li class="active">
+        <a href="usage.html" title="Usage"
+           accesskey="P">previous</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
             
-  <span class="target" id="module-encore.storage.abstract_store"></span><div class="section" id="key-value-store-api">
-<h1>Key-Value Store API<a class="headerlink" href="#key-value-store-api" title="Permalink to this headline">¶</a></h1>
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <span class="target" id="module-encore.storage.abstract_store"></span><section id="key-value-store-api">
+<h1>Key-Value Store API<a class="headerlink" href="#key-value-store-api" title="Permalink to this heading">¶</a></h1>
 <p>This module specifies the key-value store API for the various package management and
 installation systems that are in use at Enthought and our clients.</p>
 <p>The key-value store API exposes an interface on top of whatever
@@ -95,476 +104,515 @@ access to a key-value store to use it in a uniform way without having to care ab
 where and how the data is stored.  The API is also agnostic about what is being
 stored, and so while the key use case is for egg repositories, potentially any
 data values can be stored in the key-value store.</p>
-<dl class="class">
-<dt id="encore.storage.abstract_store.Value">
-<em class="property">class </em><code class="descclassname">encore.storage.abstract_store.</code><code class="descname">Value</code><a class="headerlink" href="#encore.storage.abstract_store.Value" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.abstract_store.</span></span><span class="sig-name descname"><span class="pre">Value</span></span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#Value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.Value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for file-like objects used by Key-Value stores</p>
-<dl class="docutils">
-<dt>size</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">int</span><dd>The size of the data in bytes, or None if a continuous stream or unknown.</dd>
-<dt>created</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">timestamp</span><dd>The creation time of the key as a floating point UTC timestamp in seconds
-after the Unix Epoch.</dd>
-<dt>modified</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">timestamp</span><dd>The modification time of the key as a floating point UTC timestamp in seconds
-after the Unix Epoch.</dd>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value.size">
+<span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#encore.storage.abstract_store.Value.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the data in bytes, or None if a continuous stream or unknown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
 </dl>
-<dl class="attribute">
-<dt id="encore.storage.abstract_store.Value.data">
-<code class="descname">data</code><a class="headerlink" href="#encore.storage.abstract_store.Value.data" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value.created">
+<span class="sig-name descname"><span class="pre">created</span></span><a class="headerlink" href="#encore.storage.abstract_store.Value.created" title="Permalink to this definition">¶</a></dt>
+<dd><p>The creation time of the key as a floating point UTC timestamp in seconds
+after the Unix Epoch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>timestamp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value.modified">
+<span class="sig-name descname"><span class="pre">modified</span></span><a class="headerlink" href="#encore.storage.abstract_store.Value.modified" title="Permalink to this definition">¶</a></dt>
+<dd><p>The modification time of the key as a floating point UTC timestamp in seconds
+after the Unix Epoch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>timestamp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value.data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#encore.storage.abstract_store.Value.data" title="Permalink to this definition">¶</a></dt>
 <dd><p>The byte stream of data contained in the value</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.Value.iterdata">
-<code class="descname">iterdata</code><span class="sig-paren">(</span><em>buffer_size=1048576</em>, <em>progress=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.Value.iterdata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value.iterdata">
+<span class="sig-name descname"><span class="pre">iterdata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#Value.iterdata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.Value.iterdata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an iterator over the data stream</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="encore.storage.abstract_store.Value.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.abstract_store.Value.metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value.metadata">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.abstract_store.Value.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>The metadata dictionary of the value</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="encore.storage.abstract_store.Value.permissions">
-<code class="descname">permissions</code><a class="headerlink" href="#encore.storage.abstract_store.Value.permissions" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value.permissions">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">permissions</span></span><a class="headerlink" href="#encore.storage.abstract_store.Value.permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>The permissions dictionary of the value</p>
 <p>This is only available if the user has ownership privileges for the key.
 Because different stores have different permission conventions, this
 will not be used when setting a value.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.Value.range">
-<code class="descname">range</code><span class="sig-paren">(</span><em>start=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.Value.range" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.Value.range">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#Value.range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.Value.range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a stream with a range of bytes from the data</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore">
-<em class="property">class </em><code class="descclassname">encore.storage.abstract_store.</code><code class="descname">AbstractReadOnlyStore</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.abstract_store.</span></span><span class="sig-name descname"><span class="pre">AbstractReadOnlyStore</span></span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for read-only Key-Value Store API</p>
 <p>This class implements some of the API so that it can be used with super()
 where appropriate.</p>
-<dl class="attribute">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.event_manager">
-<code class="descname">event_manager</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.event_manager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a> API.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.event_manager">
+<span class="sig-name descname"><span class="pre">event_manager</span></span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.event_manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every store is assumed to have an event_manager attribute which
+implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEventManager</span></code></a> API.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.connect">
-<code class="descname">connect</code><span class="sig-paren">(</span><em>credentials=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.connect" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.connect">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect to the key-value store, optionally with authentication</p>
 <p>This method creates or connects to any long-lived resources that the
 store requires.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>credentials</strong> &#8211; An object that can supply appropriate credentials to to authenticate
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>credentials</strong> – An object that can supply appropriate credentials to to authenticate
 the use of any required resources.  The exact form of the credentials
 is implementation-specific, but may be as simple as a
-<code class="docutils literal"><span class="pre">(username,</span> <span class="pre">password)</span></code> tuple.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>AuthorizationError</strong> - If the credentials are not valid, this error will be raised.</td>
-</tr>
-</tbody>
-</table>
+<code class="docutils literal notranslate"><span class="pre">(username,</span> <span class="pre">password)</span></code> tuple.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AuthorizationError :</strong> – If the credentials are not valid, this error will be raised.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.disconnect">
-<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.disconnect" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.disconnect">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.disconnect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect from the key-value store</p>
 <p>This method disposes or disconnects to any long-lived resources that the
 store requires.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.exists">
-<code class="descname">exists</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.exists" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test whether or not a key exists in the key-value store</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>exists</strong> (bool) - Whether or not the key exists in the key-value store.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>exists</strong> – Whether or not the key exists in the key-value store.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.get">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream of data and metdata from a given key in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>value</strong> (instance of Value) - An instance of a Value subclass which holds references to the data, metadata and other information about the key.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - If the key is not found in the store, a KeyError is raised.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>value</strong> – An instance of a Value subclass which holds references to the data,
+metadata and other information about the key.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>instance of Value</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – If the key is not found in the store, a KeyError is raised.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_data" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a stream from a given key in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> – A readable file-like object the that provides stream of data from the
+key-value store.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>file-like</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – This will raise a key error if the key is not present in the store.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.get_data_range">
-<code class="descname">get_data_range</code><span class="sig-paren">(</span><em>key</em>, <em>start=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_data_range" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.get_data_range">
+<span class="sig-name descname"><span class="pre">get_data_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.get_data_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_data_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a partial stream from a given key in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>start</strong> (<em>int or None</em>) &#8211; The first byte to return</li>
-<li><strong>end</strong> (<em>int or None</em>) &#8211; The last byte of to return</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><em>None</em>) – The first byte to return</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em> or </em><em>None</em>) – The last byte of to return</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>data</strong> (file-like) - A readable file-like object the that provides stream of data from the key-value store.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> – A readable file-like object the that provides stream of data from the
+key-value store.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>file-like</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – This will raise a key error if the key is not present in the store.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.get_metadata">
-<code class="descname">get_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.get_metadata">
+<span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a given key in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the result.  If unspecified, then
-return the entire metadata dictionary.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>select</strong> (<em>iterable of strings</em><em> or </em><em>None</em>) – Which metadata keys to populate in the result.  If unspecified, then
+return the entire metadata dictionary.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadata</strong> (dict) - A dictionary of metadata associated with the key.  The dictionary has keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>metadata</strong> – A dictionary of metadata associated with the key.  The dictionary
+has keys as specified by the select argument.  If a key specified in
+select is not present in the metadata, then it will not be present
+in the returned value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – This will raise a key error if the key is not present in the store.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.glob">
-<code class="descname">glob</code><span class="sig-paren">(</span><em>pattern</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.glob" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.glob">
+<span class="sig-name descname"><span class="pre">glob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.glob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.glob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return keys which match glob-style patterns</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Glob-style pattern to match keys with.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - A iterable of keys which match the glob pattern.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pattern</strong> (<em>string</em>) – Glob-style pattern to match keys with.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – A iterable of keys which match the glob pattern.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.is_connected">
-<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.is_connected" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.is_connected">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_connected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.is_connected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether or not the store is currently connected</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>connected</strong> (bool) - Whether or not the store is currently connected.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>connected</strong> – Whether or not the store is currently connected.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget">
-<code class="descname">multiget</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget">
+<span class="sig-name descname"><span class="pre">multiget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.multiget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the data and metadata for a collection of keys.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of (file-like, dict) tuples) - An iterator of (data, metadata) pairs.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>keys</strong> (<em>iterable of strings</em>) – The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – An iterator of (data, metadata) pairs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterator of (file-like, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>) tuples</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – This will raise a key error if the key is not present in the store.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget_data">
-<code class="descname">multiget_data</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget_data" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget_data">
+<span class="sig-name descname"><span class="pre">multiget_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.multiget_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the data for a collection of keys.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterator of file-like) - An iterator of file-like data objects corresponding to the keys.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>keys</strong> (<em>iterable of strings</em>) – The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – An iterator of file-like data objects corresponding to the keys.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterator of file-like</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – This will raise a key error if the key is not present in the store.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget_metadata">
-<code class="descname">multiget_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>select=None</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.multiget_metadata">
+<span class="sig-name descname"><span class="pre">multiget_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.multiget_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.multiget_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the metadata for a collection of keys in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; Which metadata keys to populate in the results.  If unspecified, then
-return the entire metadata dictionary.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<em>iterable of strings</em>) – The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</p></li>
+<li><p><strong>select</strong> (<em>iterable of strings</em><em> or </em><em>None</em>) – Which metadata keys to populate in the results.  If unspecified, then
+return the entire metadata dictionary.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>metadatas</strong> (iterator of dicts) - An iterator of dictionaries of metadata associated with the key. The dictionaries have keys as specified by the select argument.  If a key specified in select is not present in the metadata, then it will not be present in the returned value.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - This will raise a key error if the key is not present in the store.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>metadatas</strong> – An iterator of dictionaries of metadata associated with the key.
+The dictionaries have keys as specified by the select argument.  If
+a key specified in select is not present in the metadata, then it
+will not be present in the returned value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterator of dicts</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – This will raise a key error if the key is not present in the store.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.query">
-<code class="descname">query</code><span class="sig-paren">(</span><em>select=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.query" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.query">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys and metadata matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
 will return the complete set of metadata for the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>select</strong> (<em>iterable of strings or None</em>) &#8211; An optional list of metadata keys to return.  If this is not None,
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>select</strong> (<em>iterable of strings</em><em> or </em><em>None</em>) – An optional list of metadata keys to return.  If this is not None,
 then the metadata dictionaries will only have values for the specified
-keys populated.</li>
-<li><strong>kwargs</strong> &#8211; Arguments where the keywords are metadata keys, and values are
-possible values for that metadata item.</li>
+keys populated.</p></li>
+<li><p><strong>kwargs</strong> – Arguments where the keywords are metadata keys, and values are
+possible values for that metadata item.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>result</strong> (iterable) - An iterable of (key, metadata) tuples where metadata matches all the specified values for the specified metadata keywords. If a key specified in select is not present in the metadata of a particular key, then it will not be present in the returned value.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – An iterable of (key, metadata) tuples where metadata matches
+all the specified values for the specified metadata keywords.
+If a key specified in select is not present in the metadata of a
+particular key, then it will not be present in the returned value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.query_keys">
-<code class="descname">query_keys</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.query_keys" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.query_keys">
+<span class="sig-name descname"><span class="pre">query_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.query_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.query_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query for keys matching metadata provided as keyword arguments</p>
 <p>This provides a very simple querying interface that returns precise
 matches with the metadata.  If no arguments are supplied, the query
 will return the complete set of keys for the key-value store.</p>
-<p>This is equivalent to <code class="docutils literal"><span class="pre">self.query(**kwargs).keys()</span></code>, but potentially
+<p>This is equivalent to <code class="docutils literal notranslate"><span class="pre">self.query(**kwargs).keys()</span></code>, but potentially
 more efficiently implemented.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; Arguments where the keywords are metadata keys, and values are
-possible values for that metadata item.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>result</strong> (iterable) - An iterable of key-value store keys whose metadata matches all the specified values for the specified metadata keywords.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – Arguments where the keywords are metadata keys, and values are
+possible values for that metadata item.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – An iterable of key-value store keys whose metadata matches all the
+specified values for the specified metadata keywords.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.to_bytes">
-<code class="descname">to_bytes</code><span class="sig-paren">(</span><em>key</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.to_bytes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.to_bytes">
+<span class="sig-name descname"><span class="pre">to_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.to_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.to_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store the data associated with a key into a bytes object.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from the underlying data store to a bytes
 object.  The default implementation uses the get() method
 together with chunked reads from the returned data stream and join.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>bytes</strong>  - The contents of the file-like object as bytes.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to extracting the data.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is extracted.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after extracting the data.</li>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>bytes</em> – The contents of the file-like object as bytes.</p></li>
+<li><p><em>Events</em></p></li>
+<li><p><em>——</em></p></li>
+<li><p><em>StoreProgressStartEvent</em> – For buffering implementations, this event should be emitted prior to
+extracting the data.</p></li>
+<li><p><em>StoreProgressStepEvent</em> – For buffering implementations, this event should be emitted
+periodically as data is extracted.</p></li>
+<li><p><em>StoreProgressEndEvent</em> – For buffering implementations, this event should be emitted after
+extracting the data.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractReadOnlyStore.to_file">
-<code class="descname">to_file</code><span class="sig-paren">(</span><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.to_file" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractReadOnlyStore.to_file">
+<span class="sig-name descname"><span class="pre">to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractReadOnlyStore.to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractReadOnlyStore.to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store the data associated with a key into a file.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from the underlying data store to a path
 in the filesystem.  The default implementation uses the get() method
 together with chunked reads from the returned data stream to the disk.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to store the data to.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>path</strong> (<em>string</em>) – A file system path to store the data to.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreProgressStartEvent</strong> – For buffering implementations, this event should be emitted prior to
+writing any data to disk.</p></li>
+<li><p><strong>StoreProgressStepEvent</strong> – For buffering implementations, this event should be emitted
+periodically as data is written to disk.</p></li>
+<li><p><strong>StoreProgressEndEvent</strong> – For buffering implementations, this event should be emitted after
+finishing writing to disk.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to disk.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to disk.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to disk.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="encore.storage.abstract_store.AbstractStore">
-<em class="property">class </em><code class="descclassname">encore.storage.abstract_store.</code><code class="descname">AbstractStore</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.abstract_store.</span></span><span class="sig-name descname"><span class="pre">AbstractStore</span></span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for Key-Value Store API</p>
 <p>This class implements some of the API so that it can be used with super()
 where appropriate.</p>
-<dl class="attribute">
-<dt id="encore.storage.abstract_store.AbstractStore.event_manager">
-<code class="descname">event_manager</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.event_manager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a> API.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.event_manager">
+<span class="sig-name descname"><span class="pre">event_manager</span></span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.event_manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every store is assumed to have an event_manager attribute which
+implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEventManager</span></code></a> API.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.delete">
-<code class="descname">delete</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.delete" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.delete">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a key from the repsository.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreDeleteEvent</strong> – On successful completion of a transaction, a StoreDeleteEvent should
+be emitted with the key.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.from_bytes">
-<code class="descname">from_bytes</code><span class="sig-paren">(</span><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.from_bytes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.from_bytes">
+<span class="sig-name descname"><span class="pre">from_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.from_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.from_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently store a bytes object as the data associated with a key.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from a bytes object to the underlying
 data store.  The default implementation uses the set() method
 together with a cStringIO.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>data</strong> (<em>bytes</em>) &#8211; The data as a bytes object.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.10)"><em>bytes</em></a>) – The data as a bytes object.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.from_file">
-<code class="descname">from_file</code><span class="sig-paren">(</span><em>key</em>, <em>path</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.from_file" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.from_file">
+<span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Efficiently read data from a file into a key in the key-value store.</p>
 <p>This method can be optionally overriden by subclasses to proved a more
 efficient way of copy the data from a path in the filesystem to the
@@ -572,246 +620,225 @@ underlying data store.   The default implementation uses the set() method
 together with chunked reads from the disk which are fed into the data
 stream.</p>
 <p>This makes no attempt to set metadata.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>path</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; A file system path to read the data from.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>path</strong> (<em>string</em>) – A file system path to read the data from.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.multiset">
-<code class="descname">multiset</code><span class="sig-paren">(</span><em>keys</em>, <em>values</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.multiset">
+<span class="sig-name descname"><span class="pre">multiset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.multiset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the data and metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
 <p>Like zip() if keys and values have different lengths, then any excess
 values in the longer list should be silently ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>values</strong> (<em>iterable of (file-like, dict) tuples</em>) &#8211; An iterator that provides the (data, metadata) pairs for the
-corresponding keys.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<em>iterable of strings</em>) – The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</p></li>
+<li><p><strong>values</strong> (<em>iterable of</em><em> (</em><em>file-like</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>) </em><em>tuples</em>) – An iterator that provides the (data, metadata) pairs for the
+corresponding keys.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreProgressStartEvent</strong> – For buffering implementations, this event should be emitted prior to
+writing any data to the underlying store.</p></li>
+<li><p><strong>StoreProgressStepEvent</strong> – For buffering implementations, this event should be emitted
+periodically as data is written to the underlying store.</p></li>
+<li><p><strong>StoreProgressEndEvent</strong> – For buffering implementations, this event should be emitted after
+finishing writing to the underlying store.</p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata for each key that was set.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.multiset_data">
-<code class="descname">multiset_data</code><span class="sig-paren">(</span><em>keys</em>, <em>datas</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset_data" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.multiset_data">
+<span class="sig-name descname"><span class="pre">multiset_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.multiset_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the data for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
 <p>Like zip() if keys and datas have different lengths, then any excess
 values in the longer list should be silently ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>datas</strong> (<em>iterable of file-like objects</em>) &#8211; An iterator that provides the data file-like objects for the
-corresponding keys.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<em>iterable of strings</em>) – The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</p></li>
+<li><p><strong>datas</strong> (<em>iterable of file-like objects</em>) – An iterator that provides the data file-like objects for the
+corresponding keys.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreProgressStartEvent</strong> – For buffering implementations, this event should be emitted prior to
+writing any data to the underlying store.</p></li>
+<li><p><strong>StoreProgressStepEvent</strong> – For buffering implementations, this event should be emitted
+periodically as data is written to the underlying store.</p></li>
+<li><p><strong>StoreProgressEndEvent</strong> – For buffering implementations, this event should be emitted after
+finishing writing to the underlying store.</p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata for each key that was set.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.multiset_metadata">
-<code class="descname">multiset_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>metadatas</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.multiset_metadata">
+<span class="sig-name descname"><span class="pre">multiset_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadatas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.multiset_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiset_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
 <p>Like zip() if keys and metadatas have different lengths, then any excess
 values in the longer list should be silently ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
-corresponding keys.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<em>iterable of strings</em>) – The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</p></li>
+<li><p><strong>metadatas</strong> (<em>iterable of dicts</em>) – An iterator that provides the metadata dictionaries for the
+corresponding keys.</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata for each key that was set.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.multiupdate_metadata">
-<code class="descname">multiupdate_metadata</code><span class="sig-paren">(</span><em>keys</em>, <em>metadatas</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.multiupdate_metadata">
+<span class="sig-name descname"><span class="pre">multiupdate_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadatas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.multiupdate_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.multiupdate_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the metadata for a collection of keys.</p>
 <p>Where supported by an implementation, this should perform the whole
 collection of sets as a single transaction.</p>
 <p>Like zip() if keys and metadatas have different lengths, then any excess
 values in the longer list should be silently ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of strings</em>) &#8211; The keys for the resources in the key-value store.  Each key is a
-unique identifier for a resource within the key-value store.</li>
-<li><strong>metadatas</strong> (<em>iterable of dicts</em>) &#8211; An iterator that provides the metadata dictionaries for the
-corresponding keys.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<em>iterable of strings</em>) – The keys for the resources in the key-value store.  Each key is a
+unique identifier for a resource within the key-value store.</p></li>
+<li><p><strong>metadatas</strong> (<em>iterable of dicts</em>) – An iterator that provides the metadata dictionaries for the
+corresponding keys.</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata for each key that was set.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.set">
-<code class="descname">set</code><span class="sig-paren">(</span><em>key</em>, <em>value</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.set">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store a stream of data into a given key in the key-value store.</p>
 <p>This may be left unimplemented by subclasses that represent a read-only
 key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>value</strong> (<em>instance of Value</em>) &#8211; An instance of a Value subclass.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>value</strong> (<em>instance of Value</em>) – An instance of a Value subclass.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreProgressStartEvent</strong> – For buffering implementations, this event should be emitted prior to
+writing any data to the underlying store.</p></li>
+<li><p><strong>StoreProgressStepEvent</strong> – For buffering implementations, this event should be emitted
+periodically as data is written to the underlying store.</p></li>
+<li><p><strong>StoreProgressEndEvent</strong> – For buffering implementations, this event should be emitted after
+finishing writing to the underlying store.</p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.set_data">
-<code class="descname">set_data</code><span class="sig-paren">(</span><em>key</em>, <em>data</em>, <em>buffer_size=1048576</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set_data" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.set_data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1048576</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.set_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the data for a given key in the key-value store.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>data</strong> (<em>file-like</em>) &#8211; A readable file-like object the that provides stream of data from the
-key-value store.</li>
-<li><strong>buffer_size</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; An optional indicator of the number of bytes to read at a time.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>data</strong> (<em>file-like</em>) – A readable file-like object the that provides stream of data from the
+key-value store.</p></li>
+<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An optional indicator of the number of bytes to read at a time.
 Implementations are free to ignore this hint or use a different
-default if they need to.  The default is 1048576 bytes (1 MiB).</li>
+default if they need to.  The default is 1048576 bytes (1 MiB).</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreProgressStartEvent</strong> – For buffering implementations, this event should be emitted prior to
+writing any data to the underlying store.</p></li>
+<li><p><strong>StoreProgressStepEvent</strong> – For buffering implementations, this event should be emitted
+periodically as data is written to the underlying store.</p></li>
+<li><p><strong>StoreProgressEndEvent</strong> – For buffering implementations, this event should be emitted after
+finishing writing to the underlying store.</p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.set_metadata">
-<code class="descname">set_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set_metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.set_metadata">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.set_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.set_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set new metadata for a given key in the key-value store.</p>
 <p>This replaces the existing metadata set for the key with a new set of
 metadata.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
-keys should be strings which are valid Python identifiers.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.transaction">
-<code class="descname">transaction</code><span class="sig-paren">(</span><em>notes</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.transaction" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.transaction">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.transaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.transaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a transaction context manager</p>
 <p>Implementations which have no native notion of transactions may choose
 not to implement this.</p>
 <p>This method provides a context manager which creates a data store
 transaction in its __enter__() method, and commits it in its __exit__()
 method if no errors occur.  Intended usage is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s2">&quot;Writing data...&quot;</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">repo</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s2">&quot;Writing data...&quot;</span><span class="p">):</span>
     <span class="c1"># everything written in this block is part of the transaction</span>
     <span class="o">...</span>
 </pre></div>
@@ -819,196 +846,228 @@ method if no errors occur.  Intended usage is:</p>
 <p>If the block exits without error, the transaction commits, otherwise
 the transaction should roll back the state of the underlying data store
 to the start of the transaction.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>notes</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Some information about the transaction, which may or may not be used
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>notes</strong> (<em>string</em>) – Some information about the transaction, which may or may not be used
 by the implementation.</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transaction</strong> (context manager) - A context manager for the transaction.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Events:</th><td class="field-body"><ul class="first last simple">
-<li><strong>StoreTransactionStartEvent</strong> - This event should be emitted on entry into the transaction.</li>
-<li><strong>StoreProgressStartEvent</strong> - For buffering implementations, this event should be emitted prior to writing any data to the underlying store.</li>
-<li><strong>StoreProgressStepEvent</strong> - For buffering implementations, this event should be emitted periodically as data is written to the underlying store.</li>
-<li><strong>StoreProgressEndEvent</strong> - For buffering implementations, this event should be emitted after finishing writing to the underlying store.</li>
-<li><strong>StoreTransactionEndEvent</strong> - This event should be emitted on successful conclusion of the transaction, before any Set or Delete events are emitted.</li>
-<li><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata for each key that was set during the transaction.</li>
-<li><strong>StoreDeleteEvent</strong> - On successful completion of a transaction, a StoreDeleteEvent should be emitted with the key for all deleted keys.</li>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>transaction</strong> (<em>context manager</em>) – A context manager for the transaction.</p></li>
+<li><p><em>Events</em></p></li>
+<li><p><em>——</em></p></li>
+<li><p><em>StoreTransactionStartEvent</em> – This event should be emitted on entry into the transaction.</p></li>
+<li><p><em>StoreProgressStartEvent</em> – For buffering implementations, this event should be emitted prior to
+writing any data to the underlying store.</p></li>
+<li><p><em>StoreProgressStepEvent</em> – For buffering implementations, this event should be emitted
+periodically as data is written to the underlying store.</p></li>
+<li><p><em>StoreProgressEndEvent</em> – For buffering implementations, this event should be emitted after
+finishing writing to the underlying store.</p></li>
+<li><p><em>StoreTransactionEndEvent</em> – This event should be emitted on successful conclusion of the
+transaction, before any Set or Delete events are emitted.</p></li>
+<li><p><em>StoreSetEvent</em> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata for each key that was set during the
+transaction.</p></li>
+<li><p><em>StoreDeleteEvent</em> – On successful completion of a transaction, a StoreDeleteEvent should
+be emitted with the key for all deleted keys.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractStore.update_metadata">
-<code class="descname">update_metadata</code><span class="sig-paren">(</span><em>key</em>, <em>metadata</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.update_metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractStore.update_metadata">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractStore.update_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractStore.update_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the metadata for a given key in the key-value store.</p>
 <p>This performs a dictionary update on the existing metadata with the
 provided metadata keys and values</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The key for the resource in the key-value store.  They key is a unique
-identifier for the resource within the key-value store.</li>
-<li><strong>metadata</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; A dictionary of metadata to associate with the key.  The dictionary
-keys should be strings which are valid Python identifiers.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – The key for the resource in the key-value store.  They key is a unique
+identifier for the resource within the key-value store.</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – A dictionary of metadata to associate with the key.  The dictionary
+keys should be strings which are valid Python identifiers.</p></li>
+<li><p><strong>Events</strong> – </p></li>
+<li><p><strong>------</strong> – </p></li>
+<li><p><strong>StoreSetEvent</strong> – On successful completion of a transaction, a StoreSetEvent should be
+emitted with the key &amp; metadata</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Events:</th><td class="field-body"><p class="first last"><strong>StoreSetEvent</strong> - On successful completion of a transaction, a StoreSetEvent should be emitted with the key &amp; metadata</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="encore.storage.abstract_store.AbstractAuthorizingStore">
-<em class="property">class </em><code class="descclassname">encore.storage.abstract_store.</code><code class="descname">AbstractAuthorizingStore</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractAuthorizingStore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.abstract_store.</span></span><span class="sig-name descname"><span class="pre">AbstractAuthorizingStore</span></span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractAuthorizingStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class for Key-Value Store API with permissioning</p>
 <p>This class implements some of the API so that it can be used with super()
 where appropriate.</p>
 <p>Permission information is available only to authenticated users who are
 designated as owners of a particular key.  Permissions are simply strings
 representing some right that the store allows, the only required permission
-being &#8216;owned&#8217;.</p>
+being ‘owned’.</p>
 <p>Each permission has a set of tags which are granted that permission.  A tag
 represents a user, group or role that will be granted that permission.  The
 meaning of tags is also store dependent: a filesystem-based store may have
-tags for &#8216;user&#8217;, &#8216;group&#8217; and &#8216;other&#8217;; while a web-based store may derive its
+tags for ‘user’, ‘group’ and ‘other’; while a web-based store may derive its
 tags from a role-based authentication system.</p>
-<dl class="attribute">
-<dt id="encore.storage.abstract_store.AbstractAuthorizingStore.event_manager">
-<code class="descname">event_manager</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.event_manager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Every store is assumed to have an event_manager attribute which     implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a> API.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractAuthorizingStore.event_manager">
+<span class="sig-name descname"><span class="pre">event_manager</span></span><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.event_manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every store is assumed to have an event_manager attribute which
+implements the <a class="reference internal" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEventManager</span></code></a> API.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractAuthorizingStore.get_permissions">
-<code class="descname">get_permissions</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.get_permissions" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractAuthorizingStore.get_permissions">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractAuthorizingStore.get_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.get_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the set of permissions the user has</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The key for the resource which you want to know the permissions.</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>permissions</strong> (dict of str: set of str) - A dictionary whose keys are the permissions and values are sets of tags which have that permission.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><strong>KeyError</strong> - This error will be raised if the key does not exist or the user is not authorized to see it.</li>
-<li><strong>AuthorizationError</strong> - This error will be raised if user is authorized to see the key, but is not an owner.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The key for the resource which you want to know the permissions.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>permissions</strong> – A dictionary whose keys are the permissions and values are sets of
+tags which have that permission.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of str: set of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError :</strong> – This error will be raised if the key does not exist or the user is
+    not authorized to see it.</p></li>
+<li><p><strong>AuthorizationError :</strong> – This error will be raised if user is authorized to see the key, but
+    is not an owner.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractAuthorizingStore.set_permissions">
-<code class="descname">set_permissions</code><span class="sig-paren">(</span><em>key</em>, <em>permissions</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.set_permissions" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractAuthorizingStore.set_permissions">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permissions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractAuthorizingStore.set_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.set_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the permissions on a key the user owns</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The key for the resource which you want to know the permissions.</li>
-<li><strong>permissions</strong> (<em>dict of str: set of str</em>) &#8211; A dictionary whose keys are the permissions and values are sets of
-tags which have that permission.  There must be an &#8216;owned&#8217;
-permission with at least one tag.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The key for the resource which you want to know the permissions.</p></li>
+<li><p><strong>permissions</strong> (<em>dict of str: set of str</em>) – A dictionary whose keys are the permissions and values are sets of
+tags which have that permission.  There must be an ‘owned’
+permission with at least one tag.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><strong>KeyError</strong> - This error will be raised if the key does not exist or the user is not authorized to see it.</li>
-<li><strong>AuthorizationError</strong> - This error will be raised if user is authorized to see the key, but is not an owner.</li>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError :</strong> – This error will be raised if the key does not exist or the user is
+    not authorized to see it.</p></li>
+<li><p><strong>AuthorizationError :</strong> – This error will be raised if user is authorized to see the key, but
+    is not an owner.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.storage.abstract_store.AbstractAuthorizingStore.update_permissions">
-<code class="descname">update_permissions</code><span class="sig-paren">(</span><em>key</em>, <em>permissions</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.update_permissions" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractAuthorizingStore.update_permissions">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permissions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/abstract_store.html#AbstractAuthorizingStore.update_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.update_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add permissions on a key the user owns</p>
 <p>The tags provided in the permissions dictionary will be added to the
 existing set of tags for each permission.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The key for the resource which you want to know the permissions.</li>
-<li><strong>permissions</strong> (<em>dict of str: set of str</em>) &#8211; A dictionary whose keys are the permissions and values are sets of
-tags which have that permission.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The key for the resource which you want to know the permissions.</p></li>
+<li><p><strong>permissions</strong> (<em>dict of str: set of str</em>) – A dictionary whose keys are the permissions and values are sets of
+tags which have that permission.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><strong>KeyError</strong> - This error will be raised if the key does not exist or the user is not authorized to see it.</li>
-<li><strong>AuthorizationError</strong> - This error will be raised if user is authorized to see the key, but is not an owner.</li>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError :</strong> – This error will be raised if the key does not exist or the user is
+    not authorized to see it.</p></li>
+<li><p><strong>AuthorizationError :</strong> – This error will be raised if user is authorized to see the key, but
+    is not an owner.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="encore.storage.abstract_store.AbstractAuthorizingStore.user_tag">
-<code class="descname">user_tag</code><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.user_tag" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="encore.storage.abstract_store.AbstractAuthorizingStore.user_tag">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_tag</span></span><a class="headerlink" href="#encore.storage.abstract_store.AbstractAuthorizingStore.user_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>A tag that represents the user</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
         </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="usage.html"
+                          title="previous chapter">Usage</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="events.html"
+                          title="next chapter">Events</a></p>
+  </div>
+  <h3>This Page</h3>
+  <div>
+    <a href="../_sources/storage/abstract_store.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
       </div>
-      <div class="clearer"></div>
+        </div>
+      </div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="events.html" title="Events"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="usage.html" title="Usage"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
-      </ul>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
     </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2011-2017, Enthought, Inc..
-      Last updated on Jan 19, 2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
     </div>
   </body>
 </html>

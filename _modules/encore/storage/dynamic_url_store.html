@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>encore.storage.dynamic_url_store &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../../../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../../../genindex.html" >
+    <link rel="search" title="Search" href="../../../search.html" >
+    <link rel="top" title="Encore Documentation" href="../../../index.html" >
+    <link rel="up" title="Module code" href="../../index.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../../../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="../../index.html" accesskey="U">Module code</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../../../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../../../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <h1>Source code for encore.storage.dynamic_url_store</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># (C) Copyright 2011-2022 Enthought, Inc., Austin, TX</span>
+<span class="c1"># All right reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is open source software distributed according to the terms in</span>
+<span class="c1"># LICENSE.txt</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Dynamic URL Store</span>
+<span class="sd">=================</span>
+
+<span class="sd">This module contains the :py:class:`~DynamicURLStore` store that communicates</span>
+<span class="sd">with a remote HTTP server which provides the actual data storage.  This is a</span>
+<span class="sd">store which implements the basic operations via HTTP GET, POST, PUT and DELETE</span>
+<span class="sd">commands as described in the class documentation.</span>
+
+<span class="sd">The implementation relies on the third-party `requests` library to handle the</span>
+<span class="sd">HTTP operations.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">email.utils</span> <span class="kn">import</span> <span class="n">parsedate_tz</span><span class="p">,</span> <span class="n">mktime_tz</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">.abstract_store</span> <span class="kn">import</span> <span class="n">AbstractAuthorizingStore</span><span class="p">,</span> <span class="n">Value</span><span class="p">,</span> <span class="n">AuthorizationError</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">DummyTransactionContext</span><span class="p">,</span> <span class="n">BufferIteratorIO</span><span class="p">,</span> <span class="n">buffer_iterator</span>
+
+<span class="n">_requests_version</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">DEFAULT_PARTS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="s1">&#39;metadata&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;permissions&#39;</span><span class="p">:</span> <span class="s1">&#39;auth&#39;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">RequestsURLValue</span><span class="p">(</span><span class="n">Value</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span>
+                 <span class="n">url_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{base}</span><span class="s1">/</span><span class="si">{key}</span><span class="s1">/</span><span class="si">{part}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">parts</span><span class="o">=</span><span class="n">DEFAULT_PARTS</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">session</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url_format</span> <span class="o">=</span> <span class="n">url_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parts</span> <span class="o">=</span> <span class="n">parts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_info</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
+
+        <span class="n">modified</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Last-Modified&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">modified</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">modified</span> <span class="o">=</span> <span class="n">mktime_tz</span><span class="p">(</span><span class="n">parsedate_tz</span><span class="p">(</span><span class="n">modified</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modified</span> <span class="o">=</span> <span class="n">modified</span>
+
+        <span class="n">mimetype</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;application/octet-stream&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+
+    <span class="k">def</span> <span class="nf">_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span><span class="p">,</span>
+                                       <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span>
+                                       <span class="n">part</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parts</span><span class="p">[</span><span class="n">part</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_validate_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span> <span class="ow">or</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AuthorizationError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span><span class="o">.</span><span class="n">raw</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="s1">&#39;metadata&#39;</span><span class="p">),</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metadata</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="s1">&#39;permissions&#39;</span><span class="p">),</span>
+                                     <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">permissions</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">permissions</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modified</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modified</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mimetype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mimetype</span>
+
+    <span class="k">def</span> <span class="nf">range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># need to build a reqquest with a range header</span>
+        <span class="n">start_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">end_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;range&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes=</span><span class="si">{0}</span><span class="s1">-</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_string</span><span class="p">,</span> <span class="n">end_string</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">_requests_version</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                                     <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">prefetch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                                     <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">206</span><span class="p">:</span>
+            <span class="c1"># it worked!</span>
+            <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">raw</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># we don&#39;t support range requests...</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">max_bytes</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+                <span class="k">return</span> <span class="n">BufferIteratorIO</span><span class="p">(</span><span class="n">buffer_iterator</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span>
+                                                        <span class="n">max_bytes</span><span class="o">=</span><span class="n">max_bytes</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">raw</span>
+
+    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX in future add support for compression</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Accept-Encoding&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">_requests_version</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                                                    <span class="n">prefetch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                                                    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span><span class="p">)</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
+
+        <span class="n">modified</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Last-Modified&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">modified</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">modified</span> <span class="o">=</span> <span class="n">mktime_tz</span><span class="p">(</span><span class="n">parsedate_tz</span><span class="p">(</span><span class="n">modified</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modified</span> <span class="o">=</span> <span class="n">modified</span>
+
+        <span class="n">mimetype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span>
+                                                   <span class="s1">&#39;application/octet-stream&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_response</span><span class="o">.</span><span class="n">raw</span>
+
+
+<div class="viewcode-block" id="DynamicURLStore"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore">[docs]</a><span class="k">class</span> <span class="nc">DynamicURLStore</span><span class="p">(</span><span class="n">AbstractAuthorizingStore</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Store implementation which gets and sets from a web server</span>
+
+<span class="sd">    This store expects a server which exposes URLs for each key.  By default</span>
+<span class="sd">    these URLs are of the form::</span>
+
+<span class="sd">        &lt;base&gt;/&lt;key&gt;/&lt;part&gt;</span>
+
+<span class="sd">    Where `&lt;base&gt;` is a common prefix, `&lt;key&gt;` is the key of interest, and</span>
+<span class="sd">    `&lt;part&gt;` is one of &quot;data&quot;, &quot;metadata&quot; or &quot;auth&quot;.  If the store does not</span>
+<span class="sd">    follow this format, you can provide a differnt ``url_format`` argument</span>
+<span class="sd">    and a different mapping of `&lt;part&gt;` to aspects of the key.</span>
+
+<span class="sd">    The server is expected to respond to queries against these URLS in the</span>
+<span class="sd">    following ways:</span>
+
+<span class="sd">        `GET &lt;base&gt;/&lt;key&gt;/data`</span>
+<span class="sd">            return the bytes in the body of the response</span>
+
+<span class="sd">        `PUT &lt;base&gt;/&lt;key&gt;/data`</span>
+<span class="sd">            accept the data bytes from the body of the request</span>
+
+<span class="sd">        `GET &lt;base&gt;/&lt;key&gt;/metadata`</span>
+<span class="sd">            return metadata as JSON</span>
+
+<span class="sd">        `PUT &lt;base&gt;/&lt;key&gt;/metadata`</span>
+<span class="sd">            set the metadata based on JSON contained in the body of the request</span>
+
+<span class="sd">        `POST &lt;base&gt;/&lt;key&gt;/metadata`</span>
+<span class="sd">            update the metadata based on JSON contained in the body of the</span>
+<span class="sd">            request (as `dict.update()`)</span>
+
+<span class="sd">        `GET &lt;base&gt;/&lt;key&gt;/auth`</span>
+<span class="sd">            return permissions information as JSON</span>
+
+<span class="sd">        `PUT &lt;base&gt;/&lt;key&gt;/auth`</span>
+<span class="sd">            set the permissions based on JSON contained in the body of the</span>
+<span class="sd">            request</span>
+
+<span class="sd">        `POST &lt;base&gt;/&lt;key&gt;/metadata`</span>
+<span class="sd">            update the permissions based on JSON contained in the body of the</span>
+<span class="sd">            request</span>
+
+<span class="sd">    In addition, a DELETE request to a URL of the form `&lt;base&gt;/&lt;key&gt;` should</span>
+<span class="sd">    remove the key from the remote store.  This pattern is configurable via</span>
+<span class="sd">    the ``url_format_no_part`` argument to the constructor.</span>
+
+<span class="sd">    In addition, the server should have a query URL which accepts GET reuqests</span>
+<span class="sd">    containing a JSON data structure of metadata key, value pairs to filter</span>
+<span class="sd">    with, and should return a list of macthing keys, one per line.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">query_url</span><span class="p">,</span> <span class="n">url_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{base}</span><span class="s1">/</span><span class="si">{key}</span><span class="s1">/</span><span class="si">{part}</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="n">url_format_no_part</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{base}</span><span class="s1">/</span><span class="si">{key}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">parts</span><span class="o">=</span><span class="n">DEFAULT_PARTS</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AbstractAuthorizingStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_url</span> <span class="o">=</span> <span class="n">query_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_tag</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_format</span> <span class="o">=</span> <span class="n">url_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_format_no_part</span> <span class="o">=</span> <span class="n">url_format_no_part</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parts</span> <span class="o">=</span> <span class="n">parts</span>
+
+<div class="viewcode-block" id="DynamicURLStore.user_tag"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.user_tag">[docs]</a>    <span class="k">def</span> <span class="nf">user_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_tag</span></div>
+
+    <span class="k">def</span> <span class="nf">_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="n">safe_key</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="s2">&quot;/~!$&amp;&#39;()*+,;=:@&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">part</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">,</span>
+                                         <span class="n">key</span><span class="o">=</span><span class="n">safe_key</span><span class="p">,</span>
+                                         <span class="n">part</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="n">part</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">url</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_format_no_part</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">,</span>
+                                                 <span class="n">key</span><span class="o">=</span><span class="n">safe_key</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">url</span>
+
+    <span class="k">def</span> <span class="nf">_validate_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span> <span class="ow">or</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AuthorizationError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DynamicURLStore.get"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">safe_key</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="s2">&quot;/~!$&amp;&#39;()*+,;=:@&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">RequestsURLValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">,</span> <span class="n">safe_key</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">url_format</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parts</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+    <span class="n">get</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">get</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.connect"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Connect to a DynamicURLStore</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        credentials : (user_tag, requests.Session)</span>
+<span class="sd">            The credentials are a tuple containing ther user&#39;s permission tag</span>
+<span class="sd">            and a requests Session initialized with appropriate authentication.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">credentials</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DynamicURLStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DynamicURLStore.disconnect"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DynamicURLStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DynamicURLStore.is_connected"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DynamicURLStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_connected</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DynamicURLStore.info"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DynamicURLStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DynamicURLStore.set"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s1">&#39;Setting key &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
+    <span class="nb">set</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">set</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.delete"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">))</span></div>
+    <span class="n">delete</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">delete</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.get_data"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Accept-Encoding&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">_requests_version</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                                         <span class="n">prefetch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                                         <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">raw</span></div>
+    <span class="n">get_data</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">get_data</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.set_data"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+    <span class="n">set_data</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">set_data</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.set_metadata"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;metadata&#39;</span><span class="p">),</span>
+                                     <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">metadata</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+    <span class="n">set_metadata</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">set_metadata</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.get_metadata"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;metadata&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_requests_version</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">select</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">select</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">metadata</span></div>
+    <span class="n">get_metadata</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">get_metadata</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.update_metadata"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.update_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">update_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;metadata&#39;</span><span class="p">),</span>
+                                      <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">metadata</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+    <span class="n">update_metadata</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">update_metadata</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.get_permissions"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.get_permissions">[docs]</a>    <span class="k">def</span> <span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;permissions&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_requests_version</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+    <span class="n">get_permissions</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">get_permissions</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.set_permissions"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.set_permissions">[docs]</a>    <span class="k">def</span> <span class="nf">set_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">permissions</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;permissions&#39;</span><span class="p">),</span>
+                                     <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">permissions</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span></div>
+    <span class="n">set_permissions</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">set_permissions</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.update_permissions"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.update_permissions">[docs]</a>    <span class="k">def</span> <span class="nf">update_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">permissions</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;permissions&#39;</span><span class="p">),</span>
+                                      <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">permissions</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span></div>
+    <span class="n">update_permissions</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">update_permissions</span><span class="o">.</span><span class="vm">__doc__</span>  <span class="c1"># noqa</span>
+
+<div class="viewcode-block" id="DynamicURLStore.transaction"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.transaction">[docs]</a>    <span class="k">def</span> <span class="nf">transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Provide a transaction context manager</span>
+
+<span class="sd">        This class does not support transactions, so it returns a dummy object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DummyTransactionContext</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DynamicURLStore.query"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_keys</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="n">select</span><span class="p">))</span></div>
+    <span class="n">query</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="DynamicURLStore.query_keys"><a class="viewcode-back" href="../../../storage/dynamic_url_store.html#encore.storage.dynamic_url_store.DynamicURLStore.query_keys">[docs]</a>    <span class="k">def</span> <span class="nf">query_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">iter_lines</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">line</span></div>
+    <span class="n">query_keys</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">AbstractAuthorizingStore</span><span class="o">.</span><span class="n">query_keys</span><span class="o">.</span><span class="vm">__doc__</span></div>
+</pre></div>
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

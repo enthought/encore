@@ -1,317 +1,338 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Abstract Event Manager API &mdash; Encore Documentation</title>
     
-    <title>Abstract Event Manager API &mdash; Encore 0.6.0 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" >
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.6.0',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
-    <link rel="up" title="Events" href="index.html" />
-    <link rel="next" title="Event Manager Implementation" href="event_manager.html" />
-    <link rel="prev" title="Usage" href="usage.html" /> 
+    <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../genindex.html" >
+    <link rel="search" title="Search" href="../search.html" >
+    <link rel="top" title="Encore Documentation" href="../index.html" >
+    <link rel="up" title="Events" href="index.html" >
+    <link rel="next" title="Event Manager Implementation" href="event_manager.html" >
+    <link rel="prev" title="Usage" href="usage.html" > 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="event_manager.html" title="Event Manager Implementation"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="usage.html" title="Usage"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Events</a> &raquo;</li> 
-      </ul>
+  <body>
+  <div class="container">
+    <div class="header">
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-            <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
-            </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Abstract Event Manager API</a><ul>
-<li><a class="reference internal" href="#events">Events</a></li>
-</ul>
-</li>
-</ul>
+  </div>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="usage.html"
-                        title="previous chapter">Usage</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="event_manager.html"
-                        title="next chapter">Event Manager Implementation</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/events/abstract_event_manager.txt"
-            rel="nofollow">Show Source</a></li>
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="index.html" accesskey="U">Events</a></li> 
     </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+      <li class="active">
+        <a href="event_manager.html" title="Event Manager Implementation"
+           accesskey="N">next</a>
+      </li>
+      <li class="active">
+        <a href="usage.html" title="Usage"
+           accesskey="P">previous</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+	<div class="row-fluid">
+          <div class="span9">
             
-  <div class="section" id="abstract-event-manager-api">
-<h1>Abstract Event Manager API<a class="headerlink" href="#abstract-event-manager-api" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-encore.events.abstract_event_manager"></span><p>This module defines event manager class API.</p>
-<p>The main class of the module is the <a class="reference internal" href="#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a>.
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <section id="module-encore.events.abstract_event_manager">
+<span id="abstract-event-manager-api"></span><h1>Abstract Event Manager API<a class="headerlink" href="#module-encore.events.abstract_event_manager" title="Permalink to this heading">¶</a></h1>
+<p>This module defines event manager class API.</p>
+<p>The main class of the module is the <a class="reference internal" href="#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEventManager</span></code></a>.
 Event managers are expected to implement the interface as specified by
-<a class="reference internal" href="#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal"><span class="pre">BaseEventManager</span></code></a>. A concrete implementation is present in the
-<a class="reference internal" href="event_manager.html#module-encore.events.event_manager" title="encore.events.event_manager"><code class="xref py py-mod docutils literal"><span class="pre">event_manager</span></code></a>
+<a class="reference internal" href="#encore.events.abstract_event_manager.BaseEventManager" title="encore.events.abstract_event_manager.BaseEventManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEventManager</span></code></a>. A concrete implementation is present in the
+<a class="reference internal" href="event_manager.html#module-encore.events.event_manager" title="encore.events.event_manager"><code class="xref py py-mod docutils literal notranslate"><span class="pre">event_manager</span></code></a>
 module.</p>
-<dl class="class">
-<dt id="encore.events.abstract_event_manager.BaseEventManager">
-<em class="property">class </em><code class="descclassname">encore.events.abstract_event_manager.</code><code class="descname">BaseEventManager</code><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEventManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.events.abstract_event_manager.</span></span><span class="sig-name descname"><span class="pre">BaseEventManager</span></span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEventManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>This abstract class defines the API for Event Managers.</p>
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEventManager.connect">
-<code class="descname">connect</code><span class="sig-paren">(</span><em>cls</em>, <em>func</em>, <em>filter=None</em>, <em>priority=0</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.connect" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEventManager.connect">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEventManager.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a listener for the event.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>cls</strong> (<em>class</em>) &#8211; The class of events for which the listener is registered.</li>
-<li><strong>func</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#callable" title="(in Python v2.7)"><em>callable</em></a>) &#8211; A callable to be called when the event is emitted.  The function
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> (<em>class</em>) – The class of events for which the listener is registered.</p></li>
+<li><p><strong>func</strong> (<em>callable</em>) – A callable to be called when the event is emitted.  The function
 should expect one argument which is the event instance which was
-emitted.</li>
-<li><strong>filter</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; <p>Filters to match for before calling the listener. The listener is
+emitted.</p></li>
+<li><p><strong>filter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – <p>Filters to match for before calling the listener. The listener is
 called only when the event matches all of the filter .</p>
-<dl class="docutils">
-<dt>Filter specification:</dt>
-<dd><ul class="first last">
-<li><dl class="first docutils">
-<dt>key: string which is extended (<cite>.</cite> separated) name of an</dt>
-<dd>attribute of the event instance.</dd>
+<dl class="simple">
+<dt>Filter specification:</dt><dd><ul>
+<li><dl class="simple">
+<dt>key: string which is extended (<cite>.</cite> separated) name of an</dt><dd><p>attribute of the event instance.</p>
+</dd>
 </dl>
 </li>
-<li>value: the value of the specified attribute.</li>
+<li><p>value: the value of the specified attribute.</p></li>
 </ul>
 </dd>
 </dl>
 <p>If the attribute does not exist then the filter is considered failed
 and the listener is not called.</p>
-</li>
-<li><strong>priority</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The priority of the listener. Higher priority listeners are called
-before lower priority listeners.</li>
+</p></li>
+<li><p><strong>priority</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – The priority of the listener. Higher priority listeners are called
+before lower priority listeners.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Note</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>The filtering is added so that future optimizations can be done
 on specific events with large number of handlers. For example there
 should be a fast way to filter key events to specific listeners rather
 than iterating through all listeners.</p>
+</div>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEventManager.disable">
-<code class="descname">disable</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.disable" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEventManager.disable">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEventManager.disable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.disable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disable the event from generating notifications.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<em>class</em>) &#8211; The class of events which we want to disable.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cls</strong> (<em>class</em>) – The class of events which we want to disable.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEventManager.disconnect">
-<code class="descname">disconnect</code><span class="sig-paren">(</span><em>cls</em>, <em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.disconnect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disconnects a listener from being notified about the event&#8217;</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cls</strong> (<em>class</em>) &#8211; The class of events for which the listener is registered.</li>
-<li><strong>func</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#callable" title="(in Python v2.7)"><em>callable</em></a>) &#8211; The callable which was registered for that class.</li>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEventManager.disconnect">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEventManager.disconnect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnects a listener from being notified about the event’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cls</strong> (<em>class</em>) – The class of events for which the listener is registered.</p></li>
+<li><p><strong>func</strong> (<em>callable</em>) – The callable which was registered for that class.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>KeyError</strong> - if <cite>func</cite> is not already connected.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError :</strong> – if <cite>func</cite> is not already connected.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEventManager.emit">
-<code class="descname">emit</code><span class="sig-paren">(</span><em>event</em>, <em>block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.emit" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEventManager.emit">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEventManager.emit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.emit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Notifies all listeners about the event with the specified arguments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>event</strong> (instance of <a class="reference internal" href="#encore.events.abstract_event_manager.BaseEvent" title="encore.events.abstract_event_manager.BaseEvent"><code class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></code></a>) &#8211; The <a class="reference internal" href="#encore.events.abstract_event_manager.BaseEvent" title="encore.events.abstract_event_manager.BaseEvent"><code class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></code></a> instance to emit.</li>
-<li><strong>block</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether to block the call until the event handling is finished.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (instance of <a class="reference internal" href="#encore.events.abstract_event_manager.BaseEvent" title="encore.events.abstract_event_manager.BaseEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEvent</span></code></a>) – The <a class="reference internal" href="#encore.events.abstract_event_manager.BaseEvent" title="encore.events.abstract_event_manager.BaseEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEvent</span></code></a> instance to emit.</p></li>
+<li><p><strong>block</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether to block the call until the event handling is finished.
 If block is False, the event will be emitted in a separate thread
 and the thread will be returned, so you can later query its status
-or do <code class="docutils literal"><span class="pre">wait()</span></code> on the thread.</li>
+or do <code class="docutils literal notranslate"><span class="pre">wait()</span></code> on the thread.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Note</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>Listeners of superclasses of the event are also called.
-Eg. a <a class="reference internal" href="#encore.events.abstract_event_manager.BaseEvent" title="encore.events.abstract_event_manager.BaseEvent"><code class="xref py py-class docutils literal"><span class="pre">BaseEvent</span></code></a> listener will also be notified about any
+Eg. a <a class="reference internal" href="#encore.events.abstract_event_manager.BaseEvent" title="encore.events.abstract_event_manager.BaseEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEvent</span></code></a> listener will also be notified about any
 derived class events.</p>
+</div>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEventManager.enable">
-<code class="descname">enable</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.enable" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEventManager.enable">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEventManager.enable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.enable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enable the event again to generate notifications.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<em>class</em>) &#8211; The class of events which we want to enable.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cls</strong> (<em>class</em>) – The class of events which we want to enable.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEventManager.is_enabled">
-<code class="descname">is_enabled</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.is_enabled" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEventManager.is_enabled">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_enabled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEventManager.is_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEventManager.is_enabled" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the event is enabled.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<em>class</em>) &#8211; The class of events which we want check the status of.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cls</strong> (<em>class</em>) – The class of events which we want check the status of.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<div class="section" id="events">
-<h2>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h2>
+<section id="events">
+<h2>Events<a class="headerlink" href="#events" title="Permalink to this heading">¶</a></h2>
 <p>The module also provides the base class for all event objects.</p>
-<dl class="class">
-<dt id="encore.events.abstract_event_manager.BaseEvent">
-<em class="property">class </em><code class="descclassname">encore.events.abstract_event_manager.</code><code class="descname">BaseEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEvent" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.events.abstract_event_manager.</span></span><span class="sig-name descname"><span class="pre">BaseEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all events.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>source</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) &#8211; The object which generated the Event.</li>
-<li><strong>kwargs</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Additional Event attributes which will be added to the Event object.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><em>object</em></a>) – The object which generated the Event.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Additional Event attributes which will be added to the Event object.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEvent.mark_as_handled">
-<code class="descname">mark_as_handled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEvent.mark_as_handled" title="Permalink to this definition">¶</a></dt>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEvent.mark_as_handled">
+<span class="sig-name descname"><span class="pre">mark_as_handled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEvent.mark_as_handled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEvent.mark_as_handled" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mark the event as handled so subsequent listeners are not notified.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEvent.post_emit">
-<code class="descname">post_emit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEvent.post_emit" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEvent.post_emit">
+<span class="sig-name descname"><span class="pre">post_emit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEvent.post_emit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEvent.post_emit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called after emitting an event.</p>
 <p>Can be used any event specific functionality, post event validation etc.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="encore.events.abstract_event_manager.BaseEvent.pre_emit">
-<code class="descname">pre_emit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEvent.pre_emit" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="encore.events.abstract_event_manager.BaseEvent.pre_emit">
+<span class="sig-name descname"><span class="pre">pre_emit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/events/abstract_event_manager.html#BaseEvent.pre_emit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.events.abstract_event_manager.BaseEvent.pre_emit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called before emitting an event.</p>
 <p>Can be used any event specific functionality, validation etc.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
         </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Abstract Event Manager API</a><ul>
+<li><a class="reference internal" href="#events">Events</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="usage.html"
+                          title="previous chapter">Usage</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="event_manager.html"
+                          title="next chapter">Event Manager Implementation</a></p>
+  </div>
+  <h3>This Page</h3>
+  <div>
+    <a href="../_sources/events/abstract_event_manager.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
       </div>
-      <div class="clearer"></div>
+        </div>
+      </div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="event_manager.html" title="Event Manager Implementation"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="usage.html" title="Usage"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Events</a> &raquo;</li> 
-      </ul>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
     </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2011-2017, Enthought, Inc..
-      Last updated on Jan 19, 2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
     </div>
   </body>
 </html>

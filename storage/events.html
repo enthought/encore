@@ -1,61 +1,578 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Events &mdash; Encore Documentation</title>
     
-    <title>Events &mdash; Encore 0.6.0 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" >
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.6.0',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
-    <link rel="up" title="Storage" href="index.html" />
-    <link rel="next" title="Utils" href="utils.html" />
-    <link rel="prev" title="Key-Value Store API" href="abstract_store.html" /> 
+    <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../genindex.html" >
+    <link rel="search" title="Search" href="../search.html" >
+    <link rel="top" title="Encore Documentation" href="../index.html" >
+    <link rel="up" title="Storage" href="index.html" >
+    <link rel="next" title="Utils" href="utils.html" >
+    <link rel="prev" title="Key-Value Store API" href="abstract_store.html" > 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="utils.html" title="Utils"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="abstract_store.html" title="Key-Value Store API"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
-      </ul>
+  <body>
+  <div class="container">
+    <div class="header">
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="index.html" accesskey="U">Storage</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+      <li class="active">
+        <a href="utils.html" title="Utils"
+           accesskey="N">next</a>
+      </li>
+      <li class="active">
+        <a href="abstract_store.html" title="Key-Value Store API"
+           accesskey="P">previous</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <section id="events">
+<h1>Events<a class="headerlink" href="#events" title="Permalink to this heading">¶</a></h1>
+<p>The Storage API generates events using the Encore Event API.  This module defines
+the event classes that are required aby the abstract API.</p>
+<section id="event-inheritance-diagram">
+<h2>Event Inheritance Diagram<a class="headerlink" href="#event-inheritance-diagram" title="Permalink to this heading">¶</a></h2>
+<p>The following diagram shows the inheritance heirarchy of the various Event
+subclasses defined in this module.  When listening for events, you may want to
+listen on appropriate superclasses.</p>
+<div class="graphviz"><img src="../_images/inheritance-a70de07e5a50487e64d0d2d6cc8514b0844d524f.png" alt="Inheritance diagram of encore.events.api.BaseEvent, encore.events.progress_events.ProgressEvent, encore.events.progress_events.ProgressStartEvent, encore.events.progress_events.ProgressStepEvent, encore.events.progress_events.ProgressEndEvent, StoreEvent, StoreTransactionEvent, StoreTransactionStartEvent, StoreTransactionEndEvent, StoreKeyEvent, StoreModificationEvent, StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent, StoreProgressEvent, StoreProgressStartEvent, StoreProgressStepEvent, StoreProgressEndEvent" usemap="#inheritance1ddb2ccabe" class="inheritance graphviz" /></div>
+<map id="inheritance1ddb2ccabe" name="inheritance1ddb2ccabe">
+<area shape="rect" id="node1" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent" target="_top" title="Base class for all events." alt="" coords="5,144,80,166"/>
+<area shape="rect" id="node3" href="../events/progress_events.html#encore.events.progress_events.ProgressEvent" target="_top" title="Abstract base class for all progress events" alt="" coords="260,91,354,113"/>
+<area shape="rect" id="node8" href="#encore.storage.events.StoreEvent" target="_top" title="An abstract base class for events generated by a Key&#45;Value Store" alt="" coords="122,166,198,189"/>
+<area shape="rect" id="node2" href="../events/progress_events.html#encore.events.progress_events.ProgressEndEvent" target="_top" title="Event emitted at the end of an operation" alt="" coords="439,5,553,27"/>
+<area shape="rect" id="node10" href="#encore.storage.events.StoreProgressEndEvent" target="_top" title="Attributes" alt="" coords="620,5,762,27"/>
+<area shape="rect" id="node4" href="../events/progress_events.html#encore.events.progress_events.ProgressStartEvent" target="_top" title="Event emitted at the start of an operation" alt="" coords="437,48,556,70"/>
+<area shape="rect" id="node5" href="../events/progress_events.html#encore.events.progress_events.ProgressStepEvent" target="_top" title="Event emitted periodically during an operation" alt="" coords="438,134,555,156"/>
+<area shape="rect" id="node11" href="#encore.storage.events.StoreProgressEvent" target="_top" title="Abstract base class for ProgressEvents generated by a Key&#45;Value Store" alt="" coords="436,91,557,113"/>
+<area shape="rect" id="node12" href="#encore.storage.events.StoreProgressStartEvent" target="_top" title="Attributes" alt="" coords="618,48,763,70"/>
+<area shape="rect" id="node13" href="#encore.storage.events.StoreProgressStepEvent" target="_top" title="Attributes" alt="" coords="618,91,763,113"/>
+<area shape="rect" id="node6" href="#encore.storage.events.StoreDeleteEvent" target="_top" title="An event generated when a value is deleted into a Key&#45;Value Store" alt="" coords="636,134,745,156"/>
+<area shape="rect" id="node7" href="#encore.storage.events.StoreModificationEvent" target="_top" title="An abstract base class for modification events generated by a Key&#45;Value Store" alt="" coords="428,177,565,199"/>
+<area shape="rect" id="node14" href="#encore.storage.events.StoreSetEvent" target="_top" title="An event generated when a value is set into a Key&#45;Value Store" alt="" coords="644,177,737,199"/>
+<area shape="rect" id="node18" href="#encore.storage.events.StoreUpdateEvent" target="_top" title="An event generated when a value is updated into a Key&#45;Value Store" alt="" coords="634,220,747,242"/>
+<area shape="rect" id="node9" href="#encore.storage.events.StoreKeyEvent" target="_top" title="An abstract base class for events related to a particular key in the" alt="" coords="259,166,355,189"/>
+<area shape="rect" id="node16" href="#encore.storage.events.StoreTransactionEvent" target="_top" title="StoreTransactionEvent" alt="" coords="240,220,375,242"/>
+<area shape="rect" id="node15" href="#encore.storage.events.StoreTransactionEndEvent" target="_top" title="StoreTransactionEndEvent" alt="" coords="418,263,574,285"/>
+<area shape="rect" id="node17" href="#encore.storage.events.StoreTransactionStartEvent" target="_top" title="StoreTransactionStartEvent" alt="" coords="417,220,576,242"/>
+</map><span class="target" id="module-encore.storage.events"></span><section id="storage-events">
+<h3>Storage Events<a class="headerlink" href="#storage-events" title="Permalink to this heading">¶</a></h3>
+<p>This module contains asbtract and concrete Event subclasses that support the
+Storage API.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreDeleteEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreDeleteEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreDeleteEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreDeleteEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>An event generated when a value is deleted into a Key-Value Store</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreDeleteEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreDeleteEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreDeleteEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreDeleteEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreDeleteEvent.action">
+<span class="sig-name descname"><span class="pre">action</span></span><a class="headerlink" href="#encore.storage.events.StoreDeleteEvent.action" title="Permalink to this definition">¶</a></dt>
+<dd><p>The modification action that was performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>‘delete’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>An abstract base class for events generated by a Key-Value Store</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreEvent.source">
+<span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#encore.storage.events.StoreEvent.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key-value store which generated the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Store instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreKeyEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreKeyEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreKeyEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreKeyEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>An abstract base class for events related to a particular key in the
+store.  This should provide the key and metadata (if available) of the
+modified key.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreKeyEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreKeyEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreKeyEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreKeyEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreModificationEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreModificationEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreModificationEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreModificationEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>An abstract base class for modification events generated by a Key-Value Store</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreModificationEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreModificationEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreModificationEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreModificationEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreModificationEvent.action">
+<span class="sig-name descname"><span class="pre">action</span></span><a class="headerlink" href="#encore.storage.events.StoreModificationEvent.action" title="Permalink to this definition">¶</a></dt>
+<dd><p>The modification action that was performed.  One of ‘set’, ‘update’ or
+‘delete’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEndEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreProgressEndEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreProgressEndEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEndEvent.operation_id">
+<span class="sig-name descname"><span class="pre">operation_id</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.operation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique identifier for the operation that is finished.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEndEvent.message">
+<span class="sig-name descname"><span class="pre">message</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.message" title="Permalink to this definition">¶</a></dt>
+<dd><p>A human-readable describing the state of the operation that ended.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEndEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEndEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEndEvent.exit_state">
+<span class="sig-name descname"><span class="pre">exit_state</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.exit_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>A constant describing the end state of the operation.  One of <code class="docutils literal notranslate"><span class="pre">normal</span></code>,
+<code class="docutils literal notranslate"><span class="pre">warning</span></code>, <code class="docutils literal notranslate"><span class="pre">error</span></code> or <code class="docutils literal notranslate"><span class="pre">exception</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreProgressEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreProgressEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreProgressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class for ProgressEvents generated by a Key-Value Store</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEvent.operation_id">
+<span class="sig-name descname"><span class="pre">operation_id</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEvent.operation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique identifier for the operation being performed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEvent.message">
+<span class="sig-name descname"><span class="pre">message</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEvent.message" title="Permalink to this definition">¶</a></dt>
+<dd><p>A human-readable describing the operation being performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStartEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreProgressStartEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreProgressStartEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStartEvent.operation_id">
+<span class="sig-name descname"><span class="pre">operation_id</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.operation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique identifier for the operation being performed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStartEvent.message">
+<span class="sig-name descname"><span class="pre">message</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.message" title="Permalink to this definition">¶</a></dt>
+<dd><p>A human-readable describing the operation being performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStartEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStartEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStartEvent.steps">
+<span class="sig-name descname"><span class="pre">steps</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.steps" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of steps in the operation.  If unknown or variable, use -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStepEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreProgressStepEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreProgressStepEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStepEvent.operation_id">
+<span class="sig-name descname"><span class="pre">operation_id</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.operation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique identifier for the operation being performed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStepEvent.message">
+<span class="sig-name descname"><span class="pre">message</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.message" title="Permalink to this definition">¶</a></dt>
+<dd><p>A human-readable describing the state of the operation being performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStepEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStepEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreProgressStepEvent.step">
+<span class="sig-name descname"><span class="pre">step</span></span><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>The count of the step.  If unknown, use -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreSetEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreSetEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreSetEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreSetEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>An event generated when a value is set into a Key-Value Store</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreSetEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreSetEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreSetEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreSetEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreSetEvent.action">
+<span class="sig-name descname"><span class="pre">action</span></span><a class="headerlink" href="#encore.storage.events.StoreSetEvent.action" title="Permalink to this definition">¶</a></dt>
+<dd><p>The modification action that was performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>‘set’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreTransactionEndEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreTransactionEndEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreTransactionEndEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreTransactionEndEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreTransactionEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreTransactionEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreTransactionEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreTransactionEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreTransactionStartEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreTransactionStartEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreTransactionStartEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreTransactionStartEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="encore.storage.events.StoreUpdateEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encore.storage.events.</span></span><span class="sig-name descname"><span class="pre">StoreUpdateEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encore/storage/events.html#StoreUpdateEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encore.storage.events.StoreUpdateEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>An event generated when a value is updated into a Key-Value Store</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreUpdateEvent.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#encore.storage.events.StoreUpdateEvent.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreUpdateEvent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#encore.storage.events.StoreUpdateEvent.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>The metadata of the key which is involved in the event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="encore.storage.events.StoreUpdateEvent.action">
+<span class="sig-name descname"><span class="pre">action</span></span><a class="headerlink" href="#encore.storage.events.StoreUpdateEvent.action" title="Permalink to this definition">¶</a></dt>
+<dd><p>The modification action that was performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>‘update’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
+              <img class="logo" src="../_static/img/e-logo.png" alt="Logo">
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Events</a><ul>
 <li><a class="reference internal" href="#event-inheritance-diagram">Event Inheritance Diagram</a><ul>
 <li><a class="reference internal" href="#storage-events">Storage Events</a></li>
@@ -65,394 +582,59 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="abstract_store.html"
-                        title="previous chapter">Key-Value Store API</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="utils.html"
-                        title="next chapter">Utils</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/storage/events.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="abstract_store.html"
+                          title="previous chapter">Key-Value Store API</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="utils.html"
+                          title="next chapter">Utils</a></p>
+  </div>
+  <h3>This Page</h3>
+  <div>
+    <a href="../_sources/storage/events.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="events">
-<h1>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h1>
-<p>The Storage API generates events using the Encore Event API.  This module defines
-the event classes that are required aby the abstract API.</p>
-<div class="section" id="event-inheritance-diagram">
-<h2>Event Inheritance Diagram<a class="headerlink" href="#event-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<p>The following diagram shows the inheritance heirarchy of the various Event
-subclasses defined in this module.  When listening for events, you may want to
-listen on appropriate superclasses.</p>
-<img src="../_images/inheritance-d38a29144e017d1d1643f93dcbe77d4040c19a88.png" alt="Inheritance diagram of encore.events.api.BaseEvent, encore.events.progress_events.ProgressEvent, encore.events.progress_events.ProgressStartEvent, encore.events.progress_events.ProgressStepEvent, encore.events.progress_events.ProgressEndEvent, StoreEvent, StoreTransactionEvent, StoreTransactionStartEvent, StoreTransactionEndEvent, StoreKeyEvent, StoreModificationEvent, StoreSetEvent, StoreUpdateEvent, StoreDeleteEvent, StoreProgressEvent, StoreProgressStartEvent, StoreProgressStepEvent, StoreProgressEndEvent" usemap="#inheritance1ddb2ccabe" class="inheritance"/>
-<map id="inheritance1ddb2ccabe" name="inheritance1ddb2ccabe">
-<area shape="rect" id="node1" href="../events/abstract_event_manager.html#encore.events.abstract_event_manager.BaseEvent" target="_top" title="Base class for all events." alt="" coords="4,125,79,145"/>
-<area shape="rect" id="node3" href="../events/progress_events.html#encore.events.progress_events.ProgressEvent" target="_top" title="Abstract base class for all progress events" alt="" coords="259,88,353,108"/>
-<area shape="rect" id="node8" href="#encore.storage.events.StoreEvent" target="_top" title="An abstract base class for events generated by a Key&#45;Value Store" alt="" coords="120,151,196,172"/>
-<area shape="rect" id="node2" href="../events/progress_events.html#encore.events.progress_events.ProgressEndEvent" target="_top" title="Event emitted at the end of an operation" alt="" coords="437,5,552,25"/>
-<area shape="rect" id="node10" href="#encore.storage.events.StoreProgressEndEvent" target="_top" title="Attributes" alt="" coords="619,5,761,25"/>
-<area shape="rect" id="node4" href="../events/progress_events.html#encore.events.progress_events.ProgressStartEvent" target="_top" title="Event emitted at the start of an operation" alt="" coords="435,46,554,67"/>
-<area shape="rect" id="node5" href="../events/progress_events.html#encore.events.progress_events.ProgressStepEvent" target="_top" title="Event emitted periodically during an operation" alt="" coords="436,129,554,150"/>
-<area shape="rect" id="node11" href="#encore.storage.events.StoreProgressEvent" target="_top" title="Abstract base class for ProgressEvents generated by a Key&#45;Value Store" alt="" coords="434,88,556,108"/>
-<area shape="rect" id="node12" href="#encore.storage.events.StoreProgressStartEvent" target="_top" title="Attributes" alt="" coords="617,46,763,67"/>
-<area shape="rect" id="node13" href="#encore.storage.events.StoreProgressStepEvent" target="_top" title="Attributes" alt="" coords="617,88,762,108"/>
-<area shape="rect" id="node6" href="#encore.storage.events.StoreDeleteEvent" target="_top" title="An event generated when a value is deleted into a Key&#45;Value Store" alt="" coords="635,129,744,150"/>
-<area shape="rect" id="node7" href="#encore.storage.events.StoreModificationEvent" target="_top" title="An abstract base class for modification events generated by a Key&#45;Value Store" alt="" coords="426,171,563,191"/>
-<area shape="rect" id="node14" href="#encore.storage.events.StoreSetEvent" target="_top" title="An event generated when a value is set into a Key&#45;Value Store" alt="" coords="643,171,736,191"/>
-<area shape="rect" id="node18" href="#encore.storage.events.StoreUpdateEvent" target="_top" title="An event generated when a value is updated into a Key&#45;Value Store" alt="" coords="633,212,746,233"/>
-<area shape="rect" id="node9" href="#encore.storage.events.StoreKeyEvent" target="_top" title="An abstract base class for events related to a particular key in the" alt="" coords="258,151,353,172"/>
-</map>
-<span class="target" id="module-encore.storage.events"></span><div class="section" id="storage-events">
-<h3>Storage Events<a class="headerlink" href="#storage-events" title="Permalink to this headline">¶</a></h3>
-<p>This module contains asbtract and concrete Event subclasses that support the
-Storage API.</p>
-<dl class="class">
-<dt id="encore.storage.events.StoreEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>An abstract base class for events generated by a Key-Value Store</p>
-<dl class="attribute">
-<dt id="encore.storage.events.StoreEvent.source">
-<code class="descname">source</code><a class="headerlink" href="#encore.storage.events.StoreEvent.source" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(Store instance)</em>
-The key-value store which generated the event.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreKeyEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreKeyEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreKeyEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>An abstract base class for events related to a particular key in the
-store.  This should provide the key and metadata (if available) of the
-modified key.</p>
-<dl class="attribute">
-<dt id="encore.storage.events.StoreKeyEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreKeyEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreKeyEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreKeyEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreModificationEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreModificationEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreModificationEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>An abstract base class for modification events generated by a Key-Value Store</p>
-<dl class="attribute">
-<dt id="encore.storage.events.StoreModificationEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreModificationEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreModificationEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreModificationEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreModificationEvent.action">
-<code class="descname">action</code><a class="headerlink" href="#encore.storage.events.StoreModificationEvent.action" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The modification action that was performed.  One of &#8216;set&#8217;, &#8216;update&#8217; or     &#8216;delete&#8217;.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreSetEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreSetEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreSetEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>An event generated when a value is set into a Key-Value Store</p>
-<dl class="attribute">
-<dt id="encore.storage.events.StoreSetEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreSetEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreSetEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreSetEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreSetEvent.action">
-<code class="descname">action</code><a class="headerlink" href="#encore.storage.events.StoreSetEvent.action" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(&#8216;set&#8217;)</em>
-The modification action that was performed.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreUpdateEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreUpdateEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreUpdateEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>An event generated when a value is updated into a Key-Value Store</p>
-<dl class="attribute">
-<dt id="encore.storage.events.StoreUpdateEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreUpdateEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreUpdateEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreUpdateEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreUpdateEvent.action">
-<code class="descname">action</code><a class="headerlink" href="#encore.storage.events.StoreUpdateEvent.action" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(&#8216;update&#8217;)</em>
-The modification action that was performed.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreDeleteEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreDeleteEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreDeleteEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>An event generated when a value is deleted into a Key-Value Store</p>
-<dl class="attribute">
-<dt id="encore.storage.events.StoreDeleteEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreDeleteEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreDeleteEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreDeleteEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreDeleteEvent.action">
-<code class="descname">action</code><a class="headerlink" href="#encore.storage.events.StoreDeleteEvent.action" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(&#8216;delete&#8217;)</em>
-The modification action that was performed.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreProgressEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreProgressEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreProgressEvent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Abstract base class for ProgressEvents generated by a Key-Value Store</p>
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEvent.operation_id">
-<code class="descname">operation_id</code><a class="headerlink" href="#encore.storage.events.StoreProgressEvent.operation_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A unique identifier for the operation being performed.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEvent.message">
-<code class="descname">message</code><a class="headerlink" href="#encore.storage.events.StoreProgressEvent.message" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-A human-readable describing the operation being performed.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreProgressEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreProgressEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreProgressStartEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreProgressStartEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStartEvent.operation_id">
-<code class="descname">operation_id</code><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.operation_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A unique identifier for the operation being performed.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStartEvent.message">
-<code class="descname">message</code><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.message" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-A human-readable describing the operation being performed.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStartEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStartEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStartEvent.steps">
-<code class="descname">steps</code><a class="headerlink" href="#encore.storage.events.StoreProgressStartEvent.steps" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(int)</em>
-The number of steps in the operation.  If unknown or variable, use -1.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreProgressStepEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreProgressStepEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStepEvent.operation_id">
-<code class="descname">operation_id</code><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.operation_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A unique identifier for the operation being performed.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStepEvent.message">
-<code class="descname">message</code><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.message" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-A human-readable describing the state of the operation being performed.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStepEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStepEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressStepEvent.step">
-<code class="descname">step</code><a class="headerlink" href="#encore.storage.events.StoreProgressStepEvent.step" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(int)</em>
-The count of the step.  If unknown, use -1.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="encore.storage.events.StoreProgressEndEvent">
-<em class="property">class </em><code class="descclassname">encore.storage.events.</code><code class="descname">StoreProgressEndEvent</code><span class="sig-paren">(</span><em>source=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEndEvent.operation_id">
-<code class="descname">operation_id</code><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.operation_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A unique identifier for the operation that is finished.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEndEvent.message">
-<code class="descname">message</code><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.message" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-A human-readable describing the state of the operation that ended.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEndEvent.key">
-<code class="descname">key</code><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-The key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEndEvent.metadata">
-<code class="descname">metadata</code><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(dict)</em>
-The metadata of the key which is involved in the event.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="encore.storage.events.StoreProgressEndEvent.exit_state">
-<code class="descname">exit_state</code><a class="headerlink" href="#encore.storage.events.StoreProgressEndEvent.exit_state" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>(string)</em>
-A constant describing the end state of the operation.  One of <code class="docutils literal"><span class="pre">normal</span></code>,     <code class="docutils literal"><span class="pre">warning</span></code>, <code class="docutils literal"><span class="pre">error</span></code> or <code class="docutils literal"><span class="pre">exception</span></code>.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-</div>
-</div>
-
-
-          </div>
         </div>
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="utils.html" title="Utils"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="abstract_store.html" title="Key-Value Store API"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
-      </ul>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
     </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2011-2017, Enthought, Inc..
-      Last updated on Jan 19, 2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
     </div>
   </body>
 </html>

@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>encore.storage.sqlite_store &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../../../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../../../genindex.html" >
+    <link rel="search" title="Search" href="../../../search.html" >
+    <link rel="top" title="Encore Documentation" href="../../../index.html" >
+    <link rel="up" title="Module code" href="../../index.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../../../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="../../index.html" accesskey="U">Module code</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../../../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../../../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <h1>Source code for encore.storage.sqlite_store</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># (C) Copyright 2011-2022 Enthought, Inc., Austin, TX</span>
+<span class="c1"># All right reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is open source software distributed according to the terms in LICENSE.txt</span>
+<span class="c1">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sqlite Store</span>
+<span class="sd">------------</span>
+
+<span class="sd">This is a simple implementation of the key-value store API that lives in a sqlite</span>
+<span class="sd">database.  Each key is stored in a row which consists of the key, index columns,</span>
+<span class="sd">metadata and data.  The index columns are a specified subset of the metadata that</span>
+<span class="sd">can be queried more quickly.</span>
+
+<span class="sd">This class is provided in part as a sample implementation of the API.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="kn">from</span> <span class="nn">.abstract_store</span> <span class="kn">import</span> <span class="n">AbstractStore</span>
+<span class="kn">from</span> <span class="nn">.string_value</span> <span class="kn">import</span> <span class="n">StringValue</span>
+<span class="kn">from</span> <span class="nn">.events</span> <span class="kn">import</span> <span class="n">StoreSetEvent</span><span class="p">,</span> <span class="n">StoreUpdateEvent</span><span class="p">,</span> <span class="n">StoreDeleteEvent</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">buffer_iterator</span><span class="p">,</span> <span class="n">SimpleTransactionContext</span><span class="p">,</span> <span class="n">StoreProgressManager</span><span class="p">,</span>
+    <span class="n">add_context_manager_support</span>
+<span class="p">)</span>
+
+<span class="n">buffer</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Binary</span>
+
+
+<span class="k">def</span> <span class="nf">adapt_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">buffer</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">convert_dict</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+
+<span class="n">sqlite3</span><span class="o">.</span><span class="n">register_adapter</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">adapt_dict</span><span class="p">)</span>
+<span class="n">sqlite3</span><span class="o">.</span><span class="n">register_converter</span><span class="p">(</span><span class="s1">&#39;dict&#39;</span><span class="p">,</span> <span class="n">convert_dict</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SqliteStore"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore">[docs]</a><span class="k">class</span> <span class="nc">SqliteStore</span><span class="p">(</span><span class="n">AbstractStore</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Sqlite-based Store</span>
+
+<span class="sd">    The file-like objects returned by data methods are cStringIO objects.</span>
+
+<span class="sd">    .. warning::</span>
+
+<span class="sd">        The table name and metadata names used as index columns are not sanitized.</span>
+<span class="sd">        To prevent SQL injection these should never be directly derived from</span>
+<span class="sd">        user-supplied values.  This is particularly important for indexed queries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SqliteStore.__init__"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;:memory:&#39;</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s1">&#39;dynamic&#39;</span><span class="p">,</span> <span class="n">index_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SqliteStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">table</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span> <span class="k">if</span> <span class="n">index_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="SqliteStore.connect"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Connect to the key-value store</span>
+
+<span class="sd">        This connects to the specified location and creates the table, if needed.</span>
+<span class="sd">        Sqlite has no notion of authentication, so credentials are ignored.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">detect_types</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_DECLTYPES</span><span class="p">)</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">&quot;select name from sqlite_master where type=&#39;table&#39; and name=?&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># we need to create the table (substitution OK since self.table is internal</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;create table </span><span class="si">%s</span><span class="s2"> (</span>
+<span class="s2">                    key text primary key,</span>
+<span class="s2">                    metadata dict,</span>
+<span class="s2">                    created float,</span>
+<span class="s2">                    modified float,</span>
+<span class="s2">                    data blob</span>
+<span class="s2">                )&quot;&quot;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># we need to find the names of the existing index columns</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;PRAGMA table_info(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+            <span class="n">index_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;metadata&#39;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="s1">&#39;modified&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_columns</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">index_columns</span><span class="p">):</span>
+                <span class="c1"># being paranoid here</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_build_index</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SqliteStore.disconnect"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Disconnect from the key-value store</span>
+
+<span class="sd">        This clears the reference to the sqlite connection object, allowing it</span>
+<span class="sd">        to be garbage-collected.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="SqliteStore.is_connected"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Whether or not the store is currently connected</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        connected : bool</span>
+<span class="sd">            Whether or not the store is currently connected.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get information about the key-value store</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata giving information about the key-value store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;readonly&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+            <span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="SqliteStore.get"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve a stream of data and metdata from a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : file-like</span>
+<span class="sd">            A readable file-like object that provides stream of data from the</span>
+<span class="sd">            key-value store</span>
+<span class="sd">        metadata : dictionary</span>
+<span class="sd">            A dictionary of metadata for the key.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            If the key is not found in the store, a KeyError is raised.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="s1">&#39;modified&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">StringValue</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;modified&#39;</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SqliteStore.set"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Store a stream of data into a given key in the key-value store.</span>
+
+<span class="sd">        This may be left unimplemented by subclasses that represent a read-only</span>
+<span class="sd">        key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        value : tuple of file-like, dict</span>
+<span class="sd">            A pair of objects, the first being a readable file-like object that</span>
+<span class="sd">            provides stream of data from the key-value store.  The second is a</span>
+<span class="sd">            dictionary of metadata for the key.</span>
+<span class="sd">        buffer_size : int</span>
+<span class="sd">            An optional indicator of the number of bytes to read at a time.</span>
+<span class="sd">            Implementations are free to ignore this hint or use a different</span>
+<span class="sd">            default if they need to.  The default is 1048576 bytes (1 MiB).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">data_stream</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_stream</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">metadata</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">StoreProgressManager</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Setting data into &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,),</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">buffer_iterator</span><span class="p">(</span><span class="n">data_stream</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">,</span> <span class="n">progress</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s1">&#39;Setting key &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+                <span class="n">created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">])[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span>
+                <span class="n">modified</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">modified</span> <span class="o">=</span> <span class="n">created</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_insert_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">created</span><span class="p">,</span> <span class="n">modified</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_index</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreUpdateEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreSetEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SqliteStore.delete"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Delete a key from the repsository.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s1">&#39;Deleting &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">):</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;delete from </span><span class="si">%s</span><span class="s1"> where key=?&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreDeleteEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.exists"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Test whether or not a key exists in the key-value store</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        exists : bool</span>
+<span class="sd">            Whether or not the key exists in the key-value store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.get_data"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve a stream from a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : file-like</span>
+<span class="sd">            A readable file-like object the that provides stream of data from the</span>
+<span class="sd">            key-value store.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">add_context_manager_support</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.get_metadata"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve the metadata for a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        select : iterable of strings or None</span>
+<span class="sd">            Which metadata keys to populate in the result.  If unspecified, then</span>
+<span class="sd">            return the entire metadata dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata associated with the key.  The dictionary</span>
+<span class="sd">            has keys as specified by the metadata_keys argument.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store,</span>
+<span class="sd">            and if any metadata key is requested which is not present in the</span>
+<span class="sd">            metadata.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">select</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">metadata_key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="n">metadata_key</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">metadata_key</span> <span class="ow">in</span> <span class="n">select</span> <span class="k">if</span> <span class="n">metadata_key</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.set_data"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Replace the data for a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        data : file-like</span>
+<span class="sd">            A readable file-like object the that provides stream of data from the</span>
+<span class="sd">            key-value store.</span>
+<span class="sd">        buffer_size : int</span>
+<span class="sd">            An optional indicator of the number of bytes to read at a time.</span>
+<span class="sd">            Implementations are free to ignore this hint or use a different</span>
+<span class="sd">            default if they need to.  The default is 1048576 bytes (1 MiB).</span>
+
+<span class="sd">        Events</span>
+<span class="sd">        ------</span>
+<span class="sd">        StoreProgressStartEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted prior to</span>
+<span class="sd">            writing any data to the underlying store.</span>
+<span class="sd">        StoreProgressStepEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted</span>
+<span class="sd">            periodically as data is written to the underlying store.</span>
+<span class="sd">        StoreProgressEndEvent :</span>
+<span class="sd">            For buffering implementations, this event should be emitted after</span>
+<span class="sd">            finishing writing to the underlying store.</span>
+<span class="sd">        StoreSetEvent :</span>
+<span class="sd">            On successful completion of a transaction, a StoreSetEvent should be</span>
+<span class="sd">            emitted with the key &amp; metadata</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">metadata</span><span class="p">),</span> <span class="n">buffer_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.set_metadata"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.set_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set new metadata for a given key in the key-value store.</span>
+
+<span class="sd">        This replaces the existing metadata set for the key with a new set of</span>
+<span class="sd">        metadata.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata to associate with the key.  The dictionary</span>
+<span class="sd">            keys should be strings which are valid Python identifiers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s1">&#39;Setting metadata for &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">):</span>
+                <span class="n">created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">])[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span>
+                <span class="n">modified</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_columns</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">,</span> <span class="s1">&#39;modified&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">metadata</span><span class="p">,</span> <span class="n">modified</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreUpdateEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s1">&#39;Setting metadata for &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">):</span>
+                <span class="n">modified</span> <span class="o">=</span> <span class="n">created</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_insert_row</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">buffer</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="n">created</span><span class="p">,</span> <span class="n">modified</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_index</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreSetEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.update_metadata"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.update_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">update_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update the metadata for a given key in the key-value store.</span>
+
+<span class="sd">        This performs a dictionary update on the existing metadata with the</span>
+<span class="sd">        provided metadata keys and values</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata to associate with the key.  The dictionary</span>
+<span class="sd">            keys should be strings which are valid Python identifiers.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_columns_by_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">temp_metadata</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">temp_metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">(</span><span class="s1">&#39;Setting metadata for &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;metadata&#39;</span><span class="p">,</span> <span class="n">temp_metadata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_index</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreUpdateEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">temp_metadata</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.transaction"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.transaction">[docs]</a>    <span class="k">def</span> <span class="nf">transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Provide a transaction context manager&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SimpleTransactionContext</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_commit_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_rollback_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="SqliteStore.query"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Query for keys and metadata matching metadata provided as keyword arguments</span>
+
+<span class="sd">        This provides a very simple querying interface that returns precise</span>
+<span class="sd">        matches with the metadata.  If no arguments are supplied, the query</span>
+<span class="sd">        will return the complete set of metadata for the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        select : iterable of strings or None</span>
+<span class="sd">            An optional list of metadata keys to return.  If this is not None,</span>
+<span class="sd">            then the metadata dictionaries will only have values for the specified</span>
+<span class="sd">            keys populated.</span>
+<span class="sd">        kwargs :</span>
+<span class="sd">            Arguments where the keywords are metadata keys, and values are</span>
+<span class="sd">            possible values for that metadata item.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : iterable</span>
+<span class="sd">            An iterable of keys, metadata tuples where metadata matches</span>
+<span class="sd">            all the specified values for the specified metadata keywords.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_columns</span><span class="p">)</span>
+            <span class="n">unindexed_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">columns</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;select key, metadata from &quot;</span><span class="si">%s</span><span class="s1">&quot; where </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span>
+                    <span class="s1">&#39; and &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="o">+</span><span class="n">column</span><span class="o">+</span><span class="s1">&#39;&quot;=?&#39;</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;select key, metadata from &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,)</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">[</span><span class="n">buffer</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">unindexed_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;select key, metadata from &quot;&#39;</span> <span class="o">+</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">select</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">unindexed_columns</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="nb">dict</span><span class="p">((</span><span class="n">metadata_key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="n">metadata_key</span><span class="p">])</span>
+                        <span class="k">for</span> <span class="n">metadata_key</span> <span class="ow">in</span> <span class="n">select</span> <span class="k">if</span> <span class="n">metadata_key</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">unindexed_columns</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.query_keys"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.query_keys">[docs]</a>    <span class="k">def</span> <span class="nf">query_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Query for keys matching metadata provided as keyword arguments</span>
+
+<span class="sd">        This provides a very simple querying interface that returns precise</span>
+<span class="sd">        matches with the metadata.  If no arguments are supplied, the query</span>
+<span class="sd">        will return the complete set of keys for the key-value store.</span>
+
+<span class="sd">        This is equivalent to ``self.query(**kwargs).keys()``, but potentially</span>
+<span class="sd">        more efficiently implemented.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs :</span>
+<span class="sd">            Arguments where the keywords are metadata keys, and values are</span>
+<span class="sd">            possible values for that metadata item.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : iterable</span>
+<span class="sd">            An iterable of key-value store keys whose metadata matches all the</span>
+<span class="sd">            specified values for the specified metadata keywords.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_columns</span><span class="p">)</span>
+            <span class="n">unindexed_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unindexed_columns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">columns</span><span class="p">:</span>
+                    <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;select key, metadata from &quot;</span><span class="si">%s</span><span class="s1">&quot; where </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span>
+                        <span class="s1">&#39; and &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="o">+</span><span class="n">column</span><span class="o">+</span><span class="s1">&#39;&quot;=?&#39;</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;select key, metadata from &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">columns</span><span class="p">:</span>
+                    <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;select key from </span><span class="si">%s</span><span class="s1"> where &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span>
+                        <span class="s1">&#39; and &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="o">+</span><span class="n">column</span><span class="o">+</span><span class="s1">&#39;&quot;=?&#39;</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;select key from &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,)</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">[</span><span class="n">buffer</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">unindexed_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unindexed_columns</span><span class="p">:</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;select key, metadata from &quot;&#39;</span>
+                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;select key from &quot;&#39;</span> <span class="o">+</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">unindexed_columns</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">unindexed_columns</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">key</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">key</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.to_file"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.to_file">[docs]</a>    <span class="k">def</span> <span class="nf">to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Efficiently store the data associated with a key into a file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        path : string</span>
+<span class="sd">            A file system path to store the data to.</span>
+<span class="sd">        buffer_size : int</span>
+<span class="sd">            This is ignored.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SqliteStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SqliteStore.from_file"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.from_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Efficiently read data from a file into a key in the key-value store.</span>
+
+<span class="sd">        This makes no attempt to set metadata.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        path : string</span>
+<span class="sd">            A file system path to read the data from.</span>
+<span class="sd">        buffer_size : int</span>
+<span class="sd">            This is ignored.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SqliteStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SqliteStore.to_bytes"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.to_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Efficiently store the data associated with a key into a bytes object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        buffer_size : int</span>
+<span class="sd">            This is ignored.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SqliteStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SqliteStore.from_bytes"><a class="viewcode-back" href="../../../storage/sqlite_store.html#encore.storage.sqlite_store.SqliteStore.from_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">from_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="mi">1048576</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Efficiently read data from a bytes object into a key in the key-value store.</span>
+
+<span class="sd">        This makes no attempt to set metadata.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        data : bytes</span>
+<span class="sd">            The data as a bytes object.</span>
+<span class="sd">        buffer_size : int</span>
+<span class="sd">            This is ignored.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SqliteStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">)</span></div>
+
+    <span class="c1"># Private API</span>
+
+    <span class="k">def</span> <span class="nf">_get_columns_by_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Query the sqlite database for columns in the row with the given key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span> <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]</span>
+
+        <span class="c1"># substitution OK, since these values are not user-defined</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;select </span><span class="si">%s</span><span class="s1"> from &quot;</span><span class="si">%s</span><span class="s1">&quot; where key == ?&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="o">+</span><span class="n">column</span><span class="o">+</span><span class="s1">&#39;&quot;&#39;</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,))</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+        <span class="c1"># only expect 0 or 1 row, since primary key is unique</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">_insert_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">created</span><span class="p">,</span> <span class="n">modified</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Insert or replace a row into the underlying sqlite table</span>
+
+<span class="sd">        This simply constructs and executes the query. It does not attempt any</span>
+<span class="sd">        sort of transaction control.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;insert or replace into &quot;</span><span class="si">%s</span><span class="s1">&quot; (key, metadata, created, modified, data) values (?, ?, ?, ?, ?)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">created</span><span class="p">,</span> <span class="n">modified</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_update_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update an existing column value in the a row with the given key</span>
+
+<span class="sd">        This simply constructs and executes the query. It does not attempt any</span>
+<span class="sd">        sort of transaction control.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;update &quot;</span><span class="si">%s</span><span class="s1">&quot; set &quot;</span><span class="si">%s</span><span class="s1">&quot;=? where key=?&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_update_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update an existing column value in the a row with the given key</span>
+
+<span class="sd">        This simply constructs and executes the query. It does not attempt any</span>
+<span class="sd">        sort of transaction control.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;update &quot;</span><span class="si">%s</span><span class="s1">&quot; set </span><span class="si">%s</span><span class="s1"> where key=?&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span>
+            <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="o">+</span><span class="n">column</span><span class="o">+</span><span class="s1">&#39;&quot;=?&#39;</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="n">key</span><span class="p">,))</span>
+
+    <span class="k">def</span> <span class="nf">_update_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">==</span> <span class="s1">&#39;dynamic&#39;</span><span class="p">:</span>
+            <span class="n">missing_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">metadata</span>
+                <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_columns</span><span class="p">)</span>
+            <span class="n">query1</span> <span class="o">=</span> <span class="s1">&#39;alter table &quot;</span><span class="si">%s</span><span class="s1">&quot; add column &quot;</span><span class="si">%s</span><span class="s1">&quot; blob&#39;</span>
+            <span class="n">query2</span> <span class="o">=</span> <span class="s1">&#39;create index &quot;</span><span class="si">%s</span><span class="s1">&quot; on &quot;</span><span class="si">%s</span><span class="s1">&quot; (&quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">missing_columns</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query1</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="n">column</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query2</span> <span class="o">%</span> <span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="n">column</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_columns</span> <span class="o">|=</span> <span class="n">missing_columns</span>
+
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_columns</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">buffer</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_columns</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_build_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;select key, metadata from &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_index</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_commit_transaction</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

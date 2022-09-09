@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>encore.concurrent.futures.enhanced_thread_pool_executor &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../../../../genindex.html" >
+    <link rel="search" title="Search" href="../../../../search.html" >
+    <link rel="top" title="Encore Documentation" href="../../../../index.html" >
+    <link rel="up" title="Module code" href="../../../index.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../../../../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="../../../index.html" accesskey="U">Module code</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../../../../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../../../../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <h1>Source code for encore.concurrent.futures.enhanced_thread_pool_executor</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2009 Brian Quinlan. All Rights Reserved.</span>
+<span class="c1"># Licensed to PSF under a Contributor Agreement.</span>
+<span class="c1">#</span>
+<span class="c1"># Changes:</span>
+<span class="c1"># May 2013</span>
+<span class="c1">#   CLF: Ported to encore</span>
+<span class="c1">#   CLF: Renamed ThreadPoolExecutor to EnhancedThreadPoolExecutor</span>
+<span class="c1">#   CLF: Patched from upstream issue16284</span>
+<span class="c1">#   CLF: Patched from upstream issue11777</span>
+<span class="c1">#   CLF: Added &#39;initializer&#39; and &#39;uninitializer&#39; arguments to</span>
+<span class="c1">#        EnhancedThreadPoolExecutor</span>
+<span class="c1">#   CLF: Added &#39;name&#39; argument to EnhancedThreadPoolExecutor</span>
+
+<span class="sd">&quot;&quot;&quot;Implements EnhancedThreadPoolExecutor.</span>
+
+<span class="sd">This builds off of concurrent.futures.thread and implements the following</span>
+<span class="sd">changes:</span>
+
+<span class="sd">* Each worker can be initialized and uninitialised with specified functions.</span>
+<span class="sd">* &#39;map&#39; works without iterating (bugs.python.org/issue11777).</span>
+<span class="sd">* Workers do not unnecessarily retain references to work items</span>
+<span class="sd">  (bugs.python.org/issue16284).</span>
+<span class="sd">* Workers do not use polling: http://bugs.python.org/issue11635</span>
+<span class="sd">* Optional `name` argument to prefix executor threads&#39; names.</span>
+<span class="sd">* Optional `wait_on_exit` argument to let worker threads die</span>
+<span class="sd">  abruptly during jobs on interpreter exit instead of waiting to finish.</span>
+
+<span class="sd">The implementation is largely copied to avoid reliance on undocumented, private</span>
+<span class="sd">parts of the code. For example, &#39;_threads_queues&#39; is needed to properly</span>
+<span class="sd">manage threads in the ThreadPoolExecutor, but this is not guaranteed to exist</span>
+<span class="sd">in future implementations of concurrent.futures.thread.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">atexit</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">queue</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">_base</span>
+
+<span class="kn">from</span> <span class="nn">.future</span> <span class="kn">import</span> <span class="n">Future</span>
+
+
+<span class="c1"># Workers are created as daemon threads. This is done to allow the interpreter</span>
+<span class="c1"># to exit when there are still idle threads in a ThreadPoolExecutor&#39;s thread</span>
+<span class="c1"># pool (i.e. shutdown() was not called). However, allowing workers to die with</span>
+<span class="c1"># the interpreter has two undesirable properties:</span>
+<span class="c1">#   - The workers would still be running during interpretor shutdown,</span>
+<span class="c1">#     meaning that they would fail in unpredictable ways.</span>
+<span class="c1">#   - The workers could be killed while evaluating a work item, which could</span>
+<span class="c1">#     be bad if the callable being evaluated has external side-effects e.g.</span>
+<span class="c1">#     writing to a file.</span>
+<span class="c1">#</span>
+<span class="c1"># To work around this problem, an exit handler is installed which tells the</span>
+<span class="c1"># workers to exit when their work queues are empty and then waits until the</span>
+<span class="c1"># threads finish.</span>
+
+<span class="n">_threads_queues</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">WeakKeyDictionary</span><span class="p">()</span>
+<span class="n">_shutdown</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_python_exit</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">_shutdown</span>
+    <span class="n">_shutdown</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_threads_queues</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">_python_exit</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_WorkItem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="o">=</span> <span class="n">future</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn</span> <span class="o">=</span> <span class="n">fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">set_running_or_notify_cancel</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_worker</span><span class="p">(</span><span class="n">executor_reference</span><span class="p">,</span> <span class="n">work_queue</span><span class="p">,</span> <span class="n">initialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">uninitialize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">initialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">initialize</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">_base</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Initialize exception in worker&#39;</span><span class="p">,</span>
+                    <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">work_item</span> <span class="o">=</span> <span class="n">work_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">work_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">work_item</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+                <span class="c1"># Delete references to object. See issue16284</span>
+                <span class="k">del</span> <span class="n">work_item</span>
+                <span class="k">continue</span>
+            <span class="n">executor</span> <span class="o">=</span> <span class="n">executor_reference</span><span class="p">()</span>
+            <span class="c1"># Exit if:</span>
+            <span class="c1">#   - The interpreter is shutting down OR</span>
+            <span class="c1">#   - The executor that owns the worker has been collected OR</span>
+            <span class="c1">#   - The executor that owns the worker has been shutdown.</span>
+            <span class="k">if</span> <span class="n">_shutdown</span> <span class="ow">or</span> <span class="n">executor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">executor</span><span class="o">.</span><span class="n">_shutdown</span><span class="p">:</span>
+                <span class="c1"># Notify other workers.</span>
+                <span class="n">work_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">del</span> <span class="n">executor</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+        <span class="n">_base</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Exception in worker&#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">uninitialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">uninitialize</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+                <span class="n">_base</span><span class="o">.</span><span class="n">LOGGER</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Uninitialize exception in worker&#39;</span><span class="p">,</span>
+                        <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="EnhancedThreadPoolExecutor"><a class="viewcode-back" href="../../../../concurrent/encore.concurrent.futures.html#encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor">[docs]</a><span class="k">class</span> <span class="nc">EnhancedThreadPoolExecutor</span><span class="p">(</span><span class="n">_base</span><span class="o">.</span><span class="n">Executor</span><span class="p">):</span>
+
+    <span class="c1"># Class-attribute for customizing the type of future used by the executor.</span>
+    <span class="c1"># This is provided to ease customization of this class without having to</span>
+    <span class="c1"># duplicate its internals. The factory must accept no arguments and the</span>
+    <span class="c1"># object returned by the factory must support the concurrent.futures.Future</span>
+    <span class="c1"># API.</span>
+    <span class="n">_future_factory</span> <span class="o">=</span> <span class="n">Future</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_workers</span><span class="p">,</span> <span class="n">initializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uninitializer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wait_at_exit</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes a new EnhancedThreadPoolExecutor instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            max_workers: The maximum number of threads that can be used to</span>
+<span class="sd">                execute the given calls.</span>
+<span class="sd">            initializer: callable, taking no arguments, that is to be called on</span>
+<span class="sd">                each worker thread when it is started. Exceptions in the</span>
+<span class="sd">                initializer are logged, then ignored.</span>
+<span class="sd">            uninitializer: callable, taking no arguments, that is to be called</span>
+<span class="sd">                on each worker thread when shut down. Exceptions in the</span>
+<span class="sd">                uninitializer are logged, then ignored.</span>
+<span class="sd">            name: string giving the name for this Executor.  This name</span>
+<span class="sd">                is used as a prefix for the names of the executor&#39;s</span>
+<span class="sd">                worker threads.  If no name is given then the executor</span>
+<span class="sd">                class name will be used.</span>
+<span class="sd">            wait_at_exit: whether to wait for running jobs to finish during</span>
+<span class="sd">                interpreter exit or to abruptly kill the worker thread.</span>
+<span class="sd">                Note: The killed job does not get a chance to do any cleanups,</span>
+<span class="sd">                its resources (such as open files, database transactions, etc.)</span>
+<span class="sd">                may not be released properly. See the threading module</span>
+<span class="sd">                documentation about daemon threads for more information.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_workers</span> <span class="o">=</span> <span class="n">max_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_threads</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initializer</span> <span class="o">=</span> <span class="n">initializer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uninitializer</span> <span class="o">=</span> <span class="n">uninitializer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wait_at_exit</span> <span class="o">=</span> <span class="n">wait_at_exit</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_counter</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EnhancedThreadPoolExecutor.submit"><a class="viewcode-back" href="../../../../concurrent/encore.concurrent.futures.html#encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.submit">[docs]</a>    <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;cannot schedule new futures after shutdown&#39;</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_future_factory</span><span class="p">()</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">_WorkItem</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_work_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_thread_count</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">f</span></div>
+    <span class="n">submit</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">_base</span><span class="o">.</span><span class="n">Executor</span><span class="o">.</span><span class="n">submit</span><span class="o">.</span><span class="vm">__doc__</span>
+
+    <span class="k">def</span> <span class="nf">_adjust_thread_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># When the executor gets lost, the weakref callback will wake up</span>
+        <span class="c1"># the worker threads.</span>
+        <span class="k">def</span> <span class="nf">weakref_cb</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_queue</span><span class="p">):</span>
+            <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_threads</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_workers</span><span class="p">:</span>
+            <span class="n">thread_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">Worker-</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                 <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_thread_counter</span><span class="p">))</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_worker</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">thread_name</span><span class="p">,</span>
+                                 <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weakref_cb</span><span class="p">),</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_work_queue</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_initializer</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_uninitializer</span><span class="p">))</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_threads</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wait_at_exit</span><span class="p">:</span>
+                <span class="n">_threads_queues</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_queue</span>
+
+<div class="viewcode-block" id="EnhancedThreadPoolExecutor.shutdown"><a class="viewcode-back" href="../../../../concurrent/encore.concurrent.futures.html#encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_work_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threads</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+    <span class="n">shutdown</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">_base</span><span class="o">.</span><span class="n">Executor</span><span class="o">.</span><span class="n">shutdown</span><span class="o">.</span><span class="vm">__doc__</span>
+
+<div class="viewcode-block" id="EnhancedThreadPoolExecutor.map"><a class="viewcode-back" href="../../../../concurrent/encore.concurrent.futures.html#encore.concurrent.futures.enhanced_thread_pool_executor.EnhancedThreadPoolExecutor.map">[docs]</a>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">iterables</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a iterator equivalent to map(fn, iter).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fn: A callable that will take take as many arguments as there are</span>
+<span class="sd">                passed iterables.</span>
+<span class="sd">            timeout: The maximum number of seconds to wait. If None, then there</span>
+<span class="sd">                is no limit on the wait time.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An iterator equivalent to: map(func, \*iterables) but the calls may</span>
+<span class="sd">            be evaluated out-of-order.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TimeoutError: If the entire result iterator could not be generated</span>
+<span class="sd">                before the given timeout.</span>
+
+<span class="sd">            Exception: If fn(\*args) raises for any values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="n">timeout</span> <span class="o">+</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="k">for</span> <span class="n">args</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">)]</span>
+
+        <span class="c1"># Yield must be hidden in closure so that the futures are submitted</span>
+        <span class="c1"># before the first iterator value is required.</span>
+        <span class="k">def</span> <span class="nf">result_iterator</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">fs</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">fs</span><span class="p">:</span>
+                    <span class="n">future</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result_iterator</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

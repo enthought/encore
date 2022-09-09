@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>encore.storage.static_url_store &mdash; Encore Documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" >
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../../../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../../../genindex.html" >
+    <link rel="search" title="Search" href="../../../search.html" >
+    <link rel="top" title="Encore Documentation" href="../../../index.html" >
+    <link rel="up" title="Module code" href="../../index.html" > 
+  </head>
+  <body>
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../../../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="../../index.html" accesskey="U">Module code</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../../../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../../../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <h1>Source code for encore.storage.static_url_store</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># (C) Copyright 2011-2022 Enthought, Inc., Austin, TX</span>
+<span class="c1"># All right reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is open source software distributed according to the terms in LICENSE.txt</span>
+<span class="c1">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Static URL Store</span>
+<span class="sd">================</span>
+
+<span class="sd">This module contains the :py:class:`~StaticURLStore` store that communicates</span>
+<span class="sd">with a remote HTTP server which provides the actual data storage.  This is a</span>
+<span class="sd">simple read-only store that can be run against a static HTTP server which</span>
+<span class="sd">provides a json file with all metadata and then serves data from URLs from</span>
+<span class="sd">another path.  The metadata URL is polled periodically for updates.</span>
+
+<span class="sd">A typical static server might be layed out as::</span>
+
+<span class="sd">    base_directory/</span>
+<span class="sd">        index.json</span>
+<span class="sd">        data/</span>
+<span class="sd">            key1</span>
+<span class="sd">            key2</span>
+<span class="sd">            ...</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">.abstract_store</span> <span class="kn">import</span> <span class="n">AbstractReadOnlyStore</span>
+<span class="kn">from</span> <span class="nn">.events</span> <span class="kn">import</span> <span class="n">StoreUpdateEvent</span><span class="p">,</span> <span class="n">StoreSetEvent</span><span class="p">,</span> <span class="n">StoreDeleteEvent</span>
+<span class="kn">from</span> <span class="nn">.url_value</span> <span class="kn">import</span> <span class="n">URLValue</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">add_context_manager_support</span>
+
+
+<span class="k">def</span> <span class="nf">basic_auth_factory</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A factory that creates a :py:class:`~.HTTPBasicAuthHandler` instance</span>
+
+<span class="sd">    The arguments are passed directly through to the :py:meth:`add_password`</span>
+<span class="sd">    method of the handler.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">auth_handler</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">HTTPBasicAuthHandler</span><span class="p">()</span>
+    <span class="n">auth_handler</span><span class="o">.</span><span class="n">add_password</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="StaticURLStore"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore">[docs]</a><span class="k">class</span> <span class="nc">StaticURLStore</span><span class="p">(</span><span class="n">AbstractReadOnlyStore</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A read-only key-value store that is a front end for data served via URLs</span>
+
+<span class="sd">    All data is assumed to be served from some root url.  In addition</span>
+<span class="sd">    the store requires knowledge of two paths: a data prefix URL which is a</span>
+<span class="sd">    partial URL to which the keys will be appended when requesting data, and a</span>
+<span class="sd">    query URL which is a single URL which provides all metadata as a json</span>
+<span class="sd">    encoded file.</span>
+
+<span class="sd">    For example, an HTTP server may store data at URLs of the form::</span>
+
+<span class="sd">        http://www.example.com/data/&lt;key&gt;</span>
+
+<span class="sd">    and may store the metadata at::</span>
+
+<span class="sd">        http://www.example.com/index.json</span>
+
+<span class="sd">    These would have a root url of &quot;http://www.example.com/&quot;, a data path</span>
+<span class="sd">    of &quot;data/&quot; and a query path of &quot;index.json&quot;.</span>
+
+<span class="sd">    All queries are performed using urllib.urlopen, so this store can be</span>
+<span class="sd">    implemented by an HTTP, FTP or file server which serves static files.  When</span>
+<span class="sd">    connecting, if appropriate credentials are supplied then HTTP authentication</span>
+<span class="sd">    will be used when connecting the remote server</span>
+
+<span class="sd">    .. warning::</span>
+
+<span class="sd">        Since we use urllib without any further modifications, HTTPS requests</span>
+<span class="sd">        do not validate the server&#39;s certificate.</span>
+
+<span class="sd">    Because of the limited nature of the interface, this store implementation</span>
+<span class="sd">    is read only, and handles updates via periodic polling of the query prefix</span>
+<span class="sd">    URL.  This guarantees that the viewed data is always consistent, it just may</span>
+<span class="sd">    not be current. Most of the work of querying is done on the client side</span>
+<span class="sd">    using the cached metadata.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    event_manager :</span>
+<span class="sd">        An event_manager which implements the :py:class:`~.abstract_event_manager.BaseEventManager`</span>
+<span class="sd">        API.</span>
+<span class="sd">    root_url : str</span>
+<span class="sd">        The base url that data is served from.</span>
+<span class="sd">    data_path : str</span>
+<span class="sd">        The URL prefix that the data is served from.</span>
+<span class="sd">    query_path : str</span>
+<span class="sd">        The URL that the metadata is served from.</span>
+<span class="sd">    poll : float</span>
+<span class="sd">        The polling frequency for the polling thread.  Polls every 5 min by default.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StaticURLStore.__init__"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_url</span><span class="p">,</span> <span class="n">data_path</span><span class="p">,</span> <span class="n">query_path</span><span class="p">,</span> <span class="n">poll</span><span class="o">=</span><span class="mi">300</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StaticURLStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">=</span> <span class="n">root_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_path</span> <span class="o">=</span> <span class="n">query_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poll</span> <span class="o">=</span> <span class="n">poll</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index_thread</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="StaticURLStore.connect"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">proxy_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auth_handler_factory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Connect to the key-value store, optionally with authentication</span>
+
+<span class="sd">        This method creates appropriate urllib openers for the store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        credentials : dict</span>
+<span class="sd">            A dictionary which has at least keys &#39;username&#39; and &#39;password&#39;</span>
+<span class="sd">            and optional keys &#39;uri&#39; and &#39;realm&#39;.  The &#39;uri&#39; will default to</span>
+<span class="sd">            the root url of the store, and &#39;realm&#39; will default to</span>
+<span class="sd">            &#39;encore.storage&#39;.</span>
+<span class="sd">        proxy_handler : urllib.ProxyHandler</span>
+<span class="sd">            An optional urllib.ProxyHandler instance.  If none is provided</span>
+<span class="sd">            then urllib will create a proxy handler from the user&#39;s environment</span>
+<span class="sd">            if needed.</span>
+<span class="sd">        auth_handler_factory :</span>
+<span class="sd">            An optional factory to build urllib authenticators.  The credentials</span>
+<span class="sd">            will be passed as keyword arguments to this handler&#39;s add_password</span>
+<span class="sd">            method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">credentials</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">auth_handler_factory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">auth_handler_factory</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">HTTPBasicAuthHandler</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;uri&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span><span class="p">,</span> <span class="s1">&#39;realm&#39;</span><span class="p">:</span> <span class="s1">&#39;encore.storage&#39;</span><span class="p">}</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
+            <span class="n">auth_handler</span> <span class="o">=</span> <span class="n">auth_handler_factory</span><span class="p">()</span>
+            <span class="n">auth_handler</span><span class="o">.</span><span class="n">add_password</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">proxy_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span><span class="n">auth_handler</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span><span class="n">proxy_handler</span><span class="p">,</span> <span class="n">auth_handler</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">proxy_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">build_opener</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span><span class="n">auth_handler</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_index</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">poll</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_poll</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="StaticURLStore.disconnect"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Disconnect from the key-value store</span>
+
+<span class="sd">        This method disposes or disconnects to any long-lived resources that the</span>
+<span class="sd">        store requires.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_thread</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="StaticURLStore.is_connected"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Whether or not the store is currently connected</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        connected : bool</span>
+<span class="sd">            Whether or not the store is currently connected.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get information about the key-value store</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata giving information about the key-value store.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;readonly&#39;</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">}</span>
+
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Basic Create/Read/Update/Delete Methods</span>
+    <span class="c1">##########################################################################</span>
+
+
+<div class="viewcode-block" id="StaticURLStore.get"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve a stream of data and metdata from a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : file-like</span>
+<span class="sd">            A readable file-like object that provides stream of data from the</span>
+<span class="sd">            key-value store.  This is the same type of filelike object returned</span>
+<span class="sd">            by urllib&#39;s urlopen function.</span>
+<span class="sd">        metadata : dictionary</span>
+<span class="sd">            A dictionary of metadata for the key.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            If the key is not found in the store, a KeyError is raised.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">+</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">+</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_lock</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">URLValue</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StaticURLStore.get_data"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve a stream from a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : file-like</span>
+<span class="sd">            A readable file-like object the that provides stream of data from the</span>
+<span class="sd">            key-value store.  This is the same type of filelike object returned</span>
+<span class="sd">            by urllib&#39;s urlopen function.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">+</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">+</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">add_context_manager_support</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">stream</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StaticURLStore.get_metadata"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve the metadata for a given key in the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+<span class="sd">        select : iterable of strings or None</span>
+<span class="sd">            Which metadata keys to populate in the result.  If unspecified, then</span>
+<span class="sd">            return the entire metadata dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        metadata : dict</span>
+<span class="sd">            A dictionary of metadata associated with the key.  The dictionary</span>
+<span class="sd">            has keys as specified by the select argument.  If a key specified in</span>
+<span class="sd">            select is not present in the metadata, then it will not be present</span>
+<span class="sd">            in the returned value.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError :</span>
+<span class="sd">            This will raise a key error if the key is not present in the store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">select</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="n">s</span><span class="p">])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">select</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StaticURLStore.exists"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Test whether or not a key exists in the key-value store</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            The key for the resource in the key-value store.  They key is a unique</span>
+<span class="sd">            identifier for the resource within the key-value store.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        exists : bool</span>
+<span class="sd">            Whether or not the key exists in the key-value store.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span></div>
+
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Querying Methods</span>
+    <span class="c1">##########################################################################</span>
+
+<div class="viewcode-block" id="StaticURLStore.query"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Query for keys and metadata matching metadata provided as keyword arguments</span>
+
+<span class="sd">        This provides a very simple querying interface that returns precise</span>
+<span class="sd">        matches with the metadata.  If no arguments are supplied, the query</span>
+<span class="sd">        will return the complete set of metadata for the key-value store.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        select : iterable of strings or None</span>
+<span class="sd">            An optional list of metadata keys to return.  If this is not None,</span>
+<span class="sd">            then the metadata dictionaries will only have values for the specified</span>
+<span class="sd">            keys populated.</span>
+<span class="sd">        kwargs :</span>
+<span class="sd">            Arguments where the keywords are metadata keys, and values are</span>
+<span class="sd">            possible values for that metadata item.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : iterable</span>
+<span class="sd">            An iterable of (key, metadata) tuples where metadata matches</span>
+<span class="sd">            all the specified values for the specified metadata keywords.</span>
+<span class="sd">            If a key specified in select is not present in the metadata of a</span>
+<span class="sd">            particular key, then it will not be present in the returned value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">select</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span> <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                        <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="nb">dict</span><span class="p">((</span><span class="n">metadata_key</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="n">metadata_key</span><span class="p">])</span>
+                            <span class="k">for</span> <span class="n">metadata_key</span> <span class="ow">in</span> <span class="n">select</span> <span class="k">if</span> <span class="n">metadata_key</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span> <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                        <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="StaticURLStore.query_keys"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.query_keys">[docs]</a>    <span class="k">def</span> <span class="nf">query_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Query for keys matching metadata provided as keyword arguments</span>
+
+<span class="sd">        This provides a very simple querying interface that returns precise</span>
+<span class="sd">        matches with the metadata.  If no arguments are supplied, the query</span>
+<span class="sd">        will return the complete set of keys for the key-value store.</span>
+
+<span class="sd">        This is equivalent to ``self.query(**kwargs).keys()``, but potentially</span>
+<span class="sd">        more efficiently implemented.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs :</span>
+<span class="sd">            Arguments where the keywords are metadata keys, and values are</span>
+<span class="sd">            possible values for that metadata item.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : iterable</span>
+<span class="sd">            An iterable of key-value store keys whose metadata matches all the</span>
+<span class="sd">            specified values for the specified metadata keywords.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_lock</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span> <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                    <span class="k">yield</span> <span class="n">key</span></div>
+
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Utility Methods</span>
+    <span class="c1">##########################################################################</span>
+
+<div class="viewcode-block" id="StaticURLStore.update_index"><a class="viewcode-back" href="../../../storage/static_url_store.html#encore.storage.static_url_store.StaticURLStore.update_index">[docs]</a>    <span class="k">def</span> <span class="nf">update_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Request the most recent version of the metadata</span>
+
+<span class="sd">        This downloads the json file at the query_path location, and updates</span>
+<span class="sd">        the local metadata cache with this information.  It then emits events</span>
+<span class="sd">        that represent the difference between the old metadata and the new</span>
+<span class="sd">        metadata.</span>
+
+<span class="sd">        This method is normally called from the polling thread, but can be called</span>
+<span class="sd">        by other code when needed.  It locks the metadata index whilst performing</span>
+<span class="sd">        the update.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_path</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_lock</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="c1"># Py3: http.client.HTTPResponse always returns bytes --&gt; convert to</span>
+            <span class="c1"># str/unicode to make sure loads is happy</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+            <span class="n">old_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
+
+        <span class="c1"># emit update events</span>
+        <span class="c1"># XXX won&#39;t detect changes to data if metadata doesn&#39;t change as well!</span>
+        <span class="k">if</span> <span class="n">old_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">old_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">old_index</span><span class="p">)</span>
+            <span class="n">new_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="n">old_keys</span> <span class="o">-</span> <span class="n">new_keys</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreDeleteEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">old_index</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="n">new_keys</span> <span class="o">-</span> <span class="n">old_keys</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreSetEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">index</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="n">new_keys</span> <span class="o">&amp;</span> <span class="n">old_keys</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">old_index</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">index</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">event_manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">StoreUpdateEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">index</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span></div>
+
+
+    <span class="c1">##########################################################################</span>
+    <span class="c1"># Private Methods</span>
+    <span class="c1">##########################################################################</span>
+
+    <span class="k">def</span> <span class="nf">_poll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opener</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poll</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_index</span><span class="p">()</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="c1"># tick</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/img/e-logo.png" alt="Logo">
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
+    </div>
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
+    </div>
+  </body>
+</html>

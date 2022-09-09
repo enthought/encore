@@ -1,61 +1,356 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Key-Value Store Concepts &mdash; Encore Documentation</title>
     
-    <title>Key-Value Store Concepts &mdash; Encore 0.6.0 documentation</title>
-    
-    <link rel="stylesheet" href="../_static/enthought_doc.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../_static/css/spc-extend.css">
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/enthought.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" >
+    <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" >
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.6.0',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
+        LINK_SUFFIX: '.html',
+        SOURCELINK_SUFFIX: '.txt',
         HAS_SOURCE:  true
       };
     </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="shortcut icon" href="../_static/et.ico"/>
-    <link rel="top" title="Encore 0.6.0 documentation" href="../index.html" />
-    <link rel="up" title="Storage" href="index.html" />
-    <link rel="next" title="Usage" href="usage.html" />
-    <link rel="prev" title="Storage" href="index.html" /> 
+    <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/js/wrap_on_dot.js"></script>
+    <link rel="shortcut icon" href="../_static/img/favicon.png">
+    <link rel="index" title="Index" href="../genindex.html" >
+    <link rel="search" title="Search" href="../search.html" >
+    <link rel="top" title="Encore Documentation" href="../index.html" >
+    <link rel="up" title="Storage" href="index.html" >
+    <link rel="next" title="Usage" href="usage.html" >
+    <link rel="prev" title="Storage" href="index.html" > 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="usage.html" title="Usage"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Storage"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Storage</a> &raquo;</li> 
-      </ul>
+  <body>
+  <div class="container">
+    <div class="header">
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+  </div>
+
+    <div class="container">
+      <div class="main">
+        
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              
+    <ul class="nav nav-pills pull-left">
+	
+        <li class="active"><a href="../index.html">Encore Documentation</a></li>
+	
+          <li class="active"><a href="index.html" accesskey="U">Storage</a></li> 
+    </ul>
+              
+              
+    <ul class="nav nav-pills pull-right">
+      <li class="active">
+        <a href="../genindex.html" title="General Index"
+           accesskey="I">index</a>
+      </li>
+      <li class="active">
+        <a href="../py-modindex.html" title="Python Module Index"
+           >modules</a>
+      </li>
+      <li class="active">
+        <a href="usage.html" title="Usage"
+           accesskey="N">next</a>
+      </li>
+      <li class="active">
+        <a href="index.html" title="Storage"
+           accesskey="P">previous</a>
+      </li>
+    </ul>
+              
+	    </div>
+	  </div>
+	</div>
+        
+
+	<div class="row-fluid">
+          <div class="span9">
+            
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body" role="main">
+            
+  <section id="key-value-store-concepts">
+<h1>Key-Value Store Concepts<a class="headerlink" href="#key-value-store-concepts" title="Permalink to this heading">¶</a></h1>
+<p>The key-value store API exposes an interface on top of whatever
+backend implementation is used by subclasses.  This permits code which requires
+access to a key-value store to use it in a uniform way without having to care about
+where and how the data is stored.  The API is also agnostic about what is being
+stored, and so while the key use case is for egg repositories, potentially any
+data values can be stored in the key-value store.</p>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this heading">¶</a></h2>
+<p>We have seen a common need throughout client and internal development efforts at
+Enthought for various ways of persistently storing data and associated metadata
+and making it available within the applications we write.  Over the years,
+Enthought has implemented a number of different storage systems with similar
+general functionality; sometimes even with multiple ones in the same project.
+The particular motivation which has prompted the creation of the storage API,
+and the initial use-case is a refactor of the Enstaller project to provide a
+cleaner set of internal APIs.</p>
+<p>When faced with a problem like this, it is tempting to start from the
+implementation level and build a solution to the problem at hand (eg. “I need to
+store eggs, so I build an egg store”).  In generalizing, it is then even more
+tempting to try to replace existing implementations with a more generic
+implementation (eg. “I need to store eggs and apps and code blocks both locally
+and remotely, so I build a NoSQL-backed data store server which I can run
+locally if I need to”).  However any generic implementation must make
+trade-offs, and the trade-offs may end up being inappropriate for particular use
+cases (eg. “Now I need to have an in-memory code-block store for efficiency, and
+my store’s optimized for remote access…”).</p>
+<div class="graphviz"><img src="../_images/graphviz-a030b2145aa0789d38ba654e79d07c456ee24b3b.png" alt="digraph diagram1 {
+node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
+&quot;Egg Store&quot; -&gt; &quot;General Implementation&quot;;
+&quot;Code Block Store&quot; -&gt; &quot;General Implementation&quot;;
+&quot;Configuration Store&quot; -&gt; &quot;General Implementation&quot;
+}" class="graphviz" /></div>
+<p>Alternatively, it is tempting to start from the task that is being attempted
+(eg. “I need to store eggs, so I build an egg store”) and then generalize the
+implementation (eg. “Now I need to store eggs remotely, so I’ll build a remote
+egg store, but at least I’ll use the same API”).  However, again the specifics
+of the implementation may make it inappropriate for particular use cases (eg.
+“Now I need a code-block store, so I’ll wrap up my code-blocks as eggs and use
+an egg store… but now they’re 100 times bigger than they need to be…”)</p>
+<div class="graphviz"><img src="../_images/graphviz-f0897afcb810a3cf2c41d6dedc8788b129825d2a.png" alt="digraph diagram2 {
+node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
+&quot;Egg Store API&quot; -&gt; &quot;Memory Store&quot;
+&quot;Egg Store API&quot; -&gt; &quot;Disk Store&quot;
+&quot;Egg Store API&quot; -&gt; &quot;HTTP Store&quot;
+&quot;Egg Store API&quot; -&gt; &quot;Cached Store&quot;
+&quot;Egg Store API&quot; -&gt; &quot;SQL Store&quot;
+}" class="graphviz" /></div>
+<p>This storage API instead to simply provides an API through which data providers
+and data consumers can talk.  The API deliberately makes no assumptions about
+what is being stored (eg. eggs vs. code blocks) but also makes no assumptions
+about how the data is stored (eg. in memory, on disk, in a database, through a
+remote server).  This allows developers to re-use code more efficiently by
+permitting them to choose the pieces that make sense for their particular use
+case (eg. “I need an in-memory code-block store, so I’ll take my general
+code-block store logic which uses the API, and my in-memory store logic which
+implements the API, and join them together”).  Not every combination may make
+sense (an in-memory egg store is probably a bad idea, for example), but the
+ability to pick and choose allows a great deal of flexibility.</p>
+<div class="graphviz"><img src="../_images/graphviz-7d3cd4f7dbf0e8cf178191f426f9f0fde8f94362.png" alt="digraph diagram2 {
+node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
+&quot;Egg Store&quot; -&gt; &quot;Key-Value Store API&quot;
+&quot;Code Block Store&quot; -&gt; &quot;Key-Value Store API&quot;
+&quot;Configuration Store&quot; -&gt; &quot;Key-Value Store API&quot;
+&quot;Key-Value Store API&quot; -&gt; &quot;Memory Store&quot;
+&quot;Key-Value Store API&quot; -&gt; &quot;Disk Store&quot;
+&quot;Key-Value Store API&quot; -&gt; &quot;HTTP Store&quot;
+&quot;Key-Value Store API&quot; -&gt; &quot;Cached Store&quot;
+&quot;Key-Value Store API&quot; -&gt; &quot;SQL Store&quot;
+}" class="graphviz" /></div>
+<p>This also reflects the reality that developers frequently do not have complete
+freedom to choose the best possible data store solution due to external
+constraints.  By writing to the storage API, you have the opportunity to more
+easily re-use components, as well as the possibility of later replacing the
+sub-optimal solution with a better one.</p>
+<p>This approach also allows developers to write general connectors, adapters and
+other building blocks for repositories which only use the API and don’t care
+about what is being stored.  This should permit fast prototyping of
+functionality, if nothing else, but in many cases this approach may be good
+enough for production code.  For example, a generic joined store could be
+written which takes a list of other stores which implement the API and when
+asked for data from the store asks each store in sequence for the data until it
+finds what is requested.  To code using the joined store, it appears just like
+any other store, and the joined store doesn’t care how the stores it joins are
+implemented.</p>
+</section>
+<section id="keys">
+<h2>Keys<a class="headerlink" href="#keys" title="Permalink to this heading">¶</a></h2>
+<p>The keys of the key-value store are strings, and the key-value store API makes no
+assumptions about what the strings represent or any structure they might have.
+In particular keys are assumed to be case sensitive and may include arbitrary
+characters, so key-value store implementations should be careful to handle any issues
+which may arise if the underlying data store is case insensitive and has special
+characters which need to be escaped.</p>
+<p>Each key has associated with it a collection of metadata and some binary data.
+The key-value store API makes no assumptions about how the metadata and data is
+serialized.</p>
+</section>
+<section id="values">
+<h2>Values<a class="headerlink" href="#values" title="Permalink to this heading">¶</a></h2>
+<p>The values stored in the key-value store consist of two parts, a binary data
+stream and a metadata dictionary.  These are encapsulated into a light-weight
+data-structure which can hold additional implementation-specific information.</p>
+<p>In particular, implementations should expose attributes or properties ‘size’,
+‘created’ and ‘modified’ which proved the number of bytes in the data stream,
+the creation time of the key, and the most recent modification time of the key.
+These additional attributes are primarily provided for internal use and to assist
+composition and replication of key-value stores.</p>
+<p>The Value should contain enough information to extract the data and metadata,
+but does not have to actually open those resources until they are requested.</p>
+<p>For writable repositories, data should be supplied to keys via a Value subclass,
+if possible.  This allows copying between repositories using code like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">repo1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">repo1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>or copying between keys with code like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">repo</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Since files are likely to be common targets for extracting data from values, or
+sources for data being stored, the key-value store API provides utility methods
+<code class="docutils literal notranslate"><span class="pre">to_file()</span></code> and <code class="docutils literal notranslate"><span class="pre">from_file()</span></code>.  Simple default implementations of these methods are
+provided, but implementations of the key-value store API may be able to override
+these to be more efficient, depending on the nature of the back-end data store.</p>
+<p>For backwards compatibility, value objects express an API that makes them appear
+as a 2-tuple of (data, metadata).</p>
+</section>
+<section id="data">
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this heading">¶</a></h2>
+<p>The binary data stored in the values is presented through the key-value store API as
+file-like objects which implement at least read(), close(), __enter__() and
+__exit__() methods as well as having attributes which provide some amount of
+information about the stream, such as length, last modification time, creation
+time, and so forth.  Particular backends may choose to provide additional
+attributes or implement additional methods as needed.</p>
+<p>Frequently this will be a wrapper around a standard file, StringIO object, a
+urllib file-like object or other wrapper about a socket.  The read() method
+should accept an optional number of bytes to read, so that buffered reads can be
+performed.</p>
+<p>The key-value store API gives no special meaning to the bytes stored in the value.
+However care should be taken that it is in fact bytes being stored, and not a
+(possibly unicode) string; in particular, if an actual file is being used it should
+be opened in binary mode.</p>
+</section>
+<section id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this heading">¶</a></h2>
+<p>Metadata should be representable as a dictionary whose keys are valid Python
+identifiers, and whose values can be serialized into reasonable human-readable
+form (basically, you should be able to represent the dictionary as JSON, XML,
+YAML, or similar in a clear and sane way, because some underlying datastore
+<em>will</em>).</p>
+<p>Metadata can be retrieved via the <code class="docutils literal notranslate"><span class="pre">get_metadata()</span></code> method or as the second element
+of the tuple returned by <code class="docutils literal notranslate"><span class="pre">get()</span></code>.  Metadata can be set using <code class="docutils literal notranslate"><span class="pre">set()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">set_metadata()</span></code> and existing metadata can be modified using
+<code class="docutils literal notranslate"><span class="pre">update_metadata()</span></code> (similarly to the way that the <code class="docutils literal notranslate"><span class="pre">update()</span></code> method works
+for dictionaries).</p>
+<p>There is nothing that ensures that metadata and the corresponding data are
+synchronised for a particular object.  It is up to the user of the API to ensure
+that the metadata for stored data is correct.</p>
+<p>We currently make no assumptions about the metadata keys, but we expect
+conventions to evolve for the meanings and format of particular keys.  Given
+that this is generally thought of as a repository for storing eggs, the
+following metadata keys are likely to be available:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>type</dt><dd><p>The type of object being stored (package, app, patch, video, etc.).</p>
+</dd>
+<dt>name</dt><dd><p>The name of the object being stored.</p>
+</dd>
+<dt>version</dt><dd><p>The version of the object being stored.</p>
+</dd>
+<dt>arch</dt><dd><p>The architecture that the object being stored is for.</p>
+</dd>
+<dt>python</dt><dd><p>The version of Python that the object being stored is for.</p>
+</dd>
+<dt>ctime</dt><dd><p>The creation time of the object in the repository in seconds since
+the Unix Epoch.</p>
+</dd>
+<dt>mtime</dt><dd><p>The last modification time of the object in the repository in seconds
+since the Unix Epoch.</p>
+</dd>
+<dt>size</dt><dd><p>The size of the binary data in bytes.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Note that there is a difference in intent between the information stored in the
+metadata and the attributes on the value object: value object attributes are
+controlled by the key-value store implementation, whereas metadata are completely
+arbitrary from the point of view of the key-value store and are completely up
+to the user code as to what information is stored.</p>
+</section>
+<section id="connecting-and-disconnecting">
+<h2>Connecting and Disconnecting<a class="headerlink" href="#connecting-and-disconnecting" title="Permalink to this heading">¶</a></h2>
+<p>Before a store can be used, its <code class="docutils literal notranslate"><span class="pre">connect()</span></code> method must be called to allow any
+long-lived resources to be allocated and prepared for use, and to optionally
+handle any authentication that might be required.</p>
+<p>Conversely, the store’s <code class="docutils literal notranslate"><span class="pre">disconnect()</span></code> method should be called when code is
+done with the store, allowing it to release any long-lived resources.</p>
+</section>
+<section id="querying">
+<h2>Querying<a class="headerlink" href="#querying" title="Permalink to this heading">¶</a></h2>
+<p>A very simple querying API is provided by default.  The <code class="docutils literal notranslate"><span class="pre">query()</span></code> method simply
+takes a collection of keyword arguments and interprets them as metadata keys
+and values.  It returns all the keys and corresponding metadata that match all
+of the supplied arguments.  <code class="docutils literal notranslate"><span class="pre">query_keys()</span></code> does the same, but only returns the
+matching keys.</p>
+<p>Subclasses may choose to provide more sophisticated querying mechanisms.</p>
+</section>
+<section id="transactions">
+<h2>Transactions<a class="headerlink" href="#transactions" title="Permalink to this heading">¶</a></h2>
+<p>The base abstract key-value store has no notion of transactions, since we want to
+handle the read-only and simple writer cases efficiently.  However, if the
+underlying storage mechanism has the notion of a transaction, this can be
+encapsulated by writing a context manager for transactions.  The <code class="docutils literal notranslate"><span class="pre">transaction()</span></code>
+method returns an instance of the appropriate context manager.</p>
+</section>
+<section id="events">
+<h2>Events<a class="headerlink" href="#events" title="Permalink to this heading">¶</a></h2>
+<p>All implementations should have an event manager attribute, and may choose to
+emit appropriate events.  This is of particular importance during long-running
+interactions so that progress can be displayed.  This also provides a mechanism
+that an implementation can use to inform listeners that new objects have been
+added, or the store has been otherwise modified.</p>
+</section>
+<section id="notes-for-writing-an-implementation">
+<h2>Notes For Writing An Implementation<a class="headerlink" href="#notes-for-writing-an-implementation" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt>Metadata is really an index</dt><dd><p>In terms of traditional database design, things that you are exposing in
+metadata are really indexed columns.  If you are implementing a store which
+needs fast querying, you may want to look at how traditional databases do
+indexing to guide your data structure choices.</p>
+</dd>
+<dt>Determine the Single Points of Truth</dt><dd><p>Every piece of data should have a single point of truth - a canonical place
+which holds the correct value.  This is particularly true for metadata.</p>
+</dd>
+<dt>Testing</dt><dd><p>There are standard test suites that can validate that a store is working
+as expected by the API.  When writing an implementation of the API, you
+can subclass the tests and write appropriate setUp and tearDown methods that
+will put the store into the correct state.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+          </div>
+        </div>
+          </div>
+      <div class="spc-rightsidebar span3">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/e-logo-rev.png" alt="Logo"/>
+              <img class="logo" src="../_static/img/e-logo.png" alt="Logo">
             </a></p>
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Key-Value Store Concepts</a><ul>
 <li><a class="reference internal" href="#discussion">Discussion</a></li>
 <li><a class="reference internal" href="#keys">Keys</a></li>
@@ -71,311 +366,59 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Storage</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="usage.html"
-                        title="next chapter">Usage</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/storage/concepts.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Storage</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="usage.html"
+                          title="next chapter">Usage</a></p>
+  </div>
+  <h3>This Page</h3>
+  <div>
+    <a href="../_sources/storage/concepts.rst.txt"
+       rel="nofollow">Show Source</a>
+  </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="key-value-store-concepts">
-<h1>Key-Value Store Concepts<a class="headerlink" href="#key-value-store-concepts" title="Permalink to this headline">¶</a></h1>
-<p>The key-value store API exposes an interface on top of whatever
-backend implementation is used by subclasses.  This permits code which requires
-access to a key-value store to use it in a uniform way without having to care about
-where and how the data is stored.  The API is also agnostic about what is being
-stored, and so while the key use case is for egg repositories, potentially any
-data values can be stored in the key-value store.</p>
-<div class="section" id="discussion">
-<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
-<p>We have seen a common need throughout client and internal development efforts at
-Enthought for various ways of persistently storing data and associated metadata
-and making it available within the applications we write.  Over the years,
-Enthought has implemented a number of different storage systems with similar
-general functionality; sometimes even with multiple ones in the same project.
-The particular motivation which has prompted the creation of the storage API,
-and the initial use-case is a refactor of the Enstaller project to provide a
-cleaner set of internal APIs.</p>
-<p>When faced with a problem like this, it is tempting to start from the
-implementation level and build a solution to the problem at hand (eg. &#8220;I need to
-store eggs, so I build an egg store&#8221;).  In generalizing, it is then even more
-tempting to try to replace existing implementations with a more generic
-implementation (eg. &#8220;I need to store eggs and apps and code blocks both locally
-and remotely, so I build a NoSQL-backed data store server which I can run
-locally if I need to&#8221;).  However any generic implementation must make
-trade-offs, and the trade-offs may end up being inappropriate for particular use
-cases (eg. &#8220;Now I need to have an in-memory code-block store for efficiency, and
-my store&#8217;s optimized for remote access...&#8221;).</p>
-<img src="../_images/graphviz-4fe448c25666224d5a61b9b717d6e7beab5b64bb.png" alt="digraph diagram1 {
-node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
-&quot;Egg Store&quot; -&gt; &quot;General Implementation&quot;;
-&quot;Code Block Store&quot; -&gt; &quot;General Implementation&quot;;
-&quot;Configuration Store&quot; -&gt; &quot;General Implementation&quot;
-}" />
-<p>Alternatively, it is tempting to start from the task that is being attempted
-(eg. &#8220;I need to store eggs, so I build an egg store&#8221;) and then generalize the
-implementation (eg. &#8220;Now I need to store eggs remotely, so I&#8217;ll build a remote
-egg store, but at least I&#8217;ll use the same API&#8221;).  However, again the specifics
-of the implementation may make it inappropriate for particular use cases (eg.
-&#8220;Now I need a code-block store, so I&#8217;ll wrap up my code-blocks as eggs and use
-an egg store... but now they&#8217;re 100 times bigger than they need to be...&#8221;)</p>
-<img src="../_images/graphviz-1fc5d190e5db4a8dc3db4b5586f87bd7c09ac68e.png" alt="digraph diagram2 {
-node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
-&quot;Egg Store API&quot; -&gt; &quot;Memory Store&quot;
-&quot;Egg Store API&quot; -&gt; &quot;Disk Store&quot;
-&quot;Egg Store API&quot; -&gt; &quot;HTTP Store&quot;
-&quot;Egg Store API&quot; -&gt; &quot;Cached Store&quot;
-&quot;Egg Store API&quot; -&gt; &quot;SQL Store&quot;
-}" />
-<p>This storage API instead to simply provides an API through which data providers
-and data consumers can talk.  The API deliberately makes no assumptions about
-what is being stored (eg. eggs vs. code blocks) but also makes no assumptions
-about how the data is stored (eg. in memory, on disk, in a database, through a
-remote server).  This allows developers to re-use code more efficiently by
-permitting them to choose the pieces that make sense for their particular use
-case (eg. &#8220;I need an in-memory code-block store, so I&#8217;ll take my general
-code-block store logic which uses the API, and my in-memory store logic which
-implements the API, and join them together&#8221;).  Not every combination may make
-sense (an in-memory egg store is probably a bad idea, for example), but the
-ability to pick and choose allows a great deal of flexibility.</p>
-<img src="../_images/graphviz-9426fb227cb49e5e2cd93da35d0ce91542315638.png" alt="digraph diagram2 {
-node [shape=box, fontname=sans, fontsize=10, height=0.1, width=0.1]
-&quot;Egg Store&quot; -&gt; &quot;Key-Value Store API&quot;
-&quot;Code Block Store&quot; -&gt; &quot;Key-Value Store API&quot;
-&quot;Configuration Store&quot; -&gt; &quot;Key-Value Store API&quot;
-&quot;Key-Value Store API&quot; -&gt; &quot;Memory Store&quot;
-&quot;Key-Value Store API&quot; -&gt; &quot;Disk Store&quot;
-&quot;Key-Value Store API&quot; -&gt; &quot;HTTP Store&quot;
-&quot;Key-Value Store API&quot; -&gt; &quot;Cached Store&quot;
-&quot;Key-Value Store API&quot; -&gt; &quot;SQL Store&quot;
-}" />
-<p>This also reflects the reality that developers frequently do not have complete
-freedom to choose the best possible data store solution due to external
-constraints.  By writing to the storage API, you have the opportunity to more
-easily re-use components, as well as the possibility of later replacing the
-sub-optimal solution with a better one.</p>
-<p>This approach also allows developers to write general connectors, adapters and
-other building blocks for repositories which only use the API and don&#8217;t care
-about what is being stored.  This should permit fast prototyping of
-functionality, if nothing else, but in many cases this approach may be good
-enough for production code.  For example, a generic joined store could be
-written which takes a list of other stores which implement the API and when
-asked for data from the store asks each store in sequence for the data until it
-finds what is requested.  To code using the joined store, it appears just like
-any other store, and the joined store doesn&#8217;t care how the stores it joins are
-implemented.</p>
-</div>
-<div class="section" id="keys">
-<h2>Keys<a class="headerlink" href="#keys" title="Permalink to this headline">¶</a></h2>
-<p>The keys of the key-value store are strings, and the key-value store API makes no
-assumptions about what the strings represent or any structure they might have.
-In particular keys are assumed to be case sensitive and may include arbitrary
-characters, so key-value store implementations should be careful to handle any issues
-which may arise if the underlying data store is case insensitive and has special
-characters which need to be escaped.</p>
-<p>Each key has associated with it a collection of metadata and some binary data.
-The key-value store API makes no assumptions about how the metadata and data is
-serialized.</p>
-</div>
-<div class="section" id="values">
-<h2>Values<a class="headerlink" href="#values" title="Permalink to this headline">¶</a></h2>
-<p>The values stored in the key-value store consist of two parts, a binary data
-stream and a metadata dictionary.  These are encapsulated into a light-weight
-data-structure which can hold additional implementation-specific information.</p>
-<p>In particular, implementations should expose attributes or properties &#8216;size&#8217;,
-&#8216;created&#8217; and &#8216;modified&#8217; which proved the number of bytes in the data stream,
-the creation time of the key, and the most recent modification time of the key.
-These additional attributes are primarily provided for internal use and to assist
-composition and replication of key-value stores.</p>
-<p>The Value should contain enough information to extract the data and metadata,
-but does not have to actually open those resources until they are requested.</p>
-<p>For writable repositories, data should be supplied to keys via a Value subclass,
-if possible.  This allows copying between repositories using code like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">repo1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">repo1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>or copying between keys with code like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">repo</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key2</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>Since files are likely to be common targets for extracting data from values, or
-sources for data being stored, the key-value store API provides utility methods
-<code class="docutils literal"><span class="pre">to_file()</span></code> and <code class="docutils literal"><span class="pre">from_file()</span></code>.  Simple default implementations of these methods are
-provided, but implementations of the key-value store API may be able to override
-these to be more efficient, depending on the nature of the back-end data store.</p>
-<p>For backwards compatibility, value objects express an API that makes them appear
-as a 2-tuple of (data, metadata).</p>
-</div>
-<div class="section" id="data">
-<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
-<p>The binary data stored in the values is presented through the key-value store API as
-file-like objects which implement at least read(), close(), __enter__() and
-__exit__() methods as well as having attributes which provide some amount of
-information about the stream, such as length, last modification time, creation
-time, and so forth.  Particular backends may choose to provide additional
-attributes or implement additional methods as needed.</p>
-<p>Frequently this will be a wrapper around a standard file, StringIO object, a
-urllib file-like object or other wrapper about a socket.  The read() method
-should accept an optional number of bytes to read, so that buffered reads can be
-performed.</p>
-<p>The key-value store API gives no special meaning to the bytes stored in the value.
-However care should be taken that it is in fact bytes being stored, and not a
-(possibly unicode) string; in particular, if an actual file is being used it should
-be opened in binary mode.</p>
-</div>
-<div class="section" id="metadata">
-<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
-<p>Metadata should be representable as a dictionary whose keys are valid Python
-identifiers, and whose values can be serialized into reasonable human-readable
-form (basically, you should be able to represent the dictionary as JSON, XML,
-YAML, or similar in a clear and sane way, because some underlying datastore
-<em>will</em>).</p>
-<p>Metadata can be retrieved via the <code class="docutils literal"><span class="pre">get_metadata()</span></code> method or as the second element
-of the tuple returned by <code class="docutils literal"><span class="pre">get()</span></code>.  Metadata can be set using <code class="docutils literal"><span class="pre">set()</span></code> or
-<code class="docutils literal"><span class="pre">set_metadata()</span></code> and existing metadata can be modified using
-<code class="docutils literal"><span class="pre">update_metadata()</span></code> (similarly to the way that the <code class="docutils literal"><span class="pre">update()</span></code> method works
-for dictionaries).</p>
-<p>There is nothing that ensures that metadata and the corresponding data are
-synchronised for a particular object.  It is up to the user of the API to ensure
-that the metadata for stored data is correct.</p>
-<p>We currently make no assumptions about the metadata keys, but we expect
-conventions to evolve for the meanings and format of particular keys.  Given
-that this is generally thought of as a repository for storing eggs, the
-following metadata keys are likely to be available:</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>type</dt>
-<dd>The type of object being stored (package, app, patch, video, etc.).</dd>
-<dt>name</dt>
-<dd>The name of the object being stored.</dd>
-<dt>version</dt>
-<dd>The version of the object being stored.</dd>
-<dt>arch</dt>
-<dd>The architecture that the object being stored is for.</dd>
-<dt>python</dt>
-<dd>The version of Python that the object being stored is for.</dd>
-<dt>ctime</dt>
-<dd>The creation time of the object in the repository in seconds since
-the Unix Epoch.</dd>
-<dt>mtime</dt>
-<dd>The last modification time of the object in the repository in seconds
-since the Unix Epoch.</dd>
-<dt>size</dt>
-<dd>The size of the binary data in bytes.</dd>
-</dl>
-</div></blockquote>
-<p>Note that there is a difference in intent between the information stored in the
-metadata and the attributes on the value object: value object attributes are
-controlled by the key-value store implementation, whereas metadata are completely
-arbitrary from the point of view of the key-value store and are completely up
-to the user code as to what information is stored.</p>
-</div>
-<div class="section" id="connecting-and-disconnecting">
-<h2>Connecting and Disconnecting<a class="headerlink" href="#connecting-and-disconnecting" title="Permalink to this headline">¶</a></h2>
-<p>Before a store can be used, its <code class="docutils literal"><span class="pre">connect()</span></code> method must be called to allow any
-long-lived resources to be allocated and prepared for use, and to optionally
-handle any authentication that might be required.</p>
-<p>Conversely, the store&#8217;s <code class="docutils literal"><span class="pre">disconnect()</span></code> method should be called when code is
-done with the store, allowing it to release any long-lived resources.</p>
-</div>
-<div class="section" id="querying">
-<h2>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h2>
-<p>A very simple querying API is provided by default.  The <code class="docutils literal"><span class="pre">query()</span></code> method simply
-takes a collection of keyword arguments and interprets them as metadata keys
-and values.  It returns all the keys and corresponding metadata that match all
-of the supplied arguments.  <code class="docutils literal"><span class="pre">query_keys()</span></code> does the same, but only returns the
-matching keys.</p>
-<p>Subclasses may choose to provide more sophisticated querying mechanisms.</p>
-</div>
-<div class="section" id="transactions">
-<h2>Transactions<a class="headerlink" href="#transactions" title="Permalink to this headline">¶</a></h2>
-<p>The base abstract key-value store has no notion of transactions, since we want to
-handle the read-only and simple writer cases efficiently.  However, if the
-underlying storage mechanism has the notion of a transaction, this can be
-encapsulated by writing a context manager for transactions.  The <code class="docutils literal"><span class="pre">transaction()</span></code>
-method returns an instance of the appropriate context manager.</p>
-</div>
-<div class="section" id="events">
-<h2>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h2>
-<p>All implementations should have an event manager attribute, and may choose to
-emit appropriate events.  This is of particular importance during long-running
-interactions so that progress can be displayed.  This also provides a mechanism
-that an implementation can use to inform listeners that new objects have been
-added, or the store has been otherwise modified.</p>
-</div>
-<div class="section" id="notes-for-writing-an-implementation">
-<h2>Notes For Writing An Implementation<a class="headerlink" href="#notes-for-writing-an-implementation" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>Metadata is really an index</dt>
-<dd>In terms of traditional database design, things that you are exposing in
-metadata are really indexed columns.  If you are implementing a store which
-needs fast querying, you may want to look at how traditional databases do
-indexing to guide your data structure choices.</dd>
-<dt>Determine the Single Points of Truth</dt>
-<dd>Every piece of data should have a single point of truth - a canonical place
-which holds the correct value.  This is particularly true for metadata.</dd>
-<dt>Testing</dt>
-<dd>There are standard test suites that can validate that a store is working
-as expected by the API.  When writing an implementation of the API, you
-can subclass the tests and write appropriate setUp and tearDown methods that
-will put the store into the correct state.</dd>
-</dl>
-</div>
-</div>
-
-
-          </div>
         </div>
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="usage.html" title="Usage"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Storage"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Encore 0.6.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Storage</a> &raquo;</li> 
-      </ul>
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        
+      </div>
     </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2011-2017, Enthought, Inc..
-      Last updated on Jan 19, 2017.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+      <li>
+        &copy; Copyright 2011-2022, Enthought, Inc.
+      </li>
+      <li>
+      Last updated on Aug 19, 2022.
+      </li>
+      <li>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.1.1.
+      </li>
+    </ul>
+    </div>
+    </div>
     </div>
   </body>
 </html>

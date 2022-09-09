@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>EnCore - A collection of core-level utility modules &mdash; Encore 0.6.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/enthought_doc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/et.ico"/>
+    <link rel="top" title="Encore 0.6.0 documentation" href="#" />
+    <link rel="next" title="Events" href="events/index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="events/index.html" title="Events"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Encore 0.6.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/e-logo-rev.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">EnCore - A collection of core-level utility modules</a><ul>
+<li><a class="reference internal" href="#packages">Packages</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#util-human-date-module">util.human_date module</a></li>
+<li><a class="reference internal" href="#concurrent-futures-enhanced-thread-pool-executor">concurrent.futures.enhanced_thread_pool_executor</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="events/index.html"
+                        title="next chapter">Events</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="encore-a-collection-of-core-level-utility-modules">
+<h1>EnCore - A collection of core-level utility modules<a class="headerlink" href="#encore-a-collection-of-core-level-utility-modules" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://travis-ci.org/enthought/encore"><img alt="Build status" src="https://api.travis-ci.org/enthought/encore.png?branch=master" /></a>
+<a class="reference external image-reference" href="https://coveralls.io/r/enthought/encore"><img alt="Coverage status" src="https://coveralls.io/repos/enthought/encore/badge.png?branch=master" /></a>
+<p>This package consists of a collection of core utility packages useful for
+building Python applications.  This package is intended to be at the
+bottom of the software stack and have zero required external dependencies
+aside from the Python Standard Library.</p>
+<div class="section" id="packages">
+<h2>Packages<a class="headerlink" href="#packages" title="Permalink to this headline">¶</a></h2>
+<p><em>Events:</em> A package implementing a lightweight application-wide Event dispatch system.  Listeners
+can subscribe to events based on Event type or by filtering on event attributes.  Typical uses
+include UI components listening to low-level progress notifications and change notification for
+distributed resources.</p>
+<p><em>Storage:</em> Abstract base classes and concrete implementations of a basic key-value storage API.
+The API is intended to be general purpose enough to support a variety of local and remote storage
+systems.</p>
+<p><em>Concurrent:</em> A package of tools for handling concurrency within applications.</p>
+<p><em>Terminal:</em> Some utilities for working with text-based terminal displays.</p>
+</div>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Python &gt;= 2.7 or Python &gt;= 3.4</li>
+<li>Sphinx, graphviz, pydot (documentation build)</li>
+<li>Some optional modules have dependencies on:<ul>
+<li>Requests (<a class="reference external" href="http://docs.python-requests.org/en/latest/">http://docs.python-requests.org/en/latest/</a>)</li>
+<li>Futures (<a class="reference external" href="https://code.google.com/p/pythonfutures/">https://code.google.com/p/pythonfutures/</a>)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="events/index.html">Events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="storage/index.html">Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concurrent/index.html">Concurrent Package</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>This software is OSI Certified Open Source Software.
+OSI Certified is a certification mark of the Open Source Initiative.</p>
+<p>Unless otherwise noted:</p>
+<p>Copyright (c) 2011, Enthought, Inc.
+All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.</li>
+<li>Neither the name of Enthought, Inc. nor the names of its contributors may
+be used to endorse or promote products derived from this software without
+specific prior written permission.</li>
+</ul>
+</div></blockquote>
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &#8220;AS IS&#8221; AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+</div>
+<div class="section" id="util-human-date-module">
+<h2>util.human_date module<a class="headerlink" href="#util-human-date-module" title="Permalink to this headline">¶</a></h2>
+<p>Copyright 2009 Jai Vikram Singh Verma (jaivikram[dot]verma[at]gmail[dot]com)
+Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+&#8220;AS IS&#8221; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied.
+See the License for the specific language governing permissions
+and limitations under the License.</p>
+</div>
+<div class="section" id="concurrent-futures-enhanced-thread-pool-executor">
+<h2>concurrent.futures.enhanced_thread_pool_executor<a class="headerlink" href="#concurrent-futures-enhanced-thread-pool-executor" title="Permalink to this headline">¶</a></h2>
+<p>Copyright 2009 Brian Quinlan. All Rights Reserved.
+Licensed to PSF under a Contributor Agreement.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="events/index.html" title="Events"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Encore 0.6.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2011-2017, Enthought, Inc..
+      Last updated on Jan 19, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>
